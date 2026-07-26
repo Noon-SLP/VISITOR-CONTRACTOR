@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visitor & Contractor Management</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 650px; margin: 30px auto; padding: 0 15px; }
+    form { display: flex; flex-direction: column; gap: 10px; background: #f4f4f9; padding: 20px; border-radius: 8px; }
+    input, select, button { padding: 10px; font-size: 16px; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px; }
+    button:hover { background: #0056b3; }
+    table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+
+  <h2>Visitor & Contractor Entry Form</h2>
+  
+  <form id="entryForm">
+    <input type="text" id="name" placeholder="Full Name" required />
+    <select id="type" required>
+      <option value="">Select Category</option>
+      <option value="Visitor">Visitor</option>
+      <option value="Contractor">Contractor</option>
+    </select>
+    <input type="text" id="company" placeholder="Company Name" required />
+    <input type="tel" id="phone" placeholder="Phone Number" required />
+    <button type="submit" id="submitBtn">Submit Data</button>
+  </form>
+
+  <h2>Registered Entries</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Company</th>
+        <th>Phone</th>
+      </tr>
+    </thead>
+    <tbody id="dataTable">
+      <tr><td colspan="5">Loading data...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    // Paste your deployed Google Apps Script URL here:
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
+
+    // 1. Fetch data from Google Sheet and display in app table
+    async function loadData() {
+      try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        const tbody = document.getElementById('dataTable');
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5">No records found.</td></tr>';
+          return;
+        }
+
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.Timestamp ? new Date(row.Timestamp).toLocaleDateString() : ''}</td>
+            <td>${row.Name || ''}</td>
+            <td>${row.Type || ''}</td>
+            <td>${row.Company || ''}</td>
+            <td>${row.Phone || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Failed to load data:', err);
+      }
+    }
+
+    // 2. Submit new form entry to Google Sheet
+    document.getElementById('entryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = 'Saving...';
+      btn.disabled = true;
+
+      const payload = {
+        name: document.getElementById('name').value,
+        type: document.getElementById('type').value,
+        company: document.getElementById('company').value,
+        phone: document.getElementById('phone').value
+      };
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Bypasses browser CORS checks for Apps Script
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        // Clear form fields
+        document.getElementById('entryForm').reset();
+        
+        // Wait a second for Google Sheets to write, then refresh table
+        setTimeout(() => {
+          loadData();
+          btn.innerText = 'Submit Data';
+          btn.disabled = false;
+        }, 1500);
+
+      } catch (err) {
+        alert('Error submitting data');
+        btn.innerText = 'Submit Data';
+        btn.disabled = false;
+      }
+    });
+
+    // Initial load when page opens
+    loadData();
+  </script>
+</body>
+</html>
