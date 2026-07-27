@@ -21,11 +21,18 @@
       --danger: #ef4444;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
-    /* Perfect match to your image_cdcc99.png solid gradient background */
+    /* NEW HEXAGON MESH BACKGROUND */
     body { 
-      background: radial-gradient(circle at center, #2e3239 0%, #15171a 100%);
+      background-color: #0d0e12;
+      background-image: 
+        radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E");
+      background-size: cover, 56px 100px;
+      background-position: center;
+      background-repeat: no-repeat, repeat;
+      
       color: var(--text-main); 
       display: flex; 
       justify-content: center; 
@@ -38,6 +45,7 @@
     .text-center { text-align: center; }
     .mb-4 { margin-bottom: 16px; }
 
+    /* Login Container */
     .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
     .logo-box { width: 90px; height: 90px; margin: 0 auto 30px; background-color: var(--noon-yellow); border-radius: 12px; }
     
@@ -199,7 +207,7 @@
 
   <script>
     // ⚠️ REPLACE THIS WITH YOUR NEW APPS SCRIPT URL
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
     
     let html5QrcodeScanner = null;
     let currentUser = null; 
