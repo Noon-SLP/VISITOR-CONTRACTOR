@@ -156,7 +156,7 @@
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
-    <!-- ADMIN: Restored Name and Mail Fields -->
+    <!-- ADMIN -->
     <div id="login-admin" class="hidden">
       <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
       <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
@@ -455,7 +455,6 @@
         const iqamaFullStr = await getBase64(iqamaInput.files[0]);
         const selfieFullStr = await getBase64(selfieInput.files[0]);
         
-        // Safely extract just the Base64 data string
         const iqamaB64 = iqamaFullStr.includes(',') ? iqamaFullStr.split(',')[1] : iqamaFullStr;
         const selfieB64 = selfieFullStr.includes(',') ? selfieFullStr.split(',')[1] : selfieFullStr;
 
@@ -485,9 +484,7 @@
         const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
         const data = await res.json();
         
-        if(data.status === 'error') {
-            alert("Upload Error: " + data.message);
-        }
+        if(data.status === 'error') { alert("Upload Error: " + data.message); }
 
         btn.innerText = 'Submit for Approval';
         btn.disabled = false;
@@ -659,7 +656,9 @@
       resultCard.classList.remove('hidden', 'bg-green', 'bg-red');
       document.getElementById('btn-confirm-entry').classList.add('hidden');
       document.getElementById('r-decision').innerText = "VERIFYING...";
+      
       selfieImg.style.display = 'none'; 
+      selfieImg.src = ""; 
       currentScannedID = decodedText;
 
       try {
@@ -672,22 +671,27 @@
         document.getElementById('r-type').innerText = data.Type;
         document.getElementById('r-location').innerText = data.Location;
 
-        if(data.SelfieURL && data.SelfieURL.includes('http')) {
-            selfieImg.src = data.SelfieURL;
+        // DISPLAY THE RAW BASE64 IMAGE TO BYPASS GOOGLE DRIVE BLOCKS
+        if(data.SelfieBase64) {
+            selfieImg.src = data.SelfieBase64;
             selfieImg.style.display = 'inline-block';
         }
 
-        const today = new Date().setHours(0,0,0,0);
-        const start = new Date(data.StartDate).setHours(0,0,0,0);
-        const end = new Date(data.EndDate).setHours(0,0,0,0);
+        // IMPROVED DATE VALIDATION TO AVOID TIMEZONE ISSUES
+        const todayStr = formatToDDMMYYYY(new Date());
+        const startStr = formatToDDMMYYYY(data.StartDate);
+        
+        const todayNum = new Date().setHours(0,0,0,0);
+        const startNum = new Date(data.StartDate).setHours(0,0,0,0);
+        const endNum = new Date(data.EndDate).setHours(0,0,0,0);
 
         if (data.Status !== 'Approved') {
             showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
         } else if (data.Location !== currentUser.location) {
             showScanResult("DENIED", `Wrong Facility (Pass is for ${data.Location})`, "bg-red");
-        } else if (data.Type === 'Visitor' && start !== today) {
+        } else if (data.Type === 'Visitor' && startStr !== todayStr) {
             showScanResult("DENIED", "Pass is not valid for today", "bg-red");
-        } else if (data.Type === 'Contractor' && (today < start || today > end)) {
+        } else if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) {
             showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
         } else {
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
