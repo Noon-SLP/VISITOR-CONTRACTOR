@@ -140,7 +140,7 @@
 </head>
 <body>
 
-  <!-- ================= CAMERA MODAL (NEW) ================= -->
+  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="hidden">
     <video id="camera-video-stream" autoplay playsinline></video>
     <canvas id="camera-hidden-canvas" class="hidden"></canvas>
@@ -225,7 +225,6 @@
           </div>
         </div>
 
-        <!-- NEW LIVE CAMERA INPUTS -->
         <div class="input-group">
           <label>Upload Iqama/ID Copy</label>
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -545,7 +544,8 @@
         showDashboard('dashboard-guard');
       } else if (role === 'ops') {
         const name = document.getElementById('lo-name').value;
-        const mail = document.getElementById('lo-mail').value;
+        // FIX: Force email to lowercase immediately upon login
+        const mail = document.getElementById('lo-mail').value.toLowerCase().trim();
         if(!name || !mail) return alert("Enter Name and Gmail");
         currentUser = { role: 'ops', name: name, email: mail };
         document.getElementById('req-vname').value = name;
@@ -554,7 +554,8 @@
         startAutoRefresh('ops');
       } else if (role === 'admin') {
         const name = document.getElementById('la-name').value;
-        const mail = document.getElementById('la-mail').value;
+        // FIX: Force admin email to lowercase as well
+        const mail = document.getElementById('la-mail').value.toLowerCase().trim();
         const pass = document.getElementById('la-pass').value;
         if(!name || !mail || !pass) return alert("Enter all Admin details");
         if(pass === 'admin123') { 
