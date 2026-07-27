@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Noon SLP - Access System</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <!-- QR Code Generator & Scanner Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   
   <style>
     :root {
-      --bg-dark: #0b0e14;
+      --bg-dark: #1e2025;
       --card-bg: #12151c;
       --border-color: #242b3b;
       --noon-yellow: #ffc700;
@@ -24,15 +23,9 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     
-    /* Concept 3: Abstract Background with a dark gradient overlay */
+    /* Perfect match to your image_cdcc99.png solid gradient background */
     body { 
-      background-image: linear-gradient(rgba(11, 14, 20, 0.80), rgba(11, 14, 20, 0.95)), 
-                        url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-      
+      background: radial-gradient(circle at center, #2e3239 0%, #15171a 100%);
       color: var(--text-main); 
       display: flex; 
       justify-content: center; 
@@ -41,67 +34,41 @@
       overflow-x: hidden; 
     }
     
-    /* Utility Classes */
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .mb-4 { margin-bottom: 16px; }
-    .mt-4 { margin-top: 16px; }
 
-    /* Login Container - Frosted Glass effect */
-    .login-container { 
-      width: 100%; 
-      max-width: 420px; 
-      background-color: rgba(18, 21, 28, 0.75); 
-      backdrop-filter: blur(12px); 
-      -webkit-backdrop-filter: blur(12px);
-      padding: 40px 30px; 
-      border-radius: 12px; 
-      border: 1px solid rgba(255, 199, 0, 0.15); 
-      box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
-    }
+    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .logo-box { width: 90px; height: 90px; margin: 0 auto 30px; background-color: var(--noon-yellow); border-radius: 12px; }
     
-    /* Logo Box */
-    .logo-box { width: 100px; height: 100px; margin: 0 auto 30px; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Noon_logo_black_english.svg/512px-Noon_logo_black_english.svg.png') no-repeat center; background-size: 70%; background-color: var(--noon-yellow); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-    
-    /* Role Tabs */
-    .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: rgba(11, 14, 20, 0.8); }
-    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-transform: uppercase; transition: 0.2s; }
-    .role-tab:last-child { border-right: none; }
+    .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: #0b0e14; }
+    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; }
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
-    /* Inputs & Buttons */
     .input-group { margin-bottom: 16px; }
-    .input-field { width: 100%; padding: 14px; background-color: rgba(9, 11, 16, 0.8); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; transition: 0.2s; }
+    .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .input-field { width: 100%; padding: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; }
     .input-field:focus { border-color: var(--noon-yellow); }
-    .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
-    .btn-primary:hover { opacity: 0.9; }
+    .file-input { padding: 10px; background: var(--input-bg); border: 1px dashed var(--border-color); width: 100%; color: var(--text-muted); font-size: 12px; }
+    
+    .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
     .btn-outline { background: transparent; color: var(--noon-yellow); border: 1px solid var(--noon-yellow); }
+    .btn-success { background: var(--success); color: white; border: none; }
     
-    /* Dashboards */
     .dashboard { width: 100%; max-width: 800px; padding: 20px; margin-top: 40px; align-self: flex-start; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
     .header h2 { color: var(--noon-yellow); font-size: 20px; }
-    .user-greeting { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
     
-    /* Tables */
-    table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-    th { background: rgba(0,0,0,0.4); color: var(--text-muted); text-transform: uppercase; font-size: 12px; }
-    .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
-    .btn-approve { background: var(--success); color: white; }
-    .btn-reject { background: var(--danger); color: white; }
-    .btn-approve:hover, .btn-reject:hover { opacity: 0.8; }
-
-    /* QR / Scanner */
-    #qr-container { background: white; padding: 20px; border-radius: 8px; display: inline-block; margin: 20px 0; }
-    #reader { width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #000; }
-    .scan-result-card { background: var(--card-bg); padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px; border: 2px solid transparent; }
-    .status-approved { border-color: var(--success); }
-    .status-rejected { border-color: var(--danger); }
-
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .ops-card { background: rgba(18, 21, 28, 0.9); padding: 24px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
-    @media (max-width: 768px) { .ops-grid { grid-template-columns: 1fr; } }
+    .ops-card { background: var(--card-bg); padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); }
+    
+    #qr-container { background: white; padding: 15px; border-radius: 8px; display: inline-block; margin: 15px 0; }
+    #reader { width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #000; }
+    
+    /* Gate Scanner Flashing Colors */
+    .scan-result-card { padding: 30px; border-radius: 8px; text-align: center; margin-top: 20px; color: white; font-weight: bold; }
+    .bg-green { background-color: var(--success); }
+    .bg-red { background-color: var(--danger); }
   </style>
 </head>
 <body>
@@ -109,32 +76,34 @@
   <!-- ================= 1. LOGIN SCREEN ================= -->
   <div id="login-view" class="login-container">
     <div class="logo-box"></div>
-    
     <div class="role-tabs">
       <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')">🛡️ Guard</div>
       <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')">📋 Visitor/Ops</div>
       <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
     </div>
 
-    <!-- Guard Login Form -->
     <div id="login-guard" class="hidden">
-      <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name" required></div>
-      <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID" required></div>
-      <button class="btn-primary" onclick="login('guard')">LOGIN AS GUARD</button>
+      <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
+      <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
+      <div class="input-group">
+        <select id="lg-location" class="input-field">
+          <option value="">Select Guard Location...</option>
+          <option value="RUH01">RUH01</option>
+          <option value="JED01">JED01</option>
+          <option value="DXB01">DXB01</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
     </div>
 
-    <!-- Visitor / Ops Login Form -->
     <div id="login-ops">
-      <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Name" required></div>
-      <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Mail" required></div>
+      <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Host Name"></div>
+      <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Host Mail"></div>
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
-    <!-- Admin Login Form -->
     <div id="login-admin" class="hidden">
-      <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Name" required></div>
-      <div class="input-group"><input type="text" id="la-id" class="input-field" placeholder="Noon ID" required></div>
-      <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Password" required></div>
+      <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Password"></div>
       <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
     </div>
   </div>
@@ -145,34 +114,60 @@
       <h2>Visitor & Contractor Portal</h2>
       <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
     </div>
-    <p class="user-greeting" id="greet-ops"></p>
     
     <div class="ops-grid">
       <!-- Registration Form -->
       <div class="ops-card">
-        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Submit Request</h3>
-        <div class="input-group"><input type="text" id="req-name" class="input-field" placeholder="Full Name" readonly></div>
+        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Register Guest</h3>
+        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Guest Full Name"></div>
         <div class="input-group">
-          <select id="req-type" class="input-field">
-            <option value="Visitor">Visitor</option>
-            <option value="Contractor">Contractor</option>
+          <select id="req-location" class="input-field">
+            <option value="RUH01">Facility: RUH01</option>
+            <option value="JED01">Facility: JED01</option>
+            <option value="DXB01">Facility: DXB01</option>
           </select>
         </div>
-        <div class="input-group"><input type="text" id="req-company" class="input-field" placeholder="Company Name" required></div>
-        <div class="input-group"><input type="tel" id="req-phone" class="input-field" placeholder="Phone Number" required></div>
-        <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()">Submit Application</button>
+        <div class="input-group">
+          <select id="req-type" class="input-field" onchange="toggleDateFields()">
+            <option value="Visitor">Type: Visitor</option>
+            <option value="Contractor">Type: Contractor</option>
+          </select>
+        </div>
+        
+        <div class="input-group" id="date-visitor">
+          <label>Visit Date</label>
+          <input type="date" id="req-date-single" class="input-field">
+        </div>
+        <div class="input-group hidden" id="date-contractor">
+          <label>Contract Expiration (From - To)</label>
+          <div style="display: flex; gap: 10px;">
+            <input type="date" id="req-date-start" class="input-field">
+            <input type="date" id="req-date-end" class="input-field">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Upload ID Copy</label>
+          <input type="file" class="file-input" accept="image/*">
+        </div>
+        <div class="input-group">
+          <label>Upload Face Photo</label>
+          <input type="file" class="file-input" accept="image/*" capture="user">
+        </div>
+
+        <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()">Generate Pass</button>
       </div>
 
-      <!-- Status Checker -->
+      <!-- Portal Status Checker -->
       <div class="ops-card text-center">
-        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Check Status</h3>
+        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Guest Pass / QR</h3>
         <div class="input-group"><input type="text" id="check-id" class="input-field" placeholder="Enter NOON-XXXXXX ID"></div>
-        <button class="btn-primary btn-outline mb-4" onclick="checkStatus()">Check Status / View QR</button>
+        <button class="btn-primary btn-outline" onclick="checkStatus()">Get QR Code</button>
         
-        <div id="status-display-area" class="hidden" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-            <h4 id="v-status-msg">Loading...</h4>
-            <div id="qr-container" class="hidden"></div>
-            <p id="v-id-display" style="font-size: 16px; font-weight: bold; margin-top: 10px; color: var(--noon-yellow);"></p>
+        <div id="status-display-area" class="hidden" style="margin-top: 20px;">
+            <div id="qr-container"></div>
+            <p id="v-id-display" style="font-size: 16px; font-weight: bold; color: var(--noon-yellow);"></p>
+            <p id="v-status-msg" style="font-size: 12px; margin-top: 5px;"></p>
         </div>
       </div>
     </div>
@@ -181,99 +176,56 @@
   <!-- ================= 3. GUARD DASHBOARD ================= -->
   <div id="dashboard-guard" class="dashboard hidden text-center">
     <div class="header">
-      <h2>Security Checkpoint</h2>
+      <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
       <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
     </div>
-    <p class="user-greeting" id="greet-guard"></p>
     
     <div style="max-width: 400px; margin: 0 auto;">
-      <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()">START CAMERA SCANNER</button>
+      <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()">SCAN QR CODE</button>
       <div id="reader" class="hidden"></div>
       
       <div id="scan-result" class="scan-result-card hidden">
-        <h2 id="r-status" style="margin-bottom: 10px;">-</h2>
-        <p><strong>Name:</strong> <span id="r-name">-</span></p>
-        <p><strong>Type:</strong> <span id="r-type">-</span></p>
-        <p><strong>Company:</strong> <span id="r-company">-</span></p>
+        <h1 id="r-decision" style="font-size: 32px; margin-bottom: 10px;">-</h1>
+        <p id="r-reason" style="font-size: 14px; margin-bottom: 15px;"></p>
+        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px;">
+            <p><strong>Name:</strong> <span id="r-name">-</span></p>
+            <p><strong>Type:</strong> <span id="r-type">-</span></p>
+            <p><strong>Location:</strong> <span id="r-location">-</span></p>
+        </div>
+        <button id="btn-confirm-entry" class="btn-primary btn-success hidden" style="margin-top: 20px;" onclick="confirmEntry()">CONFIRM ENTRY</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= 4. ADMIN DASHBOARD ================= -->
-  <div id="dashboard-admin" class="dashboard hidden">
-    <div class="header">
-      <h2>Admin Control Center</h2>
-      <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
-    </div>
-    <p class="user-greeting" id="greet-admin"></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Company</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="admin-table-body">
-        <tr><td colspan="6" class="text-center">Loading requests...</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    // ⚠️ REPLACE THIS WITH YOUR APPS SCRIPT URL ⚠️
-    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
+    // ⚠️ REPLACE THIS WITH YOUR NEW APPS SCRIPT URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
     
     let html5QrcodeScanner = null;
     let currentUser = null; 
+    let currentScannedID = null;
 
-    // --- 1. Login & Navigation Logic ---
     function switchLoginTab(role) {
       document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
-      
       document.getElementById(`tab-${role}`).classList.add('active');
       document.getElementById(`login-${role}`).classList.remove('hidden');
     }
 
     function login(role) {
       if (role === 'guard') {
-        const name = document.getElementById('lg-name').value.trim();
-        const id = document.getElementById('lg-id').value.trim();
-        if(!name || !id) return alert("Please fill all fields");
-        currentUser = { role: 'guard', name: name, noonId: id };
-        document.getElementById('greet-guard').innerText = `Logged in as Guard: ${name} (${id})`;
+        const loc = document.getElementById('lg-location').value;
+        if(!loc) return alert("Select Guard Location");
+        currentUser = { role: 'guard', location: loc };
+        document.getElementById('guard-loc-display').innerText = loc;
         showDashboard('dashboard-guard');
       } 
       else if (role === 'ops') {
-        const name = document.getElementById('lo-name').value.trim();
-        const mail = document.getElementById('lo-mail').value.trim();
-        if(!name || !mail) return alert("Please fill all fields");
-        currentUser = { role: 'ops', name: name, email: mail };
-        document.getElementById('greet-ops').innerText = `Logged in as: ${name} (${mail})`;
-        document.getElementById('req-name').value = name; 
+        const name = document.getElementById('lo-name').value;
+        if(!name) return alert("Enter Host Name");
+        currentUser = { role: 'ops', name: name };
         showDashboard('dashboard-ops');
       } 
-      else if (role === 'admin') {
-        const name = document.getElementById('la-name').value.trim();
-        const id = document.getElementById('la-id').value.trim();
-        const pass = document.getElementById('la-pass').value;
-        if(!name || !id || !pass) return alert("Please fill all fields");
-        
-        if(pass === 'admin123') { 
-          currentUser = { role: 'admin', name: name, noonId: id };
-          document.getElementById('greet-admin').innerText = `Admin Active: ${name}`;
-          showDashboard('dashboard-admin');
-          loadAdminData();
-        } else {
-          alert("Incorrect Admin Password");
-        }
-      }
     }
 
     function showDashboard(dashId) {
@@ -283,138 +235,63 @@
     }
 
     function logout() {
-      currentUser = null;
-      if (html5QrcodeScanner) { html5QrcodeScanner.clear(); document.getElementById('btn-start-scan').classList.remove('hidden'); }
-      document.querySelectorAll('input').forEach(input => input.value = ''); 
-      document.querySelectorAll('.dashboard').forEach(el => el.classList.add('hidden'));
-      document.getElementById('login-view').classList.remove('hidden');
+      if(html5QrcodeScanner) html5QrcodeScanner.clear();
+      location.reload(); 
     }
 
-    // --- 2. Visitor / Ops Logic ---
+    // --- Ops Logic ---
+    function toggleDateFields() {
+      const type = document.getElementById('req-type').value;
+      document.getElementById('date-visitor').classList.toggle('hidden', type === 'Contractor');
+      document.getElementById('date-contractor').classList.toggle('hidden', type === 'Visitor');
+    }
+
     async function submitRequest() {
+      const type = document.getElementById('req-type').value;
       const payload = {
         action: 'create',
-        name: document.getElementById('req-name').value,
-        type: document.getElementById('req-type').value,
-        company: document.getElementById('req-company').value,
-        phone: document.getElementById('req-phone').value
+        hostName: currentUser.name,
+        visitorName: document.getElementById('req-vname').value,
+        type: type,
+        location: document.getElementById('req-location').value,
+        startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
+        endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value
       };
       
-      if(!payload.company || !payload.phone) return alert("Please fill company and phone details.");
+      if(!payload.visitorName || !payload.startDate) return alert("Fill required fields");
 
-      const btn = document.getElementById('btn-submit-req');
-      btn.innerText = 'Submitting...';
-      btn.disabled = true;
+      document.getElementById('btn-submit-req').innerText = 'Processing...';
       
       try {
         const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
         const data = await res.json();
-        
-        alert(`Success! Your ID is ${data.id}. Admin approval is required.`);
+        alert(`Pass Generated! ID: ${data.id}`);
         document.getElementById('check-id').value = data.id; 
-        document.getElementById('req-company').value = '';
-        document.getElementById('req-phone').value = '';
-        btn.innerText = 'Submit Application';
-        btn.disabled = false;
-      } catch (err) {
-        alert("Error submitting request.");
-        btn.innerText = 'Submit Application';
-        btn.disabled = false;
-      }
+        document.getElementById('btn-submit-req').innerText = 'Generate Pass';
+      } catch (err) { alert("Error"); }
     }
 
     async function checkStatus() {
       const id = document.getElementById('check-id').value.trim();
-      if(!id) return alert("Enter NOON-XXXXXX ID");
-
-      const displayArea = document.getElementById('status-display-area');
-      const msgLabel = document.getElementById('v-status-msg');
       const qrBox = document.getElementById('qr-container');
-      
-      displayArea.classList.remove('hidden');
-      qrBox.classList.add('hidden');
+      document.getElementById('status-display-area').classList.remove('hidden');
       qrBox.innerHTML = ''; 
-      msgLabel.innerText = "Checking...";
-      msgLabel.style.color = "var(--text-main)";
-
+      
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${id}`);
         const data = await res.json();
+        if (data.error) return document.getElementById('v-status-msg').innerText = "Not found.";
         
-        if (data.error) {
-          msgLabel.innerText = "ID not found.";
-          return;
-        }
-
-        if (data.Status === 'Approved') {
-          msgLabel.innerText = `Status: APPROVED ✅`;
-          msgLabel.style.color = 'var(--success)';
-          document.getElementById('v-id-display').innerText = data.UniqueID;
-          qrBox.classList.remove('hidden');
-          
-          new QRCode(qrBox, { text: data.UniqueID, width: 160, height: 160, colorDark : "#000", colorLight : "#fff" });
-        } else if (data.Status === 'Rejected') {
-          msgLabel.innerText = `Status: REJECTED ❌`;
-          msgLabel.style.color = 'var(--danger)';
-        } else {
-          msgLabel.innerText = `Status: PENDING ⏳\n(Awaiting Admin)`;
-          msgLabel.style.color = 'var(--noon-yellow)';
-        }
-      } catch (err) {
-        msgLabel.innerText = "Error loading status.";
-      }
+        document.getElementById('v-id-display').innerText = data.UniqueID;
+        document.getElementById('v-status-msg').innerText = `${data.Type} Pass - ${data.Location}`;
+        new QRCode(qrBox, { text: data.UniqueID, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
+      } catch (err) {}
     }
 
-    // --- 3. Admin Logic ---
-    async function loadAdminData() {
-      const tbody = document.getElementById('admin-table-body');
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>';
-      
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        tbody.innerHTML = '';
-        
-        data.reverse().forEach(row => {
-          if(!row.UniqueID) return;
-          const tr = document.createElement('tr');
-          const isPending = row.Status === 'Pending';
-          
-          let actionBtns = isPending ? `
-            <button class="action-btn btn-approve" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-            <button class="action-btn btn-reject" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
-          ` : `<span>${row.Status}</span>`;
-
-          tr.innerHTML = `
-            <td>${new Date(row.Timestamp).toLocaleDateString()}</td>
-            <td><strong>${row.UniqueID}</strong></td>
-            <td>${row.Name}</td>
-            <td>${row.Company}</td>
-            <td style="color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
-            <td>${actionBtns}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Failed to load data</td></tr>';
-      }
-    }
-
-    async function updateStatus(id, newStatus) {
-      if(!confirm(`Mark ${id} as ${newStatus}?`)) return;
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'update_status', id: id, newStatus: newStatus }) });
-        loadAdminData(); 
-      } catch (err) {
-        alert("Failed to update status");
-      }
-    }
-
-    // --- 4. Guard Scanner Logic ---
+    // --- Guard Scanner Logic ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
-      
       html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
       html5QrcodeScanner.render(onScanSuccess, (err) => {});
     }
@@ -422,41 +299,67 @@
     async function onScanSuccess(decodedText) {
       html5QrcodeScanner.pause();
       const resultCard = document.getElementById('scan-result');
-      
-      resultCard.classList.remove('hidden', 'status-approved', 'status-rejected');
-      document.getElementById('r-status').innerText = "Verifying...";
-      document.getElementById('r-status').style.color = 'var(--text-main)';
+      resultCard.classList.remove('hidden', 'bg-green', 'bg-red');
+      document.getElementById('btn-confirm-entry').classList.add('hidden');
+      document.getElementById('r-decision').innerText = "VERIFYING...";
+      currentScannedID = decodedText;
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
         const data = await res.json();
 
         if (data.error) {
-          document.getElementById('r-status').innerText = "INVALID QR";
-          resultCard.classList.add('status-rejected');
-        } else {
-          document.getElementById('r-name').innerText = data.Name;
-          document.getElementById('r-type').innerText = data.Type;
-          document.getElementById('r-company').innerText = data.Company;
+          showScanResult("DENIED", "Invalid QR Code", "bg-red");
+          return;
+        }
 
-          if (data.Status === 'Approved') {
-            document.getElementById('r-status').innerText = "ACCESS GRANTED";
-            document.getElementById('r-status').style.color = 'var(--success)';
-            resultCard.classList.add('status-approved');
-          } else {
-            document.getElementById('r-status').innerText = `ACCESS DENIED (${data.Status})`;
-            document.getElementById('r-status').style.color = 'var(--danger)';
-            resultCard.classList.add('status-rejected');
-          }
+        document.getElementById('r-name').innerText = data.VisitorName;
+        document.getElementById('r-type').innerText = data.Type;
+        document.getElementById('r-location').innerText = data.Location;
+
+        // Validation Logic
+        const today = new Date().setHours(0,0,0,0);
+        const start = new Date(data.StartDate).setHours(0,0,0,0);
+        const end = new Date(data.EndDate).setHours(0,0,0,0);
+
+        if (data.Status !== 'Approved') {
+            showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
+        } else if (data.Location !== currentUser.location) {
+            showScanResult("DENIED", `Wrong Facility (Pass is for ${data.Location})`, "bg-red");
+        } else if (data.Type === 'Visitor' && start !== today) {
+            showScanResult("DENIED", "Pass is not valid for today", "bg-red");
+        } else if (data.Type === 'Contractor' && (today < start || today > end)) {
+            showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
+        } else {
+            // All checks passed!
+            showScanResult("ALLOWED", "Pass Validated", "bg-green");
+            document.getElementById('btn-confirm-entry').classList.remove('hidden');
         }
       } catch (err) {
-        document.getElementById('r-status').innerText = "NETWORK ERROR";
+        showScanResult("ERROR", "Network failure", "bg-red");
       }
+    }
 
-      setTimeout(() => {
-        resultCard.classList.add('hidden');
+    function showScanResult(decision, reason, colorClass) {
+        document.getElementById('r-decision').innerText = decision;
+        document.getElementById('r-reason').innerText = reason;
+        document.getElementById('scan-result').classList.add(colorClass);
+        if(decision !== "ALLOWED") {
+            setTimeout(() => {
+                document.getElementById('scan-result').classList.add('hidden');
+                html5QrcodeScanner.resume();
+            }, 3000);
+        }
+    }
+
+    async function confirmEntry() {
+      document.getElementById('btn-confirm-entry').innerText = "SAVING...";
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_in', id: currentScannedID }) });
+        document.getElementById('scan-result').classList.add('hidden');
+        document.getElementById('btn-confirm-entry').innerText = "CONFIRM ENTRY";
         html5QrcodeScanner.resume();
-      }, 4000);
+      } catch (err) { alert("Failed to log entry"); }
     }
   </script>
 </body>
