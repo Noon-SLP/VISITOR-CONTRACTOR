@@ -157,8 +157,8 @@
         <select id="lg-location" class="input-field">
           <option value="">Select Guard Location...</option>
           <option value="RUH01">RUH01</option>
-          <option value="JED01">Facility: JED01</option>
-          <option value="DXB01">Facility: DXB01</option>
+          <option value="JED01">JED01</option>
+          <option value="DXB01">DXB01</option>
         </select>
       </div>
       <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
@@ -230,7 +230,7 @@
       <div class="ops-card text-center">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h3 style="color: var(--noon-yellow);">My Passes</h3>
-            <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses()">Refresh</button>
+            <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(false)">Refresh</button>
         </div>
         <div id="my-passes-list" style="max-height: 550px; overflow-y: auto;">
             <p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>
@@ -275,7 +275,7 @@
             <input type="date" id="filter-start" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
             <span style="color: var(--text-muted); font-size: 12px;">TO</span>
             <input type="date" id="filter-end" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
-            <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData()">APPLY</button>
+            <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData(false)">APPLY</button>
         </div>
       </div>
 
@@ -356,6 +356,7 @@
     let currentScannedID = null;
     let currentScanAction = 'check_in'; 
     let currentAdminFilter = 'all';
+    let autoRefreshTimer = null; // Background sync timer
 
     // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
@@ -381,7 +382,6 @@
       });
     }
 
-    // Date Range Logic
     function isDateInRange(dateStr, filterType, startStr, endStr) {
         if (filterType === 'all') return true;
         const d = new Date(dateStr);
@@ -418,8 +418,16 @@
         return true;
     }
 
-    // --- Session Persistence ---
+    // --- Session Persistence & Auto Refresh ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
+
+    function startAutoRefresh(role) {
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+        autoRefreshTimer = setInterval(() => {
+            if (role === 'ops') loadMyPasses(true);
+            else if (role === 'admin') loadAdminData(true);
+        }, 15000); // Syncs silently every 15 seconds
+    }
 
     window.onload = function() {
         const session = localStorage.getItem('noon_session');
@@ -434,10 +442,12 @@
                 } else if (currentUser.role === 'ops') {
                     document.getElementById('req-vname').value = currentUser.name;
                     showDashboard('dashboard-ops');
-                    loadMyPasses();
+                    loadMyPasses(false);
+                    startAutoRefresh('ops');
                 } else if (currentUser.role === 'admin') {
                     showDashboard('dashboard-admin');
-                    loadAdminData();
+                    loadAdminData(false);
+                    startAutoRefresh('admin');
                 }
             } else { localStorage.removeItem('noon_session'); }
         }
@@ -459,7 +469,8 @@
         currentUser = { role: 'ops', name: name, email: mail };
         document.getElementById('req-vname').value = name;
         showDashboard('dashboard-ops');
-        loadMyPasses(); 
+        loadMyPasses(false); 
+        startAutoRefresh('ops');
       } else if (role === 'admin') {
         const name = document.getElementById('la-name').value;
         const mail = document.getElementById('la-mail').value;
@@ -468,13 +479,15 @@
         if(pass === 'admin123') { 
             currentUser = { role: 'admin', name: name, email: mail };
             showDashboard('dashboard-admin');
-            loadAdminData();
+            loadAdminData(false);
+            startAutoRefresh('admin');
         } else { return alert("Incorrect Password"); }
       }
       saveSession();
     }
 
     function logout() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
       localStorage.removeItem('noon_session');
       if(html5QrcodeScanner) html5QrcodeScanner.clear();
       location.reload(); 
@@ -516,7 +529,7 @@
             document.getElementById('custom-date-picker').classList.remove('hidden');
         } else {
             document.getElementById('custom-date-picker').classList.add('hidden');
-            loadAdminData();
+            loadAdminData(false);
         }
     }
 
@@ -563,16 +576,16 @@
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
         iqamaInput.value = ""; selfieInput.value = "";
-        loadMyPasses(); 
+        loadMyPasses(false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
       }
     }
 
-    async function loadMyPasses() {
+    async function loadMyPasses(isSilent = false) {
       const listDiv = document.getElementById('my-passes-list');
-      listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
+      if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
         const data = await res.json();
@@ -618,17 +631,19 @@
             }
             listDiv.appendChild(card);
         });
-      } catch (err) { listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
+      } catch (err) { if(!isSilent) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
-    async function loadAdminData() {
+    async function loadAdminData(isSilent = false) {
       const tApprovals = document.getElementById('admin-table-approvals');
       const tHistory = document.getElementById('admin-table-history');
       const tGuard = document.getElementById('admin-table-guard-approvals');
       
-      tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-      tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
-      tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
+      if (!isSilent) {
+          tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
+          tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
+          tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
+      }
       
       try {
         const res = await fetch(SCRIPT_URL);
@@ -697,6 +712,9 @@
 
             if (row.Status === 'Approved') {
                 actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
+                
+                // NEW: Admin Check-Out Button
+                actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
             tr.innerHTML = `
@@ -750,8 +768,18 @@
       if(!confirm(`Mark ${id} as ${newStatus}?`)) return;
       try {
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'update_status', id: id, newStatus: newStatus }) });
-        loadAdminData(); 
+        loadAdminData(false); 
       } catch (err) { alert("Failed to update status"); }
+    }
+
+    // --- NEW: Admin Check Out function ---
+    async function adminCheckOut(id) {
+      if(!confirm(`Force check-out for pass ${id}?`)) return;
+      try {
+        const gInfo = `Admin (${currentUser.name})`;
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_out', id: id, guardInfo: gInfo }) });
+        loadAdminData(false); 
+      } catch (err) { alert("Failed to check out."); }
     }
 
     // --- Print QR Window ---
@@ -763,26 +791,14 @@
                 <title>Print QR Pass</title>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
                 <style>
-                    body { 
-                        margin: 0; padding: 0; background: #0b0e14; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Inter', sans-serif; 
-                    }
-                    /* Standard CR80 ID Card Dimensions */
-                    .card { 
-                        width: 85.6mm; 
-                        height: 54mm; 
-                        background: white; 
-                        border-radius: 2mm; 
-                        padding: 4mm; 
-                        box-sizing: border-box;
-                        position: relative;
-                    }
+                    body { margin: 0; padding: 0; background: #0b0e14; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Inter', sans-serif; }
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; box-sizing: border-box; position: relative; }
                     .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
                     .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
                     .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
                     .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
                     .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
                     .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
-                    
                     @media print {
                         @page { size: 85.6mm 54mm; margin: 0; }
                         body { background: white; display: block; align-items: flex-start; }
