@@ -416,14 +416,11 @@
         const b64 = canvas.toDataURL('image/jpeg', 0.8);
         capturedImages[targetPhotoType] = b64;
         
-        // Show the tiny preview next to the upload button
         const preview = document.getElementById(`preview-${targetPhotoType}`);
         preview.src = b64;
         preview.classList.remove('hidden');
         
-        // Clear the file input so they don't conflict
         document.getElementById(`req-${targetPhotoType}`).value = "";
-        
         closeLiveCamera();
     }
 
@@ -621,7 +618,6 @@
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
 
-      // Determine Iqama Source
       if (capturedImages.iqama) {
           finalIqamaB64 = capturedImages.iqama.split(',')[1];
       } else if (iqamaInput.files.length > 0) {
@@ -630,7 +626,6 @@
           finalIqamaMime = iqamaInput.files[0].type;
       } else { return alert("Please provide the Iqama/ID photo (Camera or Upload)."); }
 
-      // Determine Selfie Source
       if (capturedImages.selfie) {
           finalSelfieB64 = capturedImages.selfie.split(',')[1];
       } else if (selfieInput.files.length > 0) {
@@ -693,7 +688,6 @@
             let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
             if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
             
-            // NEW LOGIC: Visitor completes immediately on checkout. Contractor completes only when EndDate is passed.
             const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
             const isExpired = todayNum > endNum;
             const isCompleted = isVisitorDone || isExpired;
@@ -787,8 +781,6 @@
           const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime;
           const isExpired = endDateObj < today;
           
-          // NEW LOGIC: A pass only goes to History if the Visitor checked out, the pass expired, or it was rejected.
-          // Contractors stay active in Approvals until their EndDate expires!
           const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
           
           const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
@@ -830,13 +822,10 @@
               <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
             ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
 
+            // ALWAYS SHOW PRINT PASS & CHECK OUT FOR ALL APPROVED RECORDS
             if (row.Status === 'Approved') {
                 actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
-                
-                // Only show Force Check-Out if they are actually checked in
-                if (row.CheckInTime && !row.CheckOutTime) {
-                    actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
-                }
+                actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
             htmlApprovals += `<tr>
@@ -1011,7 +1000,6 @@
         const startNum = new Date(data.StartDate).setHours(0,0,0,0);
         const endNum = new Date(data.EndDate).setHours(0,0,0,0);
 
-        // NEW LOGIC: Differentiate states for Visitors vs Contractors
         const isCheckedOut = !!data.CheckOutTime;
         const isInside = !!data.CheckInTime && !data.CheckOutTime;
 
@@ -1032,7 +1020,6 @@
             confirmBtn.className = "btn-primary btn-warning hidden"; 
             confirmBtn.classList.remove('hidden');
         } else {
-            // Fresh pass OR Contractor who has previously checked out
             currentScanAction = 'check_in';
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
             confirmBtn.innerText = "CONFIRM ENTRY";
