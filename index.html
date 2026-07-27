@@ -59,8 +59,6 @@
     .input-field { width: 100%; padding: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; }
     .input-field:focus { border-color: var(--noon-yellow); }
     .file-input { padding: 10px; background: var(--input-bg); border: 1px dashed var(--border-color); width: 100%; color: var(--text-muted); font-size: 12px; border-radius: 6px; cursor: pointer; }
-    
-    /* FIX: Force Calendar Icon to be visible on dark background */
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0.9); cursor: pointer; }
     
     .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
@@ -69,7 +67,7 @@
     .btn-danger { background: var(--danger); color: white; border: none; }
     .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 4px; }
     
-    /* Standard Centered Dashboards */
+    /* Dashboards */
     .dashboard { width: 100%; max-width: 900px; padding: 20px; margin-top: 40px; align-self: flex-start; z-index: 10; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
     .header h2 { color: var(--noon-yellow); font-size: 20px; }
@@ -86,27 +84,19 @@
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
     
-    /* ================= NEW ADMIN LAYOUT (TOP NAVIGATION) ================= */
+    /* ================= ADMIN LAYOUT (TOP NAVIGATION) ================= */
     .admin-layout {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100;
     }
     
-    .admin-header-top {
-      display: flex; align-items: center; padding: 0 32px; height: 75px;
-      background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color);
-      justify-content: space-between;
-    }
-    
+    .admin-header-top { display: flex; align-items: center; padding: 0 32px; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
     .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
     .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; }
     .admin-brand-horizontal p { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-top: 2px;}
 
     .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; height: 100%; align-items: flex-end; flex: 1; }
-    .admin-nav-horizontal li { 
-        padding: 16px 24px; color: var(--text-muted); font-size: 13px; font-weight: 600; 
-        cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; 
-    }
+    .admin-nav-horizontal li { padding: 16px 24px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; }
     .admin-nav-horizontal li.active { color: var(--noon-yellow); border-bottom: 3px solid var(--noon-yellow); background: rgba(255, 199, 0, 0.05); }
     .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.02); }
 
@@ -123,7 +113,6 @@
     th { background: rgba(0,0,0,0.2); color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
     tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
 
-    /* Analytics Dashboard Layout */
     .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; z-index: 1;}
     .analytics-box { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     .analytics-box-title { font-size: 12px; font-weight: 600; color: var(--noon-yellow); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
@@ -236,7 +225,7 @@
     </div>
   </div>
 
-  <!-- ================= 3. NEW ADMIN DASHBOARD (TOP NAVIGATION) ================= -->
+  <!-- ================= 3. ADMIN DASHBOARD ================= -->
   <div id="dashboard-admin" class="hidden admin-layout">
     
     <header class="admin-header-top">
@@ -248,6 +237,8 @@
       <ul class="admin-nav-horizontal">
         <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
         <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
+        <!-- NEW GUARD APPROVALS TAB -->
+        <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
         <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
       </ul>
 
@@ -283,7 +274,7 @@
 
       <!-- HISTORY TAB -->
       <div id="admin-sec-history" class="admin-card admin-section hidden">
-        <div class="admin-card-title">Expired Requests (History)</div>
+        <div class="admin-card-title">Expired & Rejected Requests (History)</div>
         <div style="overflow-x: auto;">
           <table>
             <thead>
@@ -302,30 +293,34 @@
         </div>
       </div>
 
+      <!-- NEW GUARD APPROVALS TAB -->
+      <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
+        <div class="admin-card-title">Live Gate Check-Ins</div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Check-In Time</th>
+                <th>Visitor Name</th>
+                <th>Type</th>
+                <th>Facility</th>
+                <th>Scanned By (Guard)</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-guard-approvals">
+              <tr><td colspan="5" class="text-center" style="padding: 30px;">No gate check-ins found yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- ANALYTICS TAB -->
       <div id="admin-sec-analytics" class="admin-section hidden">
         <div class="analytics-grid">
-          
-          <div class="analytics-box">
-              <div class="analytics-box-title">📅 Date Analytics (Top Dates)</div>
-              <div id="stat-date" style="margin-top: 10px;">Loading...</div>
-          </div>
-          
-          <div class="analytics-box">
-              <div class="analytics-box-title">👤 Type Analytics</div>
-              <div id="stat-type" style="margin-top: 10px;">Loading...</div>
-          </div>
-          
-          <div class="analytics-box">
-              <div class="analytics-box-title">🏢 Facility Analytics</div>
-              <div id="stat-facility" style="margin-top: 10px;">Loading...</div>
-          </div>
-          
-          <div class="analytics-box">
-              <div class="analytics-box-title">✅ Status Analytics</div>
-              <div id="stat-status" style="margin-top: 10px;">Loading...</div>
-          </div>
-
+          <div class="analytics-box"><div class="analytics-box-title">📅 Date Analytics</div><div id="stat-date"></div></div>
+          <div class="analytics-box"><div class="analytics-box-title">👤 Type Analytics</div><div id="stat-type"></div></div>
+          <div class="analytics-box"><div class="analytics-box-title">🏢 Facility Analytics</div><div id="stat-facility"></div></div>
+          <div class="analytics-box"><div class="analytics-box-title">✅ Status Analytics</div><div id="stat-status"></div></div>
         </div>
       </div>
 
@@ -363,18 +358,89 @@
     let currentUser = null; 
     let currentScannedID = null;
 
-    // --- Format Date Helper (DD-MM-YYYY) ---
+    // --- Format Date Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
         if (isNaN(d.getTime())) return '-';
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return `${day}-${month}-${year}`;
+        return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+    }
+    
+    function formatTime(dateString) {
+        if (!dateString) return '-';
+        const d = new Date(dateString);
+        if (isNaN(d.getTime())) return '-';
+        return d.toLocaleString();
     }
 
-    // --- Navigation & Auth ---
+    // --- Session Persistence Logic ---
+    function saveSession() {
+        localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() }));
+    }
+
+    window.onload = function() {
+        const session = localStorage.getItem('noon_session');
+        if (session) {
+            const parsed = JSON.parse(session);
+            const hoursElapsed = (Date.now() - parsed.time) / (1000 * 60 * 60);
+            
+            if (hoursElapsed < 6) {
+                currentUser = parsed.user;
+                if (currentUser.role === 'guard') {
+                    document.getElementById('guard-loc-display').innerText = currentUser.location;
+                    showDashboard('dashboard-guard');
+                } else if (currentUser.role === 'ops') {
+                    document.getElementById('req-vname').value = currentUser.name;
+                    showDashboard('dashboard-ops');
+                    loadMyPasses();
+                } else if (currentUser.role === 'admin') {
+                    showDashboard('dashboard-admin');
+                    loadAdminData();
+                }
+            } else {
+                localStorage.removeItem('noon_session');
+            }
+        }
+    };
+
+    function login(role) {
+      if (role === 'guard') {
+        const name = document.getElementById('lg-name').value;
+        const id = document.getElementById('lg-id').value;
+        const loc = document.getElementById('lg-location').value;
+        if(!name || !id || !loc) return alert("Fill all Guard details");
+        // Save Guard Name & ID to log later
+        currentUser = { role: 'guard', name: name, id: id, location: loc };
+        document.getElementById('guard-loc-display').innerText = loc;
+        showDashboard('dashboard-guard');
+      } 
+      else if (role === 'ops') {
+        const name = document.getElementById('lo-name').value;
+        const mail = document.getElementById('lo-mail').value;
+        if(!name || !mail) return alert("Enter Name and Gmail");
+        currentUser = { role: 'ops', name: name, email: mail };
+        document.getElementById('req-vname').value = name;
+        showDashboard('dashboard-ops');
+        loadMyPasses(); 
+      } 
+      else if (role === 'admin') {
+        const pass = document.getElementById('la-pass').value;
+        if(pass === 'admin123') { 
+            currentUser = { role: 'admin', name: 'Admin', email: 'admin' };
+            showDashboard('dashboard-admin');
+            loadAdminData();
+        } else { return alert("Incorrect Password"); }
+      }
+      saveSession(); // Save session after successful login
+    }
+
+    function logout() {
+      localStorage.removeItem('noon_session'); // Clear session
+      if(html5QrcodeScanner) html5QrcodeScanner.clear();
+      location.reload(); 
+    }
+
+    // --- UI Navigation ---
     function switchLoginTab(role) {
       document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
@@ -389,50 +455,13 @@
       document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
     }
 
-    function login(role) {
-      if (role === 'guard') {
-        const loc = document.getElementById('lg-location').value;
-        if(!loc) return alert("Select Guard Location");
-        currentUser = { role: 'guard', location: loc };
-        document.getElementById('guard-loc-display').innerText = loc;
-        showDashboard('dashboard-guard');
-      } 
-      else if (role === 'ops') {
-        const name = document.getElementById('lo-name').value;
-        const mail = document.getElementById('lo-mail').value;
-        if(!name || !mail) return alert("Enter Name and Gmail");
-        currentUser = { role: 'ops', name: name, email: mail };
-        document.getElementById('req-vname').value = name;
-        showDashboard('dashboard-ops');
-        loadMyPasses(); 
-      } 
-      else if (role === 'admin') {
-        const name = document.getElementById('la-name').value;
-        const mail = document.getElementById('la-mail').value;
-        const pass = document.getElementById('la-pass').value;
-        if(!name || !mail || !pass) return alert("Enter all Admin details");
-        if(pass === 'admin123') { 
-            currentUser = { role: 'admin', name: name, email: mail };
-            showDashboard('dashboard-admin');
-            loadAdminData();
-        } else {
-            alert("Incorrect Password");
-        }
-      }
-    }
-
     function showDashboard(dashId) {
       document.getElementById('login-view').classList.add('hidden');
       document.querySelectorAll('.dashboard, .admin-layout').forEach(el => el.classList.add('hidden'));
       document.getElementById(dashId).classList.remove('hidden');
     }
 
-    function logout() {
-      if(html5QrcodeScanner) html5QrcodeScanner.clear();
-      location.reload(); 
-    }
-
-    // --- Ops/Visitor Logic ---
+    // --- Visitor/Ops Logic ---
     function toggleDateFields() {
       const type = document.getElementById('req-type').value;
       document.getElementById('date-visitor').classList.toggle('hidden', type === 'Contractor');
@@ -485,7 +514,7 @@
             const card = document.createElement('div');
             card.className = 'pass-item';
             
-            let html = `
+            card.innerHTML = `
                 <div class="pass-header">
                     <div>
                         <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
@@ -497,7 +526,6 @@
                     </div>
                 </div>
             `;
-            card.innerHTML = html;
             listDiv.appendChild(card);
 
             if (pass.Status === 'Approved') {
@@ -510,18 +538,18 @@
                 card.appendChild(qrWrapper);
             }
         });
-      } catch (err) {
-          listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>';
-      }
+      } catch (err) { listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
     // --- Admin Dashboard & Analytics Logic ---
     async function loadAdminData() {
       const tApprovals = document.getElementById('admin-table-approvals');
       const tHistory = document.getElementById('admin-table-history');
+      const tGuard = document.getElementById('admin-table-guard-approvals');
       
       tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
       tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
+      tGuard.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
       
       try {
         const res = await fetch(SCRIPT_URL);
@@ -529,40 +557,36 @@
         
         tApprovals.innerHTML = '';
         tHistory.innerHTML = '';
+        tGuard.innerHTML = '';
         
         const today = new Date();
         today.setHours(0,0,0,0);
         
-        let approvalsCount = 0;
-        let historyCount = 0;
-        
-        // Analytics Data Objects
+        let approvalsCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
         data.reverse().forEach(row => {
           if(!row.UniqueID) return;
           
-          // Populate Analytics Data
+          // Populate Analytics
           aType[row.Type] = (aType[row.Type] || 0) + 1;
           aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
           aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
           let dClean = formatToDDMMYYYY(row.StartDate);
           if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
 
-          // Determine Expiration
+          // Validity/Expiration Logic
           let endDateObj = new Date(row.EndDate);
-          if(isNaN(endDateObj.getTime())) {
-              endDateObj = new Date(row.StartDate);
-          }
+          if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
           endDateObj.setHours(23,59,59,999); 
           
-          const isExpired = (endDateObj < today) && row.Status !== 'Pending'; 
+          // REJECTED passes OR EXPIRED passes go straight to History
+          const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected'; 
           
-          // Format Date String
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
           const tr = document.createElement('tr');
           
-          if (isExpired) {
+          if (isHistory) {
             tr.innerHTML = `
               <td style="color: var(--text-muted);">${dateStr}</td>
               <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
@@ -590,10 +614,26 @@
             tApprovals.appendChild(tr);
             approvalsCount++;
           }
+
+          // Check if Guard logged this entry
+          if (row.CheckInTime) {
+             const gRow = document.createElement('tr');
+             gRow.innerHTML = `
+                <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
+                <td><strong>${row.VisitorName}</strong></td>
+                <td>${row.Type}</td>
+                <td>${row.Location}</td>
+                <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || 'Unknown Guard'}</td>
+             `;
+             tGuard.appendChild(gRow);
+             guardCount++;
+          }
+
         });
 
         if (approvalsCount === 0) tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
         if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>';
+        if (guardCount === 0) tGuard.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No gate check-ins found yet.</td></tr>';
 
         // Render Analytics UI
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
@@ -609,8 +649,7 @@
         document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v} Passes</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
 
       } catch (err) {
-        tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--danger); padding: 30px;">Failed to load data.</td></tr>';
-        tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--danger); padding: 30px;">Failed to load data.</td></tr>';
+        console.log(err);
       }
     }
 
@@ -642,9 +681,7 @@
         const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
         const data = await res.json();
 
-        if (data.error) {
-          return showScanResult("DENIED", "Invalid QR Code", "bg-red");
-        }
+        if (data.error) { return showScanResult("DENIED", "Invalid QR Code", "bg-red"); }
 
         document.getElementById('r-name').innerText = data.VisitorName;
         document.getElementById('r-type').innerText = data.Type;
@@ -684,7 +721,12 @@
     async function confirmEntry() {
       document.getElementById('btn-confirm-entry').innerText = "SAVING...";
       try {
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_in', id: currentScannedID }) });
+        // Send Guard Name & ID to backend
+        const gInfo = `${currentUser.name} (${currentUser.id})`;
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: 'check_in', id: currentScannedID, guardInfo: gInfo }) 
+        });
         document.getElementById('scan-result').classList.add('hidden');
         document.getElementById('btn-confirm-entry').innerText = "CONFIRM ENTRY";
         html5QrcodeScanner.resume();
