@@ -23,7 +23,23 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+    
+    /* Concept 3: Abstract Background with a dark gradient overlay */
+    body { 
+      background-image: linear-gradient(rgba(11, 14, 20, 0.80), rgba(11, 14, 20, 0.95)), 
+                        url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      
+      color: var(--text-main); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      overflow-x: hidden; 
+    }
     
     /* Utility Classes */
     .hidden { display: none !important; }
@@ -31,21 +47,31 @@
     .mb-4 { margin-bottom: 16px; }
     .mt-4 { margin-top: 16px; }
 
-    /* Login Container */
-    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    /* Login Container - Frosted Glass effect */
+    .login-container { 
+      width: 100%; 
+      max-width: 420px; 
+      background-color: rgba(18, 21, 28, 0.75); 
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px);
+      padding: 40px 30px; 
+      border-radius: 12px; 
+      border: 1px solid rgba(255, 199, 0, 0.15); 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+    }
     
     /* Logo Box */
     .logo-box { width: 100px; height: 100px; margin: 0 auto 30px; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Noon_logo_black_english.svg/512px-Noon_logo_black_english.svg.png') no-repeat center; background-size: 70%; background-color: var(--noon-yellow); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
     
     /* Role Tabs */
-    .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
-    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg-dark); cursor: pointer; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-transform: uppercase; }
+    .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: rgba(11, 14, 20, 0.8); }
+    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-transform: uppercase; transition: 0.2s; }
     .role-tab:last-child { border-right: none; }
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
     /* Inputs & Buttons */
     .input-group { margin-bottom: 16px; }
-    .input-field { width: 100%; padding: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; }
+    .input-field { width: 100%; padding: 14px; background-color: rgba(9, 11, 16, 0.8); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; transition: 0.2s; }
     .input-field:focus { border-color: var(--noon-yellow); }
     .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
     .btn-primary:hover { opacity: 0.9; }
@@ -53,17 +79,18 @@
     
     /* Dashboards */
     .dashboard { width: 100%; max-width: 800px; padding: 20px; margin-top: 40px; align-self: flex-start; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
     .header h2 { color: var(--noon-yellow); font-size: 20px; }
     .user-greeting { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
     
     /* Tables */
-    table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-    th { background: var(--bg-dark); color: var(--text-muted); text-transform: uppercase; font-size: 12px; }
-    .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+    th { background: rgba(0,0,0,0.4); color: var(--text-muted); text-transform: uppercase; font-size: 12px; }
+    .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
     .btn-approve { background: var(--success); color: white; }
     .btn-reject { background: var(--danger); color: white; }
+    .btn-approve:hover, .btn-reject:hover { opacity: 0.8; }
 
     /* QR / Scanner */
     #qr-container { background: white; padding: 20px; border-radius: 8px; display: inline-block; margin: 20px 0; }
@@ -73,7 +100,7 @@
     .status-rejected { border-color: var(--danger); }
 
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .ops-card { background: var(--card-bg); padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .ops-card { background: rgba(18, 21, 28, 0.9); padding: 24px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
     @media (max-width: 768px) { .ops-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -199,11 +226,11 @@
 
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    // ⚠️ REPLACE THIS WITH YOUR APPS SCRIPT URL
+    // ⚠️ REPLACE THIS WITH YOUR APPS SCRIPT URL ⚠️
     const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
     
     let html5QrcodeScanner = null;
-    let currentUser = null; // Stores logged-in user data
+    let currentUser = null; 
 
     // --- 1. Login & Navigation Logic ---
     function switchLoginTab(role) {
@@ -229,7 +256,7 @@
         if(!name || !mail) return alert("Please fill all fields");
         currentUser = { role: 'ops', name: name, email: mail };
         document.getElementById('greet-ops').innerText = `Logged in as: ${name} (${mail})`;
-        document.getElementById('req-name').value = name; // Auto-fill form
+        document.getElementById('req-name').value = name; 
         showDashboard('dashboard-ops');
       } 
       else if (role === 'admin') {
@@ -238,7 +265,7 @@
         const pass = document.getElementById('la-pass').value;
         if(!name || !id || !pass) return alert("Please fill all fields");
         
-        if(pass === 'admin123') { // Admin password check
+        if(pass === 'admin123') { 
           currentUser = { role: 'admin', name: name, noonId: id };
           document.getElementById('greet-admin').innerText = `Admin Active: ${name}`;
           showDashboard('dashboard-admin');
@@ -257,8 +284,8 @@
 
     function logout() {
       currentUser = null;
-      if (html5QrcodeScanner) { html5QrcodeScanner.clear(); }
-      document.querySelectorAll('input').forEach(input => input.value = ''); // Clear forms
+      if (html5QrcodeScanner) { html5QrcodeScanner.clear(); document.getElementById('btn-start-scan').classList.remove('hidden'); }
+      document.querySelectorAll('input').forEach(input => input.value = ''); 
       document.querySelectorAll('.dashboard').forEach(el => el.classList.add('hidden'));
       document.getElementById('login-view').classList.remove('hidden');
     }
@@ -284,7 +311,7 @@
         const data = await res.json();
         
         alert(`Success! Your ID is ${data.id}. Admin approval is required.`);
-        document.getElementById('check-id').value = data.id; // Auto-fill status checker
+        document.getElementById('check-id').value = data.id; 
         document.getElementById('req-company').value = '';
         document.getElementById('req-phone').value = '';
         btn.innerText = 'Submit Application';
