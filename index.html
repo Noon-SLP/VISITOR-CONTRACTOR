@@ -216,12 +216,12 @@
         </div>
 
         <div class="input-group">
-          <label>Upload Iqama/ID Copy</label>
+          <label>Upload Iqama/ID Copy (Camera/Gallery)</label>
           <input type="file" id="req-iqama" class="file-input" accept="image/*">
         </div>
         <div class="input-group">
-          <label>Upload Selfie Photo</label>
-          <input type="file" id="req-selfie" class="file-input" accept="image/*" capture="user">
+          <label>Upload Selfie Photo (Camera/Gallery)</label>
+          <input type="file" id="req-selfie" class="file-input" accept="image/*">
         </div>
 
         <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;">Submit for Approval</button>
@@ -290,11 +290,11 @@
       </div>
 
       <div id="admin-sec-history" class="admin-card admin-section hidden">
-        <div class="admin-card-title">Expired & Rejected Requests (History)</div>
+        <div class="admin-card-title">Access & Gate History</div>
         <div style="overflow-x: auto;">
           <table>
-            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th></tr></thead>
-            <tbody id="admin-table-history"><tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
+            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th></tr></thead>
+            <tbody id="admin-table-history"><tr><td colspan="8" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -388,23 +388,27 @@
         if (isNaN(d.getTime())) return true;
         
         const now = new Date();
-        now.setHours(23,59,59,999);
+        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
         if (filterType === 'today') {
-            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-            return d >= todayStart && d <= now;
+            return d >= todayStart && d <= todayEnd;
         } else if (filterType === 'weekly') {
-            const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7); weekAgo.setHours(0,0,0,0);
-            return d >= weekAgo && d <= now;
+            const weekAgo = new Date(todayStart);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return d >= weekAgo && d <= todayEnd;
         } else if (filterType === 'monthly') {
-            const monthAgo = new Date(); monthAgo.setMonth(now.getMonth() - 1); monthAgo.setHours(0,0,0,0);
-            return d >= monthAgo && d <= now;
+            const monthAgo = new Date(todayStart);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return d >= monthAgo && d <= todayEnd;
         } else if (filterType === '6months') {
-            const sixAgo = new Date(); sixAgo.setMonth(now.getMonth() - 6); sixAgo.setHours(0,0,0,0);
-            return d >= sixAgo && d <= now;
+            const sixAgo = new Date(todayStart);
+            sixAgo.setMonth(sixAgo.getMonth() - 6);
+            return d >= sixAgo && d <= todayEnd;
         } else if (filterType === 'year') {
-            const yearAgo = new Date(); yearAgo.setFullYear(now.getFullYear() - 1); yearAgo.setHours(0,0,0,0);
-            return d >= yearAgo && d <= now;
+            const yearAgo = new Date(todayStart);
+            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+            return d >= yearAgo && d <= todayEnd;
         } else if (filterType === 'custom') {
             if(!startStr || !endStr) return true;
             const start = new Date(startStr); start.setHours(0,0,0,0);
@@ -623,7 +627,7 @@
       const tGuard = document.getElementById('admin-table-guard-approvals');
       
       tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-      tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
+      tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
       tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
       
       try {
@@ -646,8 +650,10 @@
           if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
           endDateObj.setHours(23,59,59,999); 
           
-          const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected'; 
-          const inRange = isDateInRange(row.Timestamp, currentAdminFilter, fStart, fEnd);
+          const isCheckedOut = !!row.CheckOutTime;
+          const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected' || isCheckedOut; 
+          
+          const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
 
           if (inRange) {
@@ -658,21 +664,31 @@
               if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
           }
 
-          const tr = document.createElement('tr');
-          
           if (isHistory) {
             if(inRange) {
+                const tr = document.createElement('tr');
+                let finalStatus = row.Status;
+                let sColor = 'var(--noon-yellow)';
+                if (isCheckedOut) { finalStatus = 'COMPLETED'; sColor = 'var(--success)'; }
+                else if (row.Status === 'Rejected') { finalStatus = 'REJECTED'; sColor = 'var(--danger)'; }
+                else if (endDateObj < today) { finalStatus = 'EXPIRED'; sColor = 'var(--danger)'; }
+                else { finalStatus = row.Status; sColor = 'var(--success)'; }
+
                 tr.innerHTML = `
                   <td style="color: var(--text-muted);">${dateStr}</td>
                   <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
                   <td>${row.Type}</td>
                   <td>${row.Location}</td>
-                  <td style="font-weight: 600; color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
+                  <td style="font-weight: 600; color: ${sColor}">${finalStatus}</td>
+                  <td style="color: var(--text-muted); font-size: 11px;">${row.CheckInTime ? formatTime(row.CheckInTime) : '-'}</td>
+                  <td style="color: var(--text-muted); font-size: 11px;">${row.CheckOutTime ? formatTime(row.CheckOutTime) : '-'}</td>
+                  <td style="color: var(--noon-yellow); font-size: 11px;">${row.ScannedByGuard || '-'}</td>
                 `;
                 tHistory.appendChild(tr);
                 historyCount++;
             }
           } else {
+            const tr = document.createElement('tr');
             const isPending = row.Status === 'Pending';
             let actionBtns = isPending ? `
               <button class="btn-primary btn-success btn-sm" style="width: auto; margin-right: 5px;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
@@ -712,7 +728,7 @@
         });
 
         if (approvalsCount === 0) tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
-        if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
+        if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
         if (guardCount === 0) tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
@@ -768,10 +784,7 @@
                     .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
                     
                     @media print {
-                        @page { 
-                            size: 85.6mm 54mm; 
-                            margin: 0; 
-                        }
+                        @page { size: 85.6mm 54mm; margin: 0; }
                         body { background: white; display: block; align-items: flex-start; }
                         .card { border-radius: 0; border: none; box-shadow: none; margin: 0; padding: 4mm; }
                         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
