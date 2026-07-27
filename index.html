@@ -23,7 +23,6 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
-    /* NEW HEXAGON MESH BACKGROUND */
     body { 
       background-color: #0d0e12;
       background-image: 
@@ -47,19 +46,10 @@
 
     /* Login Container */
     .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
-    .logo-box { 
-  width: 130px; 
-  height: 130px; 
-  margin: 0 auto 30px; 
-  background-image: url('logo.jpeg');
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-radius: 12px;
-}
+    .logo-box { width: 130px; height: 130px; margin: 0 auto 30px; background-color: #12151c; background-image: url('logo.jpeg'); background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 12px; }
     
     .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: #0b0e14; }
-    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; }
+    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; transition: 0.2s;}
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
     .input-group { margin-bottom: 16px; }
@@ -68,24 +58,33 @@
     .input-field:focus { border-color: var(--noon-yellow); }
     .file-input { padding: 10px; background: var(--input-bg); border: 1px dashed var(--border-color); width: 100%; color: var(--text-muted); font-size: 12px; }
     
-    .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+    .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
     .btn-outline { background: transparent; color: var(--noon-yellow); border: 1px solid var(--noon-yellow); }
     .btn-success { background: var(--success); color: white; border: none; }
+    .btn-danger { background: var(--danger); color: white; border: none; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 4px; }
     
-    .dashboard { width: 100%; max-width: 800px; padding: 20px; margin-top: 40px; align-self: flex-start; }
+    .dashboard { width: 100%; max-width: 900px; padding: 20px; margin-top: 40px; align-self: flex-start; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
     .header h2 { color: var(--noon-yellow); font-size: 20px; }
     
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     .ops-card { background: var(--card-bg); padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); }
     
-    #qr-container { background: white; padding: 15px; border-radius: 8px; display: inline-block; margin: 15px 0; }
-    #reader { width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #000; }
+    /* Auto QR display elements */
+    .pass-item { background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px; text-align: left; }
+    .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
-    /* Gate Scanner Flashing Colors */
+    #reader { width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #000; }
     .scan-result-card { padding: 30px; border-radius: 8px; text-align: center; margin-top: 20px; color: white; font-weight: bold; }
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
+    
+    /* Admin Table */
+    table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; font-size: 13px; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th { background: rgba(0,0,0,0.4); color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -99,6 +98,7 @@
       <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
     </div>
 
+    <!-- GUARD -->
     <div id="login-guard" class="hidden">
       <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
       <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
@@ -113,19 +113,23 @@
       <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
     </div>
 
+    <!-- VISITOR/CONTRACTOR -->
     <div id="login-ops">
-      <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Host Name"></div>
-      <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Host Mail"></div>
+      <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
+      <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
+    <!-- ADMIN -->
     <div id="login-admin" class="hidden">
+      <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
+      <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
       <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Password"></div>
       <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
     </div>
   </div>
 
-  <!-- ================= 2. VISITOR / OPS DASHBOARD ================= -->
+  <!-- ================= 2. VISITOR / CONTRACTOR DASHBOARD ================= -->
   <div id="dashboard-ops" class="dashboard hidden">
     <div class="header">
       <h2>Visitor & Contractor Portal</h2>
@@ -135,8 +139,8 @@
     <div class="ops-grid">
       <!-- Registration Form -->
       <div class="ops-card">
-        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Register Guest</h3>
-        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Guest Full Name"></div>
+        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Request Access Pass</h3>
+        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Confirm Full Name"></div>
         <div class="input-group">
           <select id="req-location" class="input-field">
             <option value="RUH01">Facility: RUH01</option>
@@ -162,35 +166,49 @@
             <input type="date" id="req-date-end" class="input-field">
           </div>
         </div>
-
-        <div class="input-group">
-          <label>Upload ID Copy</label>
-          <input type="file" class="file-input" accept="image/*">
-        </div>
-        <div class="input-group">
-          <label>Upload Face Photo</label>
-          <input type="file" class="file-input" accept="image/*" capture="user">
-        </div>
-
-        <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()">Generate Pass</button>
+        <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()">Submit for Approval</button>
       </div>
 
-      <!-- Portal Status Checker -->
+      <!-- Live Auto-Updating Passes -->
       <div class="ops-card text-center">
-        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Guest Pass / QR</h3>
-        <div class="input-group"><input type="text" id="check-id" class="input-field" placeholder="Enter NOON-XXXXXX ID"></div>
-        <button class="btn-primary btn-outline" onclick="checkStatus()">Get QR Code</button>
-        
-        <div id="status-display-area" class="hidden" style="margin-top: 20px;">
-            <div id="qr-container"></div>
-            <p id="v-id-display" style="font-size: 16px; font-weight: bold; color: var(--noon-yellow);"></p>
-            <p id="v-status-msg" style="font-size: 12px; margin-top: 5px;"></p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="color: var(--noon-yellow);">My Passes</h3>
+            <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses()">Refresh</button>
+        </div>
+        <div id="my-passes-list" style="max-height: 450px; overflow-y: auto;">
+            <p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= 3. GUARD DASHBOARD ================= -->
+  <!-- ================= 3. ADMIN DASHBOARD ================= -->
+  <div id="dashboard-admin" class="dashboard hidden">
+    <div class="header">
+      <h2>Admin Control Center</h2>
+      <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
+    </div>
+    
+    <div style="overflow-x: auto; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color);">
+      <table>
+        <thead>
+          <tr>
+            <th>Date Logged</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Facility</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="admin-table-body">
+          <tr><td colspan="6" class="text-center" style="padding: 20px;">Loading requests...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================= 4. GUARD DASHBOARD ================= -->
   <div id="dashboard-guard" class="dashboard hidden text-center">
     <div class="header">
       <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
@@ -215,13 +233,14 @@
   </div>
 
   <script>
-    // ⚠️ REPLACE THIS WITH YOUR NEW APPS SCRIPT URL
+    // ⚠️ REPLACE THIS WITH YOUR NEW APPS SCRIPT URL ⚠️
     const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
     
     let html5QrcodeScanner = null;
     let currentUser = null; 
     let currentScannedID = null;
 
+    // --- Navigation & Auth ---
     function switchLoginTab(role) {
       document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
@@ -239,10 +258,26 @@
       } 
       else if (role === 'ops') {
         const name = document.getElementById('lo-name').value;
-        if(!name) return alert("Enter Host Name");
-        currentUser = { role: 'ops', name: name };
+        const mail = document.getElementById('lo-mail').value;
+        if(!name || !mail) return alert("Enter Name and Gmail");
+        currentUser = { role: 'ops', name: name, email: mail };
+        document.getElementById('req-vname').value = name; // Pre-fill name
         showDashboard('dashboard-ops');
+        loadMyPasses(); 
       } 
+      else if (role === 'admin') {
+        const name = document.getElementById('la-name').value;
+        const mail = document.getElementById('la-mail').value;
+        const pass = document.getElementById('la-pass').value;
+        if(!name || !mail || !pass) return alert("Enter all Admin details");
+        if(pass === 'admin123') { 
+            currentUser = { role: 'admin', name: name, email: mail };
+            showDashboard('dashboard-admin');
+            loadAdminData();
+        } else {
+            alert("Incorrect Password");
+        }
+      }
     }
 
     function showDashboard(dashId) {
@@ -256,7 +291,7 @@
       location.reload(); 
     }
 
-    // --- Ops Logic ---
+    // --- Ops/Visitor Logic ---
     function toggleDateFields() {
       const type = document.getElementById('req-type').value;
       document.getElementById('date-visitor').classList.toggle('hidden', type === 'Contractor');
@@ -268,6 +303,7 @@
       const payload = {
         action: 'create',
         hostName: currentUser.name,
+        hostEmail: currentUser.email, 
         visitorName: document.getElementById('req-vname').value,
         type: type,
         location: document.getElementById('req-location').value,
@@ -277,32 +313,102 @@
       
       if(!payload.visitorName || !payload.startDate) return alert("Fill required fields");
 
-      document.getElementById('btn-submit-req').innerText = 'Processing...';
-      
+      document.getElementById('btn-submit-req').innerText = 'Sending to Admin...';
       try {
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const data = await res.json();
-        alert(`Pass Generated! ID: ${data.id}`);
-        document.getElementById('check-id').value = data.id; 
-        document.getElementById('btn-submit-req').innerText = 'Generate Pass';
-      } catch (err) { alert("Error"); }
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+        document.getElementById('btn-submit-req').innerText = 'Submit for Approval';
+        loadMyPasses(); 
+      } catch (err) { alert("Error"); document.getElementById('btn-submit-req').innerText = 'Submit for Approval';}
     }
 
-    async function checkStatus() {
-      const id = document.getElementById('check-id').value.trim();
-      const qrBox = document.getElementById('qr-container');
-      document.getElementById('status-display-area').classList.remove('hidden');
-      qrBox.innerHTML = ''; 
+    async function loadMyPasses() {
+      const listDiv = document.getElementById('my-passes-list');
+      listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
       
       try {
-        const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${id}`);
+        const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
         const data = await res.json();
-        if (data.error) return document.getElementById('v-status-msg').innerText = "Not found.";
+        listDiv.innerHTML = '';
+
+        if(data.length === 0) return listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
+
+        data.reverse().forEach((pass, index) => {
+            const statusColor = pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)';
+            
+            const card = document.createElement('div');
+            card.className = 'pass-item';
+            
+            let html = `
+                <div class="pass-header">
+                    <div>
+                        <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
+                        <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${pass.Status}</span><br>
+                        <span style="font-size: 10px; color: var(--text-muted);">${pass.UniqueID}</span>
+                    </div>
+                </div>
+            `;
+            card.innerHTML = html;
+            listDiv.appendChild(card);
+
+            if (pass.Status === 'Approved') {
+                const qrWrapper = document.createElement('div');
+                qrWrapper.style.textAlign = 'center';
+                const qrBox = document.createElement('div');
+                qrBox.className = 'qr-box';
+                new QRCode(qrBox, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
+                qrWrapper.appendChild(qrBox);
+                card.appendChild(qrWrapper);
+            }
+        });
+      } catch (err) {
+          listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>';
+      }
+    }
+
+    // --- Admin Dashboard Logic ---
+    async function loadAdminData() {
+      const tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 20px;">Loading requests...</td></tr>';
+      
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        tbody.innerHTML = '';
         
-        document.getElementById('v-id-display').innerText = data.UniqueID;
-        document.getElementById('v-status-msg').innerText = `${data.Type} Pass - ${data.Location}`;
-        new QRCode(qrBox, { text: data.UniqueID, width: 160, height: 160, colorDark: "#000", colorLight: "#fff" });
-      } catch (err) {}
+        data.reverse().forEach(row => {
+          if(!row.UniqueID) return;
+          const tr = document.createElement('tr');
+          const isPending = row.Status === 'Pending';
+          
+          let actionBtns = isPending ? `
+            <button class="btn-primary btn-success btn-sm" style="width: auto; margin-right: 5px;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
+            <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
+          ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
+
+          tr.innerHTML = `
+            <td style="font-size: 12px; color: var(--text-muted);">${new Date(row.Timestamp).toLocaleDateString()}</td>
+            <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+            <td>${row.Type}</td>
+            <td>${row.Location}</td>
+            <td style="color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
+            <td>${actionBtns}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--danger);">Failed to load data</td></tr>';
+      }
+    }
+
+    async function updateStatus(id, newStatus) {
+      if(!confirm(`Mark ${id} as ${newStatus}?`)) return;
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'update_status', id: id, newStatus: newStatus }) });
+        loadAdminData(); 
+      } catch (err) { alert("Failed to update status"); }
     }
 
     // --- Guard Scanner Logic ---
@@ -326,15 +432,13 @@
         const data = await res.json();
 
         if (data.error) {
-          showScanResult("DENIED", "Invalid QR Code", "bg-red");
-          return;
+          return showScanResult("DENIED", "Invalid QR Code", "bg-red");
         }
 
         document.getElementById('r-name').innerText = data.VisitorName;
         document.getElementById('r-type').innerText = data.Type;
         document.getElementById('r-location').innerText = data.Location;
 
-        // Validation Logic
         const today = new Date().setHours(0,0,0,0);
         const start = new Date(data.StartDate).setHours(0,0,0,0);
         const end = new Date(data.EndDate).setHours(0,0,0,0);
@@ -348,13 +452,10 @@
         } else if (data.Type === 'Contractor' && (today < start || today > end)) {
             showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
         } else {
-            // All checks passed!
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
             document.getElementById('btn-confirm-entry').classList.remove('hidden');
         }
-      } catch (err) {
-        showScanResult("ERROR", "Network failure", "bg-red");
-      }
+      } catch (err) { showScanResult("ERROR", "Network failure", "bg-red"); }
     }
 
     function showScanResult(decision, reason, colorClass) {
