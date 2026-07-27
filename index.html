@@ -53,11 +53,15 @@
     .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; transition: 0.2s;}
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
+    /* Inputs */
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
     .input-field { width: 100%; padding: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; }
     .input-field:focus { border-color: var(--noon-yellow); }
     .file-input { padding: 10px; background: var(--input-bg); border: 1px dashed var(--border-color); width: 100%; color: var(--text-muted); font-size: 12px; border-radius: 6px; cursor: pointer; }
+    
+    /* FIX: Force Calendar Icon to be visible on dark background */
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0.9); cursor: pointer; }
     
     .btn-primary { width: 100%; padding: 14px; background-color: var(--noon-yellow); color: #000; font-weight: 700; font-size: 14px; border: none; border-radius: 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
     .btn-outline { background: transparent; color: var(--noon-yellow); border: 1px solid var(--noon-yellow); }
@@ -82,29 +86,36 @@
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
     
-    /* ================= ADMIN LAYOUT ================= */
+    /* ================= NEW ADMIN LAYOUT (TOP NAVIGATION) ================= */
     .admin-layout {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      display: flex; background-color: var(--bg-dark); z-index: 100;
+      display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100;
     }
     
-    .admin-sidebar { width: 260px; background-color: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 24px 16px; }
-    .admin-brand { margin-bottom: 40px; padding: 0 8px; }
-    .admin-brand h1 { font-size: 20px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; }
-    .admin-brand p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-weight: 600; }
+    .admin-header-top {
+      display: flex; align-items: center; padding: 0 32px; height: 75px;
+      background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color);
+      justify-content: space-between;
+    }
     
-    .admin-nav { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-    .admin-nav li { padding: 14px 16px; border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
-    .admin-nav li.active { background-color: rgba(255, 199, 0, 0.1); color: var(--noon-yellow); font-weight: 600; border-left: 3px solid var(--noon-yellow); }
-    .admin-nav li:hover:not(.active) { background-color: rgba(255, 255, 255, 0.03); color: var(--text-main); }
+    .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
+    .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; }
+    .admin-brand-horizontal p { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-top: 2px;}
+
+    .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; height: 100%; align-items: flex-end; flex: 1; }
+    .admin-nav-horizontal li { 
+        padding: 16px 24px; color: var(--text-muted); font-size: 13px; font-weight: 600; 
+        cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; 
+    }
+    .admin-nav-horizontal li.active { color: var(--noon-yellow); border-bottom: 3px solid var(--noon-yellow); background: rgba(255, 199, 0, 0.05); }
+    .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.02); }
+
+    .admin-user-info { display: flex; align-items: center; gap: 15px; }
     
-    .admin-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+    .admin-main { flex: 1; overflow-y: auto; padding: 32px; position: relative; }
     .admin-main::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background-image: url('logo.jpeg'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.03; pointer-events: none; z-index: 0; }
-    .admin-top-header { padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); z-index: 1; }
-    .admin-top-header h2 { font-size: 22px; font-weight: 600; }
     
-    .admin-content { padding: 32px; z-index: 1; flex: 1; }
-    .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px; }
+    .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px; position: relative; z-index: 1;}
     .admin-card-title { padding: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); }
     
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -113,10 +124,13 @@
     tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
 
     /* Analytics Dashboard Layout */
-    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .analytics-box { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; display: flex; flex-direction: column; min-height: 250px;}
-    .analytics-box-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: auto;}
-    .chart-placeholder { height: 120px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; margin-top: 20px;}
+    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; z-index: 1;}
+    .analytics-box { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    .analytics-box-title { font-size: 12px; font-weight: 600; color: var(--noon-yellow); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+    
+    .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-val { font-weight: 700; color: var(--text-main); }
   </style>
 </head>
 <body>
@@ -222,110 +236,99 @@
     </div>
   </div>
 
-  <!-- ================= 3. ADMIN DASHBOARD ================= -->
+  <!-- ================= 3. NEW ADMIN DASHBOARD (TOP NAVIGATION) ================= -->
   <div id="dashboard-admin" class="hidden admin-layout">
     
-    <aside class="admin-sidebar">
-      <div class="admin-brand">
+    <header class="admin-header-top">
+      <div class="admin-brand-horizontal">
         <h1>NOON SLP</h1>
         <p>Visitor & Contractor Management</p>
       </div>
-      <ul class="admin-nav">
+      
+      <ul class="admin-nav-horizontal">
         <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
         <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
         <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
       </ul>
-      <div style="margin-top: auto;">
-        <button class="btn-primary btn-outline" style="width: 100%; border-color: var(--border-color); color: var(--text-muted);" onclick="logout()">SIGN OUT</button>
+
+      <div class="admin-user-info">
+        <span style="font-size: 12px; color: var(--text-muted);">Admin Session</span>
+        <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()">SIGN OUT</button>
       </div>
-    </aside>
+    </header>
 
     <main class="admin-main">
-      <header class="admin-top-header">
-        <h2>Control Center</h2>
-        <div style="display: flex; align-items: center; gap: 15px;">
-           <span style="font-size: 13px; color: var(--text-muted);">Admin Session Active</span>
-           <div style="width: 32px; height: 32px; background: var(--noon-yellow); border-radius: 50%; color: black; display: flex; align-items: center; justify-content: center; font-weight: bold;">A</div>
-        </div>
-      </header>
       
-      <div class="admin-content">
-        
-        <!-- APPROVALS TAB -->
-        <div id="admin-sec-approvals" class="admin-card admin-section">
-          <div class="admin-card-title">Pending & Active Requests</div>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Validity Period</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Facility</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="admin-table-approvals">
-                <tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- APPROVALS TAB -->
+      <div id="admin-sec-approvals" class="admin-card admin-section">
+        <div class="admin-card-title">Pending & Active Requests</div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Validity Period</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Facility</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-approvals">
+              <tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- HISTORY TAB -->
-        <div id="admin-sec-history" class="admin-card admin-section hidden">
-          <div class="admin-card-title">Expired Requests (History)</div>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Validity Period</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Facility</th>
-                  <th>Final Status</th>
-                </tr>
-              </thead>
-              <tbody id="admin-table-history">
-                <tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- ANALYTICS TAB -->
-        <div id="admin-sec-analytics" class="admin-section hidden">
-          <div class="analytics-grid">
-            <div class="analytics-box">
-                <div class="analytics-box-title">Vehicle & Visitor Processing Growth</div>
-                <div class="chart-placeholder">Data Visualization Pending</div>
-            </div>
-            <div class="analytics-box">
-                <div class="analytics-box-title">Movement Cohorts</div>
-                <div class="chart-placeholder" style="background: rgba(255, 199, 0, 0.1); border-color: var(--noon-yellow); border-style: solid;">
-                    INBOUND DATA
-                </div>
-            </div>
-            <div class="analytics-box">
-                <div class="analytics-box-title">Peak Operating Hours</div>
-                <div style="display: flex; gap: 15px; margin-top: 30px; align-items: flex-end; justify-content: center; height: 100%;">
-                    <div style="width: 30px; height: 40%; background: var(--noon-yellow); border-radius: 4px 4px 0 0;"></div>
-                    <div style="width: 30px; height: 80%; background: var(--success); border-radius: 4px 4px 0 0;"></div>
-                    <div style="width: 30px; height: 30%; background: #60a5fa; border-radius: 4px 4px 0 0;"></div>
-                    <div style="width: 30px; height: 20%; background: #a78bfa; border-radius: 4px 4px 0 0;"></div>
-                </div>
-            </div>
-            <div class="analytics-box">
-                <div class="analytics-box-title">Facility Utilization Ranking</div>
-                <div style="display: flex; justify-content: center; align-items: center; height: 100%; margin-top: 20px;">
-                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 25px solid var(--border-color); border-top-color: var(--noon-yellow); border-right-color: var(--success);"></div>
-                </div>
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      <!-- HISTORY TAB -->
+      <div id="admin-sec-history" class="admin-card admin-section hidden">
+        <div class="admin-card-title">Expired Requests (History)</div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Validity Period</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Facility</th>
+                <th>Final Status</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-history">
+              <tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ANALYTICS TAB -->
+      <div id="admin-sec-analytics" class="admin-section hidden">
+        <div class="analytics-grid">
+          
+          <div class="analytics-box">
+              <div class="analytics-box-title">📅 Date Analytics (Top Dates)</div>
+              <div id="stat-date" style="margin-top: 10px;">Loading...</div>
+          </div>
+          
+          <div class="analytics-box">
+              <div class="analytics-box-title">👤 Type Analytics</div>
+              <div id="stat-type" style="margin-top: 10px;">Loading...</div>
+          </div>
+          
+          <div class="analytics-box">
+              <div class="analytics-box-title">🏢 Facility Analytics</div>
+              <div id="stat-facility" style="margin-top: 10px;">Loading...</div>
+          </div>
+          
+          <div class="analytics-box">
+              <div class="analytics-box-title">✅ Status Analytics</div>
+              <div id="stat-status" style="margin-top: 10px;">Loading...</div>
+          </div>
+
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -354,7 +357,6 @@
   </div>
 
   <script>
-    // ⚠️ REPLACE THIS EXACT STRING WITH YOUR DEPLOYED GOOGLE APPS SCRIPT URL ⚠️
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
     
     let html5QrcodeScanner = null;
@@ -381,7 +383,7 @@
     }
 
     function switchAdminTab(tabName) {
-      document.querySelectorAll('.admin-nav li').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-nav-horizontal li').forEach(t => t.classList.remove('active'));
       document.getElementById(`nav-${tabName}`).classList.add('active');
       document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
       document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
@@ -513,7 +515,7 @@
       }
     }
 
-    // --- Admin Dashboard Logic ---
+    // --- Admin Dashboard & Analytics Logic ---
     async function loadAdminData() {
       const tApprovals = document.getElementById('admin-table-approvals');
       const tHistory = document.getElementById('admin-table-history');
@@ -528,32 +530,39 @@
         tApprovals.innerHTML = '';
         tHistory.innerHTML = '';
         
-        // Setup today for validity check (ignoring time)
         const today = new Date();
         today.setHours(0,0,0,0);
         
         let approvalsCount = 0;
         let historyCount = 0;
+        
+        // Analytics Data Objects
+        let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
         data.reverse().forEach(row => {
           if(!row.UniqueID) return;
           
+          // Populate Analytics Data
+          aType[row.Type] = (aType[row.Type] || 0) + 1;
+          aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
+          aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
+          let dClean = formatToDDMMYYYY(row.StartDate);
+          if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
+
           // Determine Expiration
           let endDateObj = new Date(row.EndDate);
           if(isNaN(endDateObj.getTime())) {
-              endDateObj = new Date(row.StartDate); // Fallback for visitors
+              endDateObj = new Date(row.StartDate);
           }
-          endDateObj.setHours(23,59,59,999); // Pass is valid until end of the given day
+          endDateObj.setHours(23,59,59,999); 
           
           const isExpired = (endDateObj < today) && row.Status !== 'Pending'; 
           
-          // Format Date String: DD-MM-YYYY to DD-MM-YYYY
+          // Format Date String
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
-
           const tr = document.createElement('tr');
           
           if (isExpired) {
-            // Build History Row
             tr.innerHTML = `
               <td style="color: var(--text-muted);">${dateStr}</td>
               <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
@@ -564,7 +573,6 @@
             tHistory.appendChild(tr);
             historyCount++;
           } else {
-            // Build Approvals Row
             const isPending = row.Status === 'Pending';
             let actionBtns = isPending ? `
               <button class="btn-primary btn-success btn-sm" style="width: auto; margin-right: 5px;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
@@ -586,6 +594,19 @@
 
         if (approvalsCount === 0) tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
         if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>';
+
+        // Render Analytics UI
+        document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
+        document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
+        
+        let statusHtml = '';
+        if(aStatus['Approved']) statusHtml += `<div class="stat-row"><span style="color:var(--success)">Approved</span> <span class="stat-val">${aStatus['Approved']}</span></div>`;
+        if(aStatus['Pending']) statusHtml += `<div class="stat-row"><span style="color:var(--noon-yellow)">Pending</span> <span class="stat-val">${aStatus['Pending']}</span></div>`;
+        if(aStatus['Rejected']) statusHtml += `<div class="stat-row"><span style="color:var(--danger)">Rejected</span> <span class="stat-val">${aStatus['Rejected']}</span></div>`;
+        document.getElementById('stat-status').innerHTML = statusHtml || '<div class="stat-row"><span>No Data</span></div>';
+
+        let topDates = Object.entries(aDate).sort((a,b) => b[1]-a[1]).slice(0, 5);
+        document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v} Passes</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
 
       } catch (err) {
         tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="color: var(--danger); padding: 30px;">Failed to load data.</td></tr>';
@@ -672,4 +693,3 @@
   </script>
 </body>
 </html>
-
