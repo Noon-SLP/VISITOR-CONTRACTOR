@@ -80,7 +80,7 @@
     .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
-    /* ================= GUARD SCANNER UI ================= */
+    /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
     #reader a:hover { background: rgba(255, 199, 0, 0.15); }
@@ -93,7 +93,6 @@
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
     .bg-blue { background-color: #3b82f6; }
-    
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* ================= ADMIN LAYOUT ================= */
@@ -132,6 +131,12 @@
     .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
     .stat-row:last-child { border-bottom: none; }
     .stat-val { font-weight: 700; color: var(--text-main); }
+
+    /* Admin Filters */
+    .admin-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: var(--card-bg); padding: 15px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; position: relative; z-index: 1;}
+    .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
+    .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+    .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
   </style>
 </head>
 <body>
@@ -145,7 +150,6 @@
       <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
     </div>
 
-    <!-- GUARD -->
     <div id="login-guard" class="hidden">
       <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
       <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
@@ -160,14 +164,12 @@
       <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
     </div>
 
-    <!-- VISITOR/CONTRACTOR -->
     <div id="login-ops">
       <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
       <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
-    <!-- ADMIN -->
     <div id="login-admin" class="hidden">
       <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
       <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
@@ -257,6 +259,26 @@
     </header>
 
     <main class="admin-main">
+      
+      <!-- GLOBAL ADMIN FILTER -->
+      <div class="admin-filter-bar" id="admin-global-filter">
+        <div style="display: flex; gap: 5px;">
+            <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
+            <button class="btn-filter" onclick="setAdminFilter('today', this)">Today</button>
+            <button class="btn-filter" onclick="setAdminFilter('weekly', this)">Weekly</button>
+            <button class="btn-filter" onclick="setAdminFilter('monthly', this)">Monthly</button>
+            <button class="btn-filter" onclick="setAdminFilter('6months', this)">6 Months</button>
+            <button class="btn-filter" onclick="setAdminFilter('year', this)">1 Year</button>
+            <button class="btn-filter" onclick="setAdminFilter('custom', this)">Custom</button>
+        </div>
+        <div id="custom-date-picker" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+            <input type="date" id="filter-start" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
+            <span style="color: var(--text-muted); font-size: 12px;">TO</span>
+            <input type="date" id="filter-end" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
+            <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData()">APPLY</button>
+        </div>
+      </div>
+
       <div id="admin-sec-approvals" class="admin-card admin-section">
         <div class="admin-card-title">Pending & Active Requests</div>
         <div style="overflow-x: auto;">
@@ -326,14 +348,16 @@
   </div>
 
   <script>
-    // ⚠️ REPLACE THIS EXACT STRING WITH YOUR DEPLOYED GOOGLE APPS SCRIPT URL ⚠️
+    // ⚠️ YOUR SPECIFIC DEPLOYED APPS SCRIPT URL ⚠️
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
     
     let html5QrcodeScanner = null;
     let currentUser = null; 
     let currentScannedID = null;
-    let currentScanAction = 'check_in'; // Dynamic state: check_in or check_out
+    let currentScanAction = 'check_in'; 
+    let currentAdminFilter = 'all';
 
+    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -357,16 +381,47 @@
       });
     }
 
-    function saveSession() {
-        localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() }));
+    // Date Range Logic
+    function isDateInRange(dateStr, filterType, startStr, endStr) {
+        if (filterType === 'all') return true;
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return true;
+        
+        const now = new Date();
+        now.setHours(23,59,59,999);
+
+        if (filterType === 'today') {
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            return d >= todayStart && d <= now;
+        } else if (filterType === 'weekly') {
+            const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7); weekAgo.setHours(0,0,0,0);
+            return d >= weekAgo && d <= now;
+        } else if (filterType === 'monthly') {
+            const monthAgo = new Date(); monthAgo.setMonth(now.getMonth() - 1); monthAgo.setHours(0,0,0,0);
+            return d >= monthAgo && d <= now;
+        } else if (filterType === '6months') {
+            const sixAgo = new Date(); sixAgo.setMonth(now.getMonth() - 6); sixAgo.setHours(0,0,0,0);
+            return d >= sixAgo && d <= now;
+        } else if (filterType === 'year') {
+            const yearAgo = new Date(); yearAgo.setFullYear(now.getFullYear() - 1); yearAgo.setHours(0,0,0,0);
+            return d >= yearAgo && d <= now;
+        } else if (filterType === 'custom') {
+            if(!startStr || !endStr) return true;
+            const start = new Date(startStr); start.setHours(0,0,0,0);
+            const end = new Date(endStr); end.setHours(23,59,59,999);
+            return d >= start && d <= end;
+        }
+        return true;
     }
+
+    // --- Session Persistence ---
+    function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     window.onload = function() {
         const session = localStorage.getItem('noon_session');
         if (session) {
             const parsed = JSON.parse(session);
             const hoursElapsed = (Date.now() - parsed.time) / (1000 * 60 * 60);
-            
             if (hoursElapsed < 6) {
                 currentUser = parsed.user;
                 if (currentUser.role === 'guard') {
@@ -380,9 +435,7 @@
                     showDashboard('dashboard-admin');
                     loadAdminData();
                 }
-            } else {
-                localStorage.removeItem('noon_session');
-            }
+            } else { localStorage.removeItem('noon_session'); }
         }
     };
 
@@ -395,8 +448,7 @@
         currentUser = { role: 'guard', name: name, id: id, location: loc };
         document.getElementById('guard-loc-display').innerText = loc;
         showDashboard('dashboard-guard');
-      } 
-      else if (role === 'ops') {
+      } else if (role === 'ops') {
         const name = document.getElementById('lo-name').value;
         const mail = document.getElementById('lo-mail').value;
         if(!name || !mail) return alert("Enter Name and Gmail");
@@ -404,8 +456,7 @@
         document.getElementById('req-vname').value = name;
         showDashboard('dashboard-ops');
         loadMyPasses(); 
-      } 
-      else if (role === 'admin') {
+      } else if (role === 'admin') {
         const name = document.getElementById('la-name').value;
         const mail = document.getElementById('la-mail').value;
         const pass = document.getElementById('la-pass').value;
@@ -425,6 +476,7 @@
       location.reload(); 
     }
 
+    // --- UI Navigation ---
     function switchLoginTab(role) {
       document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
@@ -451,15 +503,27 @@
       document.getElementById('date-contractor').classList.toggle('hidden', type === 'Visitor');
     }
 
+    function setAdminFilter(range, btnElement) {
+        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+        currentAdminFilter = range;
+        
+        if (range === 'custom') {
+            document.getElementById('custom-date-picker').classList.remove('hidden');
+        } else {
+            document.getElementById('custom-date-picker').classList.add('hidden');
+            loadAdminData();
+        }
+    }
+
+    // --- Core Logic ---
     async function submitRequest() {
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
       const btn = document.getElementById('btn-submit-req');
       
-      if(iqamaInput.files.length === 0 || selfieInput.files.length === 0) {
-        return alert("Please upload both Iqama/ID and Selfie pictures.");
-      }
+      if(iqamaInput.files.length === 0 || selfieInput.files.length === 0) { return alert("Please upload both Iqama/ID and Selfie pictures."); }
 
       btn.innerText = 'Processing Images...';
       btn.disabled = true;
@@ -467,7 +531,6 @@
       try {
         const iqamaFullStr = await getBase64(iqamaInput.files[0]);
         const selfieFullStr = await getBase64(selfieInput.files[0]);
-        
         const iqamaB64 = iqamaFullStr.includes(',') ? iqamaFullStr.split(',')[1] : iqamaFullStr;
         const selfieB64 = selfieFullStr.includes(',') ? selfieFullStr.split(',')[1] : selfieFullStr;
 
@@ -487,27 +550,19 @@
         };
         
         if(!payload.visitorName || !payload.startDate) {
-            btn.innerText = 'Submit for Approval';
-            btn.disabled = false;
+            btn.innerText = 'Submit for Approval'; btn.disabled = false;
             return alert("Fill required date and name fields");
         }
 
         btn.innerText = 'Uploading to Server...';
-        
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const data = await res.json();
-        
-        if(data.status === 'error') { alert("Upload Error: " + data.message); }
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
-        btn.innerText = 'Submit for Approval';
-        btn.disabled = false;
-        iqamaInput.value = "";
-        selfieInput.value = "";
+        btn.innerText = 'Submit for Approval'; btn.disabled = false;
+        iqamaInput.value = ""; selfieInput.value = "";
         loadMyPasses(); 
       } catch (err) { 
-        alert("Network Error: Could not reach the database. Check your internet or Apps Script URL."); 
-        btn.innerText = 'Submit for Approval';
-        btn.disabled = false;
+        alert("Network Error: Could not reach the database."); 
+        btn.innerText = 'Submit for Approval'; btn.disabled = false;
       }
     }
 
@@ -519,8 +574,12 @@
         const data = await res.json();
         listDiv.innerHTML = '';
         if(data.length === 0) return listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
+        
         data.reverse().forEach((pass) => {
-            const statusColor = pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)';
+            const isCompleted = pass.CheckOutTime ? true : false;
+            const statusText = isCompleted ? 'COMPLETED' : pass.Status;
+            const statusColor = isCompleted ? 'var(--text-muted)' : (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
+            
             const card = document.createElement('div');
             card.className = 'pass-item';
             card.innerHTML = `
@@ -530,13 +589,13 @@
                         <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span>
                     </div>
                     <div style="text-align: right;">
-                        <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${pass.Status}</span><br>
+                        <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${statusText}</span><br>
                         <span style="font-size: 10px; color: var(--text-muted);">${pass.UniqueID}</span>
                     </div>
                 </div>
             `;
-            listDiv.appendChild(card);
-            if (pass.Status === 'Approved') {
+            
+            if (pass.Status === 'Approved' && !isCompleted) {
                 const qrWrapper = document.createElement('div');
                 qrWrapper.style.textAlign = 'center';
                 const qrBox = document.createElement('div');
@@ -544,7 +603,16 @@
                 new QRCode(qrBox, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
                 qrWrapper.appendChild(qrBox);
                 card.appendChild(qrWrapper);
+            } else if (isCompleted) {
+                const compText = document.createElement('div');
+                compText.style.textAlign = 'center';
+                compText.style.marginTop = '15px';
+                compText.style.fontSize = '12px';
+                compText.style.color = 'var(--text-muted)';
+                compText.innerHTML = `<em>Checked Out: ${formatTime(pass.CheckOutTime)}</em>`;
+                card.appendChild(compText);
             }
+            listDiv.appendChild(card);
         });
       } catch (err) { listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
@@ -563,43 +631,57 @@
         const data = await res.json();
         
         tApprovals.innerHTML = ''; tHistory.innerHTML = ''; tGuard.innerHTML = '';
+        
         const today = new Date(); today.setHours(0,0,0,0);
+        const fStart = document.getElementById('filter-start').value;
+        const fEnd = document.getElementById('filter-end').value;
+
         let approvalsCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
         data.reverse().forEach(row => {
           if(!row.UniqueID) return;
           
-          aType[row.Type] = (aType[row.Type] || 0) + 1;
-          aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
-          aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
-          let dClean = formatToDDMMYYYY(row.StartDate);
-          if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
-
           let endDateObj = new Date(row.EndDate);
           if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
           endDateObj.setHours(23,59,59,999); 
           
           const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected'; 
+          const inRange = isDateInRange(row.Timestamp, currentAdminFilter, fStart, fEnd);
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
+
+          if (inRange) {
+              aType[row.Type] = (aType[row.Type] || 0) + 1;
+              aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
+              aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
+              let dClean = formatToDDMMYYYY(row.StartDate);
+              if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
+          }
+
           const tr = document.createElement('tr');
           
           if (isHistory) {
-            tr.innerHTML = `
-              <td style="color: var(--text-muted);">${dateStr}</td>
-              <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-              <td>${row.Type}</td>
-              <td>${row.Location}</td>
-              <td style="font-weight: 600; color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
-            `;
-            tHistory.appendChild(tr);
-            historyCount++;
+            if(inRange) {
+                tr.innerHTML = `
+                  <td style="color: var(--text-muted);">${dateStr}</td>
+                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+                  <td>${row.Type}</td>
+                  <td>${row.Location}</td>
+                  <td style="font-weight: 600; color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
+                `;
+                tHistory.appendChild(tr);
+                historyCount++;
+            }
           } else {
             const isPending = row.Status === 'Pending';
             let actionBtns = isPending ? `
               <button class="btn-primary btn-success btn-sm" style="width: auto; margin-right: 5px;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
               <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
             ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
+
+            if (row.Status === 'Approved') {
+                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
+            }
 
             tr.innerHTML = `
               <td style="color: var(--text-muted);">${dateStr}</td>
@@ -613,10 +695,9 @@
             approvalsCount++;
           }
 
-          if (row.CheckInTime) {
+          if (row.CheckInTime && inRange) {
              const gRow = document.createElement('tr');
              const checkOutText = row.CheckOutTime ? formatTime(row.CheckOutTime) : '<span style="color:var(--noon-yellow)">Inside Facility</span>';
-             
              gRow.innerHTML = `
                 <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
                 <td style="color: var(--text-muted);">${checkOutText}</td>
@@ -631,8 +712,8 @@
         });
 
         if (approvalsCount === 0) tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
-        if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>';
-        if (guardCount === 0) tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found.</td></tr>';
+        if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
+        if (guardCount === 0) tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
         document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
@@ -657,6 +738,72 @@
       } catch (err) { alert("Failed to update status"); }
     }
 
+    // --- Print QR Window ---
+    function printQR(name, type, location, id, status) {
+        const printWindow = window.open('', '', 'width=500,height=400');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print QR Pass</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+                <style>
+                    body { 
+                        margin: 0; padding: 0; background: #0b0e14; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Inter', sans-serif; 
+                    }
+                    /* Standard CR80 ID Card Dimensions */
+                    .card { 
+                        width: 85.6mm; 
+                        height: 54mm; 
+                        background: white; 
+                        border-radius: 2mm; 
+                        padding: 4mm; 
+                        box-sizing: border-box;
+                        position: relative;
+                    }
+                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
+                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
+                    
+                    @media print {
+                        @page { 
+                            size: 85.6mm 54mm; 
+                            margin: 0; 
+                        }
+                        body { background: white; display: block; align-items: flex-start; }
+                        .card { border-radius: 0; border: none; box-shadow: none; margin: 0; padding: 4mm; }
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="top-row">
+                        <div>
+                            <p class="name">${name}</p>
+                            <p class="sub">${type} &bull; ${location}</p>
+                        </div>
+                        <div>
+                            <p class="status">${status}</p>
+                            <p class="id">${id}</p>
+                        </div>
+                    </div>
+                    <div class="qr-box" id="qr-code"></div>
+                </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
+                    setTimeout(() => { window.print(); window.close(); }, 800);
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    // --- Guard Scanner Logic ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
@@ -666,7 +813,7 @@
 
     function showScanResult(decision, reasonHtml, colorClass) {
         document.getElementById('r-decision').innerText = decision;
-        document.getElementById('r-reason').innerHTML = reasonHtml; // Using HTML to allow bold/colored warnings
+        document.getElementById('r-reason').innerHTML = reasonHtml; 
         document.getElementById('scan-result').className = `scan-result-card ${colorClass}`;
         
         if (decision === "DENIED") {
@@ -722,21 +869,18 @@
         } else if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) {
             showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
         } else if (data.CheckOutTime) {
-            // Already Checked Out
             showScanResult("DENIED", "Pass already used / Visitor checked out", "bg-red");
         } else if (data.CheckInTime) {
-            // CHECK OUT MODE
             currentScanAction = 'check_out';
             showScanResult("CHECK OUT", "Visitor is exiting facility.<br><br><span style='color:#ffc700; font-size:14px;'>⚠️ PLEASE TAKE THE ID CARD FROM THE VISITOR AFTER CHECK OUT.</span>", "bg-blue");
             confirmBtn.innerText = "CONFIRM CHECK OUT";
-            confirmBtn.className = "btn-primary btn-warning hidden"; // yellow button
+            confirmBtn.className = "btn-primary btn-warning hidden"; 
             confirmBtn.classList.remove('hidden');
         } else {
-            // CHECK IN MODE
             currentScanAction = 'check_in';
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
             confirmBtn.innerText = "CONFIRM ENTRY";
-            confirmBtn.className = "btn-primary btn-success hidden"; // green button
+            confirmBtn.className = "btn-primary btn-success hidden"; 
             confirmBtn.classList.remove('hidden');
         }
       } catch (err) { showScanResult("ERROR", "Network failure", "bg-red"); }
@@ -747,10 +891,7 @@
       btn.innerText = "SAVING...";
       try {
         const gInfo = `${currentUser.name} (${currentUser.id})`;
-        await fetch(SCRIPT_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo }) 
-        });
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo }) });
         document.getElementById('scan-result').classList.add('hidden');
         html5QrcodeScanner.resume();
       } catch (err) { 
