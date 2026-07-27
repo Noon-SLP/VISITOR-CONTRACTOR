@@ -83,6 +83,7 @@
     .scan-result-card { padding: 30px; border-radius: 8px; text-align: center; margin-top: 20px; color: white; font-weight: bold; }
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
+    .visitor-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; margin-bottom: 15px; display: none; }
     
     /* ================= ADMIN LAYOUT (TOP NAVIGATION) ================= */
     .admin-layout {
@@ -133,7 +134,6 @@
       <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
     </div>
 
-    <!-- GUARD -->
     <div id="login-guard" class="hidden">
       <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
       <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
@@ -148,18 +148,14 @@
       <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
     </div>
 
-    <!-- VISITOR/CONTRACTOR -->
     <div id="login-ops">
       <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
       <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
-    <!-- ADMIN -->
     <div id="login-admin" class="hidden">
-      <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
-      <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
-      <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Password"></div>
+      <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Admin Password"></div>
       <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
     </div>
   </div>
@@ -237,7 +233,6 @@
       <ul class="admin-nav-horizontal">
         <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
         <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
-        <!-- NEW GUARD APPROVALS TAB -->
         <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
         <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
       </ul>
@@ -249,7 +244,6 @@
     </header>
 
     <main class="admin-main">
-      
       <!-- APPROVALS TAB -->
       <div id="admin-sec-approvals" class="admin-card admin-section">
         <div class="admin-card-title">Pending & Active Requests</div>
@@ -293,7 +287,7 @@
         </div>
       </div>
 
-      <!-- NEW GUARD APPROVALS TAB -->
+      <!-- GUARD APPROVALS TAB -->
       <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
         <div class="admin-card-title">Live Gate Check-Ins</div>
         <div style="overflow-x: auto;">
@@ -323,7 +317,6 @@
           <div class="analytics-box"><div class="analytics-box-title">✅ Status Analytics</div><div id="stat-status"></div></div>
         </div>
       </div>
-
     </main>
   </div>
 
@@ -341,6 +334,10 @@
       <div id="scan-result" class="scan-result-card hidden">
         <h1 id="r-decision" style="font-size: 32px; margin-bottom: 10px;">-</h1>
         <p id="r-reason" style="font-size: 14px; margin-bottom: 15px;"></p>
+        
+        <!-- NEW: Selfie Image Container -->
+        <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Selfie">
+
         <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px;">
             <p><strong>Name:</strong> <span id="r-name">-</span></p>
             <p><strong>Type:</strong> <span id="r-type">-</span></p>
@@ -358,7 +355,7 @@
     let currentUser = null; 
     let currentScannedID = null;
 
-    // --- Format Date Helpers ---
+    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -373,7 +370,17 @@
         return d.toLocaleString();
     }
 
-    // --- Session Persistence Logic ---
+    // Convert file to Base64 String for upload
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    // --- Session Persistence ---
     function saveSession() {
         localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() }));
     }
@@ -409,7 +416,6 @@
         const id = document.getElementById('lg-id').value;
         const loc = document.getElementById('lg-location').value;
         if(!name || !id || !loc) return alert("Fill all Guard details");
-        // Save Guard Name & ID to log later
         currentUser = { role: 'guard', name: name, id: id, location: loc };
         document.getElementById('guard-loc-display').innerText = loc;
         showDashboard('dashboard-guard');
@@ -431,11 +437,11 @@
             loadAdminData();
         } else { return alert("Incorrect Password"); }
       }
-      saveSession(); // Save session after successful login
+      saveSession();
     }
 
     function logout() {
-      localStorage.removeItem('noon_session'); // Clear session
+      localStorage.removeItem('noon_session');
       if(html5QrcodeScanner) html5QrcodeScanner.clear();
       location.reload(); 
     }
@@ -470,50 +476,61 @@
 
     async function submitRequest() {
       const type = document.getElementById('req-type').value;
-      const iqamaFile = document.getElementById('req-iqama').files.length > 0;
-      const selfieFile = document.getElementById('req-selfie').files.length > 0;
+      const iqamaInput = document.getElementById('req-iqama');
+      const selfieInput = document.getElementById('req-selfie');
       
-      const payload = {
-        action: 'create',
-        hostName: currentUser.name,
-        hostEmail: currentUser.email, 
-        visitorName: document.getElementById('req-vname').value,
-        type: type,
-        location: document.getElementById('req-location').value,
-        startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
-        endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value
-      };
-      
-      if(!payload.visitorName || !payload.startDate) return alert("Fill required date and name fields");
-      if(!iqamaFile || !selfieFile) return alert("Please upload both Iqama/ID and Selfie pictures.");
+      if(iqamaInput.files.length === 0 || selfieInput.files.length === 0) {
+        return alert("Please upload both Iqama/ID and Selfie pictures.");
+      }
 
-      document.getElementById('btn-submit-req').innerText = 'Sending to Admin...';
+      document.getElementById('btn-submit-req').innerText = 'Processing Images...';
+
       try {
+        const iqamaB64 = await getBase64(iqamaInput.files[0]);
+        const selfieB64 = await getBase64(selfieInput.files[0]);
+
+        const payload = {
+          action: 'create',
+          hostName: currentUser.name,
+          hostEmail: currentUser.email, 
+          visitorName: document.getElementById('req-vname').value,
+          type: type,
+          location: document.getElementById('req-location').value,
+          startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
+          endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value,
+          iqamaBase64: iqamaB64.split(',')[1],
+          iqamaMimeType: iqamaInput.files[0].type,
+          selfieBase64: selfieB64.split(',')[1],
+          selfieMimeType: selfieInput.files[0].type
+        };
+        
+        if(!payload.visitorName || !payload.startDate) return alert("Fill required date and name fields");
+
+        document.getElementById('btn-submit-req').innerText = 'Uploading to Drive...';
+        
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
         document.getElementById('btn-submit-req').innerText = 'Submit for Approval';
-        document.getElementById('req-iqama').value = "";
-        document.getElementById('req-selfie').value = "";
+        iqamaInput.value = "";
+        selfieInput.value = "";
         loadMyPasses(); 
-      } catch (err) { alert("Error connecting to database."); document.getElementById('btn-submit-req').innerText = 'Submit for Approval';}
+      } catch (err) { 
+        alert("Error connecting to database. Did you set Apps Script permissions?"); 
+        document.getElementById('btn-submit-req').innerText = 'Submit for Approval';
+      }
     }
 
     async function loadMyPasses() {
       const listDiv = document.getElementById('my-passes-list');
       listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
-      
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
         const data = await res.json();
         listDiv.innerHTML = '';
-
         if(data.length === 0) return listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
-
         data.reverse().forEach((pass) => {
             const statusColor = pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)';
-            
             const card = document.createElement('div');
             card.className = 'pass-item';
-            
             card.innerHTML = `
                 <div class="pass-header">
                     <div>
@@ -527,7 +544,6 @@
                 </div>
             `;
             listDiv.appendChild(card);
-
             if (pass.Status === 'Approved') {
                 const qrWrapper = document.createElement('div');
                 qrWrapper.style.textAlign = 'center';
@@ -555,34 +571,25 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
-        tApprovals.innerHTML = '';
-        tHistory.innerHTML = '';
-        tGuard.innerHTML = '';
-        
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        
+        tApprovals.innerHTML = ''; tHistory.innerHTML = ''; tGuard.innerHTML = '';
+        const today = new Date(); today.setHours(0,0,0,0);
         let approvalsCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
         data.reverse().forEach(row => {
           if(!row.UniqueID) return;
           
-          // Populate Analytics
           aType[row.Type] = (aType[row.Type] || 0) + 1;
           aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
           aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
           let dClean = formatToDDMMYYYY(row.StartDate);
           if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
 
-          // Validity/Expiration Logic
           let endDateObj = new Date(row.EndDate);
           if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
           endDateObj.setHours(23,59,59,999); 
           
-          // REJECTED passes OR EXPIRED passes go straight to History
           const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected'; 
-          
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
           const tr = document.createElement('tr');
           
@@ -615,7 +622,6 @@
             approvalsCount++;
           }
 
-          // Check if Guard logged this entry
           if (row.CheckInTime) {
              const gRow = document.createElement('tr');
              gRow.innerHTML = `
@@ -628,14 +634,12 @@
              tGuard.appendChild(gRow);
              guardCount++;
           }
-
         });
 
         if (approvalsCount === 0) tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
         if (historyCount === 0) tHistory.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>';
         if (guardCount === 0) tGuard.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No gate check-ins found yet.</td></tr>';
 
-        // Render Analytics UI
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
         document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
         
@@ -648,9 +652,7 @@
         let topDates = Object.entries(aDate).sort((a,b) => b[1]-a[1]).slice(0, 5);
         document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v} Passes</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
 
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) { console.log(err); }
     }
 
     async function updateStatus(id, newStatus) {
@@ -672,9 +674,12 @@
     async function onScanSuccess(decodedText) {
       html5QrcodeScanner.pause();
       const resultCard = document.getElementById('scan-result');
+      const selfieImg = document.getElementById('r-selfie');
+      
       resultCard.classList.remove('hidden', 'bg-green', 'bg-red');
       document.getElementById('btn-confirm-entry').classList.add('hidden');
       document.getElementById('r-decision').innerText = "VERIFYING...";
+      selfieImg.style.display = 'none'; // hide until loaded
       currentScannedID = decodedText;
 
       try {
@@ -686,6 +691,12 @@
         document.getElementById('r-name').innerText = data.VisitorName;
         document.getElementById('r-type').innerText = data.Type;
         document.getElementById('r-location').innerText = data.Location;
+
+        // Display Selfie
+        if(data.SelfieURL) {
+            selfieImg.src = data.SelfieURL;
+            selfieImg.style.display = 'inline-block';
+        }
 
         const today = new Date().setHours(0,0,0,0);
         const start = new Date(data.StartDate).setHours(0,0,0,0);
@@ -721,7 +732,6 @@
     async function confirmEntry() {
       document.getElementById('btn-confirm-entry').innerText = "SAVING...";
       try {
-        // Send Guard Name & ID to backend
         const gInfo = `${currentUser.name} (${currentUser.id})`;
         await fetch(SCRIPT_URL, { 
             method: 'POST', 
