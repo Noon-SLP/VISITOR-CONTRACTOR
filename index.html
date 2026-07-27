@@ -85,7 +85,7 @@
     .bg-red { background-color: var(--danger); }
     .visitor-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; margin-bottom: 15px; display: none; }
     
-    /* ================= ADMIN LAYOUT (TOP NAVIGATION) ================= */
+    /* ================= ADMIN LAYOUT ================= */
     .admin-layout {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100;
@@ -134,6 +134,7 @@
       <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
     </div>
 
+    <!-- GUARD -->
     <div id="login-guard" class="hidden">
       <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
       <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
@@ -148,13 +149,17 @@
       <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
     </div>
 
+    <!-- VISITOR/CONTRACTOR -->
     <div id="login-ops">
       <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
       <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
       <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
     </div>
 
+    <!-- ADMIN: Restored Name and Mail Fields -->
     <div id="login-admin" class="hidden">
+      <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
+      <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
       <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Admin Password"></div>
       <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
     </div>
@@ -223,20 +228,17 @@
 
   <!-- ================= 3. ADMIN DASHBOARD ================= -->
   <div id="dashboard-admin" class="hidden admin-layout">
-    
     <header class="admin-header-top">
       <div class="admin-brand-horizontal">
         <h1>NOON SLP</h1>
         <p>Visitor & Contractor Management</p>
       </div>
-      
       <ul class="admin-nav-horizontal">
         <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
         <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
         <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
         <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
       </ul>
-
       <div class="admin-user-info">
         <span style="font-size: 12px; color: var(--text-muted);">Admin Session</span>
         <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()">SIGN OUT</button>
@@ -244,71 +246,36 @@
     </header>
 
     <main class="admin-main">
-      <!-- APPROVALS TAB -->
       <div id="admin-sec-approvals" class="admin-card admin-section">
         <div class="admin-card-title">Pending & Active Requests</div>
         <div style="overflow-x: auto;">
           <table>
-            <thead>
-              <tr>
-                <th>Validity Period</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Facility</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="admin-table-approvals">
-              <tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>
-            </tbody>
+            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="admin-table-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- HISTORY TAB -->
       <div id="admin-sec-history" class="admin-card admin-section hidden">
         <div class="admin-card-title">Expired & Rejected Requests (History)</div>
         <div style="overflow-x: auto;">
           <table>
-            <thead>
-              <tr>
-                <th>Validity Period</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Facility</th>
-                <th>Final Status</th>
-              </tr>
-            </thead>
-            <tbody id="admin-table-history">
-              <tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr>
-            </tbody>
+            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th></tr></thead>
+            <tbody id="admin-table-history"><tr><td colspan="5" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- GUARD APPROVALS TAB -->
       <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
         <div class="admin-card-title">Live Gate Check-Ins</div>
         <div style="overflow-x: auto;">
           <table>
-            <thead>
-              <tr>
-                <th>Check-In Time</th>
-                <th>Visitor Name</th>
-                <th>Type</th>
-                <th>Facility</th>
-                <th>Scanned By (Guard)</th>
-              </tr>
-            </thead>
-            <tbody id="admin-table-guard-approvals">
-              <tr><td colspan="5" class="text-center" style="padding: 30px;">No gate check-ins found yet.</td></tr>
-            </tbody>
+            <thead><tr><th>Check-In Time</th><th>Visitor Name</th><th>Type</th><th>Facility</th><th>Scanned By (Guard)</th></tr></thead>
+            <tbody id="admin-table-guard-approvals"><tr><td colspan="5" class="text-center" style="padding: 30px;">No gate check-ins found yet.</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ANALYTICS TAB -->
       <div id="admin-sec-analytics" class="admin-section hidden">
         <div class="analytics-grid">
           <div class="analytics-box"><div class="analytics-box-title">📅 Date Analytics</div><div id="stat-date"></div></div>
@@ -335,7 +302,6 @@
         <h1 id="r-decision" style="font-size: 32px; margin-bottom: 10px;">-</h1>
         <p id="r-reason" style="font-size: 14px; margin-bottom: 15px;"></p>
         
-        <!-- NEW: Selfie Image Container -->
         <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Selfie">
 
         <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px;">
@@ -355,7 +321,6 @@
     let currentUser = null; 
     let currentScannedID = null;
 
-    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -370,7 +335,6 @@
         return d.toLocaleString();
     }
 
-    // Convert file to Base64 String for upload
     function getBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -380,7 +344,6 @@
       });
     }
 
-    // --- Session Persistence ---
     function saveSession() {
         localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() }));
     }
@@ -430,9 +393,12 @@
         loadMyPasses(); 
       } 
       else if (role === 'admin') {
+        const name = document.getElementById('la-name').value;
+        const mail = document.getElementById('la-mail').value;
         const pass = document.getElementById('la-pass').value;
+        if(!name || !mail || !pass) return alert("Enter all Admin details");
         if(pass === 'admin123') { 
-            currentUser = { role: 'admin', name: 'Admin', email: 'admin' };
+            currentUser = { role: 'admin', name: name, email: mail };
             showDashboard('dashboard-admin');
             loadAdminData();
         } else { return alert("Incorrect Password"); }
@@ -446,7 +412,6 @@
       location.reload(); 
     }
 
-    // --- UI Navigation ---
     function switchLoginTab(role) {
       document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
@@ -467,7 +432,6 @@
       document.getElementById(dashId).classList.remove('hidden');
     }
 
-    // --- Visitor/Ops Logic ---
     function toggleDateFields() {
       const type = document.getElementById('req-type').value;
       document.getElementById('date-visitor').classList.toggle('hidden', type === 'Contractor');
@@ -478,16 +442,22 @@
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
+      const btn = document.getElementById('btn-submit-req');
       
       if(iqamaInput.files.length === 0 || selfieInput.files.length === 0) {
         return alert("Please upload both Iqama/ID and Selfie pictures.");
       }
 
-      document.getElementById('btn-submit-req').innerText = 'Processing Images...';
+      btn.innerText = 'Processing Images...';
+      btn.disabled = true;
 
       try {
-        const iqamaB64 = await getBase64(iqamaInput.files[0]);
-        const selfieB64 = await getBase64(selfieInput.files[0]);
+        const iqamaFullStr = await getBase64(iqamaInput.files[0]);
+        const selfieFullStr = await getBase64(selfieInput.files[0]);
+        
+        // Safely extract just the Base64 data string
+        const iqamaB64 = iqamaFullStr.includes(',') ? iqamaFullStr.split(',')[1] : iqamaFullStr;
+        const selfieB64 = selfieFullStr.includes(',') ? selfieFullStr.split(',')[1] : selfieFullStr;
 
         const payload = {
           action: 'create',
@@ -498,24 +468,36 @@
           location: document.getElementById('req-location').value,
           startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
           endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value,
-          iqamaBase64: iqamaB64.split(',')[1],
+          iqamaBase64: iqamaB64,
           iqamaMimeType: iqamaInput.files[0].type,
-          selfieBase64: selfieB64.split(',')[1],
+          selfieBase64: selfieB64,
           selfieMimeType: selfieInput.files[0].type
         };
         
-        if(!payload.visitorName || !payload.startDate) return alert("Fill required date and name fields");
+        if(!payload.visitorName || !payload.startDate) {
+            btn.innerText = 'Submit for Approval';
+            btn.disabled = false;
+            return alert("Fill required date and name fields");
+        }
 
-        document.getElementById('btn-submit-req').innerText = 'Uploading to Drive...';
+        btn.innerText = 'Uploading to Server...';
         
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-        document.getElementById('btn-submit-req').innerText = 'Submit for Approval';
+        const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const data = await res.json();
+        
+        if(data.status === 'error') {
+            alert("Upload Error: " + data.message);
+        }
+
+        btn.innerText = 'Submit for Approval';
+        btn.disabled = false;
         iqamaInput.value = "";
         selfieInput.value = "";
         loadMyPasses(); 
       } catch (err) { 
-        alert("Error connecting to database. Did you set Apps Script permissions?"); 
-        document.getElementById('btn-submit-req').innerText = 'Submit for Approval';
+        alert("Network Error: Could not reach the database. Check your internet or Apps Script URL."); 
+        btn.innerText = 'Submit for Approval';
+        btn.disabled = false;
       }
     }
 
@@ -557,7 +539,6 @@
       } catch (err) { listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
-    // --- Admin Dashboard & Analytics Logic ---
     async function loadAdminData() {
       const tApprovals = document.getElementById('admin-table-approvals');
       const tHistory = document.getElementById('admin-table-history');
@@ -663,7 +644,6 @@
       } catch (err) { alert("Failed to update status"); }
     }
 
-    // --- Guard Scanner Logic ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
@@ -679,7 +659,7 @@
       resultCard.classList.remove('hidden', 'bg-green', 'bg-red');
       document.getElementById('btn-confirm-entry').classList.add('hidden');
       document.getElementById('r-decision').innerText = "VERIFYING...";
-      selfieImg.style.display = 'none'; // hide until loaded
+      selfieImg.style.display = 'none'; 
       currentScannedID = decodedText;
 
       try {
@@ -692,8 +672,7 @@
         document.getElementById('r-type').innerText = data.Type;
         document.getElementById('r-location').innerText = data.Location;
 
-        // Display Selfie
-        if(data.SelfieURL) {
+        if(data.SelfieURL && data.SelfieURL.includes('http')) {
             selfieImg.src = data.SelfieURL;
             selfieImg.style.display = 'inline-block';
         }
