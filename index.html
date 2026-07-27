@@ -79,11 +79,29 @@
     .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
-    #reader { width: 100%; border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #000; }
-    .scan-result-card { padding: 30px; border-radius: 8px; text-align: center; margin-top: 20px; color: white; font-weight: bold; }
+    /* ================= UPGRADED GUARD SCANNER UI ================= */
+    #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    
+    /* Target the injected links ("Request Camera Permissions" / "Scan an Image File") */
+    #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
+    #reader a:hover { background: rgba(255, 199, 0, 0.15); }
+    
+    /* Target injected buttons */
+    #reader button { background: var(--noon-yellow) !important; color: #000 !important; border: none; padding: 14px 28px; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer; margin: 15px 5px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(255, 199, 0, 0.2); }
+    
+    /* Target injected select menus (camera selection) */
+    #reader select { padding: 12px; border-radius: 8px; background: var(--input-bg); color: white; border: 1px solid var(--border-color); font-size: 15px; margin: 15px 0; width: 100%; max-width: 300px; outline: none; }
+    #reader select:focus { border-color: var(--noon-yellow); }
+    
+    /* Target text inside scanner */
+    #reader span { font-size: 16px !important; color: var(--text-main); line-height: 1.5; }
+
+    .scan-result-card { padding: 30px; border-radius: 12px; text-align: center; margin-top: 25px; color: white; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
     .bg-green { background-color: var(--success); }
     .bg-red { background-color: var(--danger); }
-    .visitor-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; margin-bottom: 15px; display: none; }
+    
+    /* Upgraded Image Container */
+    .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* ================= ADMIN LAYOUT ================= */
     .admin-layout {
@@ -291,31 +309,33 @@
   <div id="dashboard-guard" class="dashboard hidden text-center">
     <div class="header">
       <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
-      <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
+      <button class="btn-primary btn-outline" style="width: auto; padding: 8px 16px; font-size: 14px;" onclick="logout()">Logout</button>
     </div>
     
-    <div style="max-width: 400px; margin: 0 auto;">
-      <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()">SCAN QR CODE</button>
+    <div style="max-width: 450px; margin: 0 auto;">
+      <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;">START CAMERA SCANNER</button>
       <div id="reader" class="hidden"></div>
       
       <div id="scan-result" class="scan-result-card hidden">
-        <h1 id="r-decision" style="font-size: 32px; margin-bottom: 10px;">-</h1>
-        <p id="r-reason" style="font-size: 14px; margin-bottom: 15px;"></p>
+        <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
+        <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
         
-        <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Selfie">
+        <!-- Enlarged Selfie Element -->
+        <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
 
-        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: left; font-size: 14px;">
-            <p><strong>Name:</strong> <span id="r-name">-</span></p>
+        <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: left; font-size: 16px; line-height: 1.6;">
+            <p><strong>Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
             <p><strong>Type:</strong> <span id="r-type">-</span></p>
             <p><strong>Location:</strong> <span id="r-location">-</span></p>
         </div>
-        <button id="btn-confirm-entry" class="btn-primary btn-success hidden" style="margin-top: 20px;" onclick="confirmEntry()">CONFIRM ENTRY</button>
+        <button id="btn-confirm-entry" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmEntry()">CONFIRM ENTRY</button>
       </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
+    // ⚠️ REPLACE THIS EXACT STRING WITH YOUR DEPLOYED GOOGLE APPS SCRIPT URL ⚠️
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
     
     let html5QrcodeScanner = null;
     let currentUser = null; 
@@ -671,13 +691,11 @@
         document.getElementById('r-type').innerText = data.Type;
         document.getElementById('r-location').innerText = data.Location;
 
-        // DISPLAY THE RAW BASE64 IMAGE TO BYPASS GOOGLE DRIVE BLOCKS
         if(data.SelfieBase64) {
             selfieImg.src = data.SelfieBase64;
-            selfieImg.style.display = 'inline-block';
+            selfieImg.style.display = 'block';
         }
 
-        // IMPROVED DATE VALIDATION TO AVOID TIMEZONE ISSUES
         const todayStr = formatToDDMMYYYY(new Date());
         const startStr = formatToDDMMYYYY(data.StartDate);
         
