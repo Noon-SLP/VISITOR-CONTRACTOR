@@ -80,6 +80,11 @@
     .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
+    /* CUSTOM LIVE CAMERA MODAL UI */
+    #custom-camera-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); }
+    .cam-controls { display: flex; gap: 15px; margin-top: 20px; }
+    
     /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
@@ -96,11 +101,7 @@
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* ================= ADMIN LAYOUT ================= */
-    .admin-layout {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100;
-    }
-    
+    .admin-layout { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100; }
     .admin-header-top { display: flex; align-items: center; padding: 0 32px; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
     .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
     .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; }
@@ -110,7 +111,6 @@
     .admin-nav-horizontal li { padding: 16px 24px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; }
     .admin-nav-horizontal li.active { color: var(--noon-yellow); border-bottom: 3px solid var(--noon-yellow); background: rgba(255, 199, 0, 0.05); }
     .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.02); }
-
     .admin-user-info { display: flex; align-items: center; gap: 15px; }
     
     .admin-main { flex: 1; overflow-y: auto; padding: 32px; position: relative; }
@@ -132,7 +132,6 @@
     .stat-row:last-child { border-bottom: none; }
     .stat-val { font-weight: 700; color: var(--text-main); }
 
-    /* Admin Filters */
     .admin-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: var(--card-bg); padding: 15px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; position: relative; z-index: 1;}
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
     .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
@@ -140,6 +139,17 @@
   </style>
 </head>
 <body>
+
+  <!-- ================= CAMERA MODAL (NEW) ================= -->
+  <div id="custom-camera-modal" class="hidden">
+    <video id="camera-video-stream" autoplay playsinline></video>
+    <canvas id="camera-hidden-canvas" class="hidden"></canvas>
+    <div class="cam-controls">
+        <button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()">📸 CAPTURE</button>
+        <button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()">🔄 FLIP CAM</button>
+        <button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()">❌ CANCEL</button>
+    </div>
+  </div>
 
   <!-- ================= 1. LOGIN SCREEN ================= -->
   <div id="login-view" class="login-container">
@@ -215,13 +225,23 @@
           </div>
         </div>
 
+        <!-- NEW LIVE CAMERA INPUTS -->
         <div class="input-group">
-          <label>Upload Iqama/ID Copy (Take Photo or Choose File)</label>
-          <input type="file" id="req-iqama" class="file-input" accept="image/*">
+          <label>Upload Iqama/ID Copy</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')">📷 Live Camera</button>
+            <input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')">
+          </div>
+          <img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
         </div>
+
         <div class="input-group">
-          <label>Upload Selfie Photo (Take Photo or Choose File)</label>
-          <input type="file" id="req-selfie" class="file-input" accept="image/*">
+          <label>Upload Selfie Photo</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')">📷 Live Camera</button>
+            <input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')">
+          </div>
+          <img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
         </div>
 
         <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;">Submit for Approval</button>
@@ -357,6 +377,67 @@
     let currentScanAction = 'check_in'; 
     let currentAdminFilter = 'all';
     let autoRefreshTimer = null;
+
+    // Custom Live Camera Variables
+    let liveStream = null;
+    let currentFacingMode = 'environment';
+    let targetPhotoType = '';
+    let capturedImages = { iqama: null, selfie: null };
+
+    // --- Custom Live Camera Logic ---
+    async function openLiveCamera(type) {
+        targetPhotoType = type;
+        document.getElementById('custom-camera-modal').classList.remove('hidden');
+        await startStream();
+    }
+
+    async function startStream() {
+        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); }
+        try {
+            liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
+            document.getElementById('camera-video-stream').srcObject = liveStream;
+        } catch (err) {
+            alert("Camera access denied or not available on this device.");
+            closeLiveCamera();
+        }
+    }
+
+    function switchLiveCamera() {
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        startStream();
+    }
+
+    function captureLivePhoto() {
+        const video = document.getElementById('camera-video-stream');
+        const canvas = document.getElementById('camera-hidden-canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        const b64 = canvas.toDataURL('image/jpeg', 0.8);
+        capturedImages[targetPhotoType] = b64;
+        
+        // Show the tiny preview next to the upload button
+        const preview = document.getElementById(`preview-${targetPhotoType}`);
+        preview.src = b64;
+        preview.classList.remove('hidden');
+        
+        // Clear the file input so they don't conflict
+        document.getElementById(`req-${targetPhotoType}`).value = "";
+        
+        closeLiveCamera();
+    }
+
+    function closeLiveCamera() {
+        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
+        document.getElementById('custom-camera-modal').classList.add('hidden');
+    }
+
+    function clearCapturedData(type) {
+        capturedImages[type] = null;
+        document.getElementById(`preview-${type}`).classList.add('hidden');
+        document.getElementById(`preview-${type}`).src = "";
+    }
 
     // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
@@ -538,17 +619,31 @@
       const selfieInput = document.getElementById('req-selfie');
       const btn = document.getElementById('btn-submit-req');
       
-      if(iqamaInput.files.length === 0 || selfieInput.files.length === 0) { return alert("Please upload both Iqama/ID and Selfie pictures."); }
+      let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
+      let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
+
+      // Determine Iqama Source
+      if (capturedImages.iqama) {
+          finalIqamaB64 = capturedImages.iqama.split(',')[1];
+      } else if (iqamaInput.files.length > 0) {
+          const iFull = await getBase64(iqamaInput.files[0]);
+          finalIqamaB64 = iFull.split(',')[1];
+          finalIqamaMime = iqamaInput.files[0].type;
+      } else { return alert("Please provide the Iqama/ID photo (Camera or Upload)."); }
+
+      // Determine Selfie Source
+      if (capturedImages.selfie) {
+          finalSelfieB64 = capturedImages.selfie.split(',')[1];
+      } else if (selfieInput.files.length > 0) {
+          const sFull = await getBase64(selfieInput.files[0]);
+          finalSelfieB64 = sFull.split(',')[1];
+          finalSelfieMime = selfieInput.files[0].type;
+      } else { return alert("Please provide the Selfie photo (Camera or Upload)."); }
 
       btn.innerText = 'Processing Images...';
       btn.disabled = true;
 
       try {
-        const iqamaFullStr = await getBase64(iqamaInput.files[0]);
-        const selfieFullStr = await getBase64(selfieInput.files[0]);
-        const iqamaB64 = iqamaFullStr.includes(',') ? iqamaFullStr.split(',')[1] : iqamaFullStr;
-        const selfieB64 = selfieFullStr.includes(',') ? selfieFullStr.split(',')[1] : selfieFullStr;
-
         const payload = {
           action: 'create',
           hostName: currentUser.name,
@@ -558,10 +653,10 @@
           location: document.getElementById('req-location').value,
           startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
           endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value,
-          iqamaBase64: iqamaB64,
-          iqamaMimeType: iqamaInput.files[0].type,
-          selfieBase64: selfieB64,
-          selfieMimeType: selfieInput.files[0].type
+          iqamaBase64: finalIqamaB64,
+          iqamaMimeType: finalIqamaMime,
+          selfieBase64: finalSelfieB64,
+          selfieMimeType: finalSelfieMime
         };
         
         if(!payload.visitorName || !payload.startDate) {
@@ -574,6 +669,7 @@
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
         iqamaInput.value = ""; selfieInput.value = "";
+        clearCapturedData('iqama'); clearCapturedData('selfie');
         loadMyPasses(false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
@@ -588,7 +684,7 @@
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
         const data = await res.json();
         if(!isSilent) listDiv.innerHTML = '';
-        else if (data.length === 0) return; // if silent and empty, do nothing
+        else if (data.length === 0) return; 
         
         let newHtml = '';
         if(data.length === 0) newHtml = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
@@ -627,7 +723,6 @@
 
         listDiv.innerHTML = newHtml;
 
-        // Render QRs after DOM update
         data.forEach((pass) => {
             const isCompleted = pass.CheckOutTime ? true : false;
             if (pass.Status === 'Approved' && !isCompleted) {
