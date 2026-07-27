@@ -544,7 +544,6 @@
         showDashboard('dashboard-guard');
       } else if (role === 'ops') {
         const name = document.getElementById('lo-name').value;
-        // FIX: Force email to lowercase immediately upon login
         const mail = document.getElementById('lo-mail').value.toLowerCase().trim();
         if(!name || !mail) return alert("Enter Name and Gmail");
         currentUser = { role: 'ops', name: name, email: mail };
@@ -554,7 +553,6 @@
         startAutoRefresh('ops');
       } else if (role === 'admin') {
         const name = document.getElementById('la-name').value;
-        // FIX: Force admin email to lowercase as well
         const mail = document.getElementById('la-mail').value.toLowerCase().trim();
         const pass = document.getElementById('la-pass').value;
         if(!name || !mail || !pass) return alert("Enter all Admin details");
@@ -691,9 +689,22 @@
         if(data.length === 0) newHtml = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
         
         data.reverse().forEach((pass) => {
-            const isCompleted = pass.CheckOutTime ? true : false;
-            const statusText = isCompleted ? 'COMPLETED' : pass.Status;
-            const statusColor = isCompleted ? 'var(--text-muted)' : (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
+            const todayNum = new Date().setHours(0,0,0,0);
+            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
+            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            
+            // NEW LOGIC: Visitor completes immediately on checkout. Contractor completes only when EndDate is passed.
+            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
+            const isExpired = todayNum > endNum;
+            const isCompleted = isVisitorDone || isExpired;
+            
+            let statusText = pass.Status;
+            let statusColor = (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
+
+            if (isCompleted) {
+                statusText = isExpired ? 'EXPIRED' : 'COMPLETED';
+                statusColor = 'var(--text-muted)';
+            }
             
             let cardHtml = `
             <div class="pass-item">
@@ -716,7 +727,8 @@
                     </div>
                 `;
             } else if (isCompleted) {
-                cardHtml += `<div style="text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);"><em>Checked Out: ${formatTime(pass.CheckOutTime)}</em></div>`;
+                let textStr = isExpired ? "Pass Expired" : `Checked Out: ${formatTime(pass.CheckOutTime)}`;
+                cardHtml += `<div style="text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);"><em>${textStr}</em></div>`;
             }
             cardHtml += `</div>`;
             newHtml += cardHtml;
@@ -725,7 +737,13 @@
         listDiv.innerHTML = newHtml;
 
         data.forEach((pass) => {
-            const isCompleted = pass.CheckOutTime ? true : false;
+            const todayNum = new Date().setHours(0,0,0,0);
+            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
+            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
+            const isExpired = todayNum > endNum;
+            const isCompleted = isVisitorDone || isExpired;
+            
             if (pass.Status === 'Approved' && !isCompleted) {
                 const qrElement = document.getElementById(`qr-${pass.UniqueID}`);
                 if(qrElement) new QRCode(qrElement, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
@@ -766,8 +784,12 @@
           if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
           endDateObj.setHours(23,59,59,999); 
           
-          const isCheckedOut = !!row.CheckOutTime;
-          const isHistory = (endDateObj < today && row.Status !== 'Pending') || row.Status === 'Rejected' || isCheckedOut; 
+          const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime;
+          const isExpired = endDateObj < today;
+          
+          // NEW LOGIC: A pass only goes to History if the Visitor checked out, the pass expired, or it was rejected.
+          // Contractors stay active in Approvals until their EndDate expires!
+          const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
           
           const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
           const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
@@ -784,9 +806,9 @@
             if(inRange) {
                 let finalStatus = row.Status;
                 let sColor = 'var(--noon-yellow)';
-                if (isCheckedOut) { finalStatus = 'COMPLETED'; sColor = 'var(--success)'; }
-                else if (row.Status === 'Rejected') { finalStatus = 'REJECTED'; sColor = 'var(--danger)'; }
-                else if (endDateObj < today) { finalStatus = 'EXPIRED'; sColor = 'var(--danger)'; }
+                if (row.Status === 'Rejected') { finalStatus = 'REJECTED'; sColor = 'var(--danger)'; }
+                else if (isExpired) { finalStatus = 'EXPIRED'; sColor = 'var(--danger)'; }
+                else if (isVisitorDone) { finalStatus = 'COMPLETED'; sColor = 'var(--success)'; }
                 else { finalStatus = row.Status; sColor = 'var(--success)'; }
 
                 htmlHistory += `<tr>
@@ -810,7 +832,11 @@
 
             if (row.Status === 'Approved') {
                 actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
-                actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
+                
+                // Only show Force Check-Out if they are actually checked in
+                if (row.CheckInTime && !row.CheckOutTime) {
+                    actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
+                }
             }
 
             htmlApprovals += `<tr>
@@ -985,6 +1011,10 @@
         const startNum = new Date(data.StartDate).setHours(0,0,0,0);
         const endNum = new Date(data.EndDate).setHours(0,0,0,0);
 
+        // NEW LOGIC: Differentiate states for Visitors vs Contractors
+        const isCheckedOut = !!data.CheckOutTime;
+        const isInside = !!data.CheckInTime && !data.CheckOutTime;
+
         if (data.Status !== 'Approved') {
             showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
         } else if (data.Location !== currentUser.location) {
@@ -993,15 +1023,16 @@
             showScanResult("DENIED", "Pass is not valid for today", "bg-red");
         } else if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) {
             showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
-        } else if (data.CheckOutTime) {
+        } else if (data.Type === 'Visitor' && isCheckedOut) {
             showScanResult("DENIED", "Pass already used / Visitor checked out", "bg-red");
-        } else if (data.CheckInTime) {
+        } else if (isInside) {
             currentScanAction = 'check_out';
-            showScanResult("CHECK OUT", "Visitor is exiting facility.<br><br><span style='color:#ffc700; font-size:14px;'>⚠️ PLEASE TAKE THE ID CARD FROM THE VISITOR AFTER CHECK OUT.</span>", "bg-blue");
+            showScanResult("CHECK OUT", "Visitor/Contractor is exiting facility.<br><br><span style='color:#ffc700; font-size:14px;'>⚠️ PLEASE TAKE THE ID CARD FROM THE PERSON AFTER CHECK OUT.</span>", "bg-blue");
             confirmBtn.innerText = "CONFIRM CHECK OUT";
             confirmBtn.className = "btn-primary btn-warning hidden"; 
             confirmBtn.classList.remove('hidden');
         } else {
+            // Fresh pass OR Contractor who has previously checked out
             currentScanAction = 'check_in';
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
             confirmBtn.innerText = "CONFIRM ENTRY";
