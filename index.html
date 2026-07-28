@@ -430,16 +430,14 @@
     let currentAdminFilter = 'all';
     let autoRefreshTimer = null;
     
-    let globalAdminData = []; // Caches data so the View Record modal opens instantly
-    let checkedPrintIds = new Set(); // Saves checkboxes between auto-refreshes
+    let globalAdminData = []; 
+    let checkedPrintIds = new Set(); 
 
-    // Custom Live Camera Variables
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
     let capturedImages = { iqama: null, selfie: null };
 
-    // --- Custom Live Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -491,7 +489,6 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
-    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -551,7 +548,6 @@
         return true;
     }
 
-    // --- Session Persistence & Auto Refresh ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     function startAutoRefresh(role) {
@@ -764,7 +760,6 @@
                 statusColor = 'var(--text-muted)';
             }
             
-            // NEW: Add Validity Stamp dynamically to Ops Portal
             const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} to ${formatToDDMMYYYY(pass.EndDate)})`;
 
             let cardHtml = `
@@ -815,7 +810,6 @@
       } catch (err) { if(!isSilent) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
-    // Checkbox persistence handlers
     function handlePrintCheckbox(cb) {
         if(cb.checked) checkedPrintIds.add(cb.value);
         else checkedPrintIds.delete(cb.value);
@@ -844,7 +838,7 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
-        globalAdminData = data; // Cache data for the View Record modal
+        globalAdminData = data; 
 
         let htmlApprovals = ''; let htmlHistory = ''; let htmlGuard = '';
         
@@ -868,7 +862,7 @@
           const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
           
           const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
-          const dateStr = `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
+          const dateStr = row.Type === 'Visitor' ? formatToDDMMYYYY(row.StartDate) : `${formatToDDMMYYYY(row.StartDate)} to ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
 
           if (inRange) {
               aType[row.Type] = (aType[row.Type] || 0) + 1;
@@ -906,13 +900,14 @@
               <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
             ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
 
-            // Adding View Record Button for all
             actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
 
             let cbHtml = '';
             if (row.Status === 'Approved') {
                 const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
                 cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
+                
+                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
                 actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
@@ -982,7 +977,6 @@
       } catch (err) { alert("Failed to check out."); }
     }
 
-    // --- VIEW FULL RECORD MODAL ---
     function openViewRecord(id) {
         const r = globalAdminData.find(x => x.UniqueID === id);
         if (!r) return;
@@ -993,7 +987,7 @@
             <div><strong>Visitor Name</strong>${r.VisitorName || '-'}</div>
             <div><strong>Type</strong>${r.Type || '-'}</div>
             <div><strong>Location</strong>${r.Location || '-'}</div>
-            <div><strong>Validity Period</strong>${formatToDDMMYYYY(r.StartDate)} to ${formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
+            <div><strong>Validity Period</strong>${r.Type === 'Visitor' ? formatToDDMMYYYY(r.StartDate) : formatToDDMMYYYY(r.StartDate) + ' to ' + formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
             <div><strong>SLP Ticket No</strong>${r.SlpTicketNo || '-'}</div>
             <div><strong>Contact No</strong>${r.ContactNo || '-'}</div>
         `;
@@ -1027,10 +1021,11 @@
         document.getElementById('view-record-modal').classList.add('hidden');
     }
 
-    // --- BATCH PRINT QR WINDOW ---
     function printSelected() {
         const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox:checked');
         if (checkboxes.length === 0) return alert("Please select at least one approved pass to print using the checkboxes.");
+
+        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = MULTIPLE passes per page (Standard A4/Letter)\n[Cancel] = SINGLE pass per page (ID Card Printer)");
 
         const printWindow = window.open('', '', 'width=800,height=600');
         let cardsHtml = '';
@@ -1055,11 +1050,25 @@
                             <p class="id">${id}</p>
                         </div>
                     </div>
-                    <div class="qr-box" id="qr-code-${index}"></div>
+                    <div class="qr-box" id="qr-code-batch-${index}"></div>
                 </div>
             `;
-            scripts += `new QRCode(document.getElementById("qr-code-${index}"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });\n`;
+            scripts += `new QRCode(document.getElementById("qr-code-batch-${index}"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });\n`;
         });
+
+        let printStyles = printModeMultiple ? `
+            @media print {
+                @page { margin: 10mm; }
+                body { display: flex; flex-wrap: wrap; gap: 5mm; align-content: flex-start; justify-content: flex-start; }
+                .card { page-break-inside: avoid; border: 1px solid #ccc !important; }
+            }
+        ` : `
+            @media print {
+                @page { size: 85.6mm 54mm; margin: 0; }
+                body { display: block; margin: 0; }
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 100vw; height: 100vh; page-break-after: always; }
+            }
+        `;
 
         printWindow.document.write(`
             <html>
@@ -1067,20 +1076,16 @@
                 <title>Batch Print Passes</title>
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
                 <style>
-                    body { margin: 0; padding: 0; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; background: #333; padding-top: 20px;}
-                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; box-sizing: border-box; position: relative; border: 1px solid #ccc; margin-bottom: 20px; page-break-inside: avoid; }
+                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-wrap: wrap; gap: 15px; }
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
                     .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
                     .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
                     .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
                     .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
                     .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
                     .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
-                    @media print {
-                        @page { size: 85.6mm 54mm; margin: 0; }
-                        body { background: white; display: block; align-items: flex-start; margin: 0; padding: 0; }
-                        .card { border-radius: 0; border: none; box-shadow: none; margin: 0; padding: 4mm; page-break-after: always; width: 100vw; height: 100vh;}
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    }
+                    ${printStyles}
                 </style>
             </head>
             <body>
@@ -1096,7 +1101,68 @@
         printWindow.document.close();
     }
 
-    // --- Guard Scanner Logic ---
+    function printQR(name, type, location, id, status) {
+        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = Standard Printer (A4/Letter, prints top-left)\n[Cancel] = ID Card Printer (85.6x54mm format)");
+        
+        const printWindow = window.open('', '', 'width=800,height=600');
+        
+        let printStyles = printModeMultiple ? `
+            @media print {
+                @page { margin: 10mm; }
+                body { display: flex; align-items: flex-start; justify-content: flex-start; }
+                .card { border: 1px solid #ccc !important; }
+            }
+        ` : `
+            @media print {
+                @page { size: 85.6mm 54mm; margin: 0; }
+                body { display: block; margin: 0; }
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 100vw; height: 100vh; }
+            }
+        `;
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print QR Pass</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+                <style>
+                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; }
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
+                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
+                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
+                    ${printStyles}
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="top-row">
+                        <div>
+                            <p class="name">${name}</p>
+                            <p class="sub">${type} &bull; ${location}</p>
+                        </div>
+                        <div>
+                            <p class="status">${status}</p>
+                            <p class="id">${id}</p>
+                        </div>
+                    </div>
+                    <div class="qr-box" id="qr-code"></div>
+                </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
+                    setTimeout(() => { window.print(); window.close(); }, 800);
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
