@@ -132,7 +132,7 @@
     .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* VIEW RECORD MODAL / EXTEND PASS MODAL */
+    /* VIEW RECORD / EXTEND PASS MODAL */
     .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
@@ -779,6 +779,96 @@
       }
     }
 
+    function renderMyPasses(data) {
+        const listDiv = document.getElementById('my-passes-list');
+        let newHtml = '';
+        if(data.length === 0) newHtml = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
+        
+        data.reverse().forEach((pass) => {
+            const todayNum = new Date().setHours(0,0,0,0);
+            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
+            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            
+            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
+            const isExpired = todayNum > endNum;
+            const isCompleted = isVisitorDone || isExpired;
+            
+            let statusText = pass.Status;
+            let statusColor = (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
+
+            if (isCompleted) {
+                statusText = isExpired ? 'EXPIRED' : 'COMPLETED';
+                statusColor = 'var(--text-muted)';
+            }
+            
+            const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} to ${formatToDDMMYYYY(pass.EndDate)})`;
+
+            let cardHtml = `
+            <div class="pass-item">
+                <div class="pass-header">
+                    <div>
+                        <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
+                        <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span><br>
+                        <span style="font-size: 10px; color: var(--noon-yellow);">${validityText}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${statusText}</span><br>
+                        <span style="font-size: 10px; color: var(--text-muted);">${pass.UniqueID}</span>
+                    </div>
+                </div>
+            `;
+            
+            if (pass.Status === 'Approved' && !isCompleted) {
+                cardHtml += `
+                    <div style="text-align: center;">
+                        <div class="qr-box" id="qr-${pass.UniqueID}"></div>
+                    </div>
+                `;
+            } else if (isCompleted) {
+                let textStr = isExpired ? "Pass Expired" : `Checked Out: ${formatTime(pass.CheckOutTime)}`;
+                cardHtml += `<div style="text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);"><em>${textStr}</em></div>`;
+            }
+            cardHtml += `</div>`;
+            newHtml += cardHtml;
+        });
+
+        listDiv.innerHTML = newHtml;
+
+        data.forEach((pass) => {
+            const todayNum = new Date().setHours(0,0,0,0);
+            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
+            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
+            const isExpired = todayNum > endNum;
+            const isCompleted = isVisitorDone || isExpired;
+            
+            if (pass.Status === 'Approved' && !isCompleted) {
+                const qrElement = document.getElementById(`qr-${pass.UniqueID}`);
+                if(qrElement) new QRCode(qrElement, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
+            }
+        });
+    }
+
+    async function loadMyPasses(isSilent = false) {
+      const listDiv = document.getElementById('my-passes-list');
+      
+      const cached = localStorage.getItem('cached_passes_' + currentUser.email);
+      if (cached && !isSilent) {
+          renderMyPasses(JSON.parse(cached));
+      } else if (!isSilent) {
+          listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
+      }
+
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
+        const data = await res.json();
+        localStorage.setItem('cached_passes_' + currentUser.email, JSON.stringify(data));
+        renderMyPasses(data);
+      } catch (err) { 
+        if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; 
+      }
+    }
+
     function renderAdminData(data) {
         globalAdminData = data; 
         const tPending = document.getElementById('admin-table-pending');
@@ -795,6 +885,7 @@
         let pendingCount = 0, activeCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
+        // Data is reversed before being passed in, so newest is always first
         data.forEach(row => {
           if(!row.UniqueID) return;
           
@@ -868,10 +959,10 @@
                 let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 
                 let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
                   <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
                   <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>
                   <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>
+                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
                 </div>`;
 
                 htmlActive += `<tr>
