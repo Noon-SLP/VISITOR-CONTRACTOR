@@ -905,9 +905,11 @@
             let cbHtml = '';
             if (row.Status === 'Approved') {
                 const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
-                cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
+                // NEW: Added data-date to the checkbox to feed into the batch print
+                cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 
-                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
+                // NEW: Added dateStr variable to printQR
+                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
                 actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
@@ -1037,6 +1039,7 @@
             const type = cb.getAttribute('data-type');
             const location = cb.getAttribute('data-location');
             const status = cb.getAttribute('data-status');
+            const date = cb.getAttribute('data-date'); // Gets date for batch print
 
             cardsHtml += `
                 <div class="card">
@@ -1044,6 +1047,7 @@
                         <div>
                             <p class="name">${name}</p>
                             <p class="sub">${type} &bull; ${location}</p>
+                            <p class="date">Valid: ${date}</p>
                         </div>
                         <div>
                             <p class="status">${status}</p>
@@ -1053,7 +1057,7 @@
                     <div class="qr-box" id="qr-code-batch-${index}"></div>
                 </div>
             `;
-            scripts += `new QRCode(document.getElementById("qr-code-batch-${index}"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });\n`;
+            scripts += `new QRCode(document.getElementById("qr-code-batch-${index}"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });\n`;
         });
 
         let printStyles = printModeMultiple ? `
@@ -1080,11 +1084,12 @@
                     body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-wrap: wrap; gap: 15px; }
                     .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
                     .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
-                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
                     .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
                     .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
                     .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
-                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
                     ${printStyles}
                 </style>
             </head>
@@ -1101,7 +1106,7 @@
         printWindow.document.close();
     }
 
-    function printQR(name, type, location, id, status) {
+    function printQR(name, type, location, id, status, date) {
         const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = Standard Printer (A4/Letter, prints top-left)\n[Cancel] = ID Card Printer (85.6x54mm format)");
         
         const printWindow = window.open('', '', 'width=800,height=600');
@@ -1130,11 +1135,12 @@
                     body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; }
                     .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
                     .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
-                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
                     .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
                     .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
                     .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
-                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
                     ${printStyles}
                 </style>
             </head>
@@ -1144,6 +1150,7 @@
                         <div>
                             <p class="name">${name}</p>
                             <p class="sub">${type} &bull; ${location}</p>
+                            <p class="date">Valid: ${date}</p>
                         </div>
                         <div>
                             <p class="status">${status}</p>
@@ -1154,7 +1161,7 @@
                 </div>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
                 <script>
-                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
+                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });
                     setTimeout(() => { window.print(); window.close(); }, 800);
                 <\/script>
             </body>
