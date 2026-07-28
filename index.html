@@ -137,8 +137,8 @@
     .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* VIEW RECORD MODAL */
-    #view-record-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    /* VIEW RECORD MODAL / EXTEND PASS MODAL */
+    .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
     .record-modal-content { padding: 25px; overflow-y: auto; font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-main); }
@@ -174,14 +174,35 @@
 <body>
 
   <!-- ================= VIEW RECORD MODAL ================= -->
-  <div id="view-record-modal" class="hidden">
+  <div id="view-record-modal" class="popup-modal hidden">
     <div class="record-modal-box">
         <div class="record-modal-header">
             <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Detailed Record View</h3>
             <button onclick="closeViewRecord()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
         </div>
-        <div id="view-record-content" class="record-modal-content">
-            <!-- Content injected here via JS -->
+        <div id="view-record-content" class="record-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ================= EXTEND PASS MODAL ================= -->
+  <div id="extend-pass-modal" class="popup-modal hidden">
+    <div class="record-modal-box" style="max-width: 400px; display: block;">
+        <div class="record-modal-header">
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Extend Pass Validity</h3>
+            <button onclick="closeExtendPass()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
+            <input type="hidden" id="extend-id">
+            <input type="hidden" id="extend-type">
+            <div class="input-group" id="extend-start-group">
+                <label style="color: var(--noon-yellow); font-size: 13px;">New Visit / Start Date</label>
+                <input type="date" id="extend-start" class="input-field">
+            </div>
+            <div class="input-group" id="extend-end-group">
+                <label style="color: var(--noon-yellow); font-size: 13px;">New End Date</label>
+                <input type="date" id="extend-end" class="input-field">
+            </div>
+            <button id="btn-submit-extend" class="btn-primary" onclick="submitExtendPass()">SAVE EXTENSION</button>
         </div>
     </div>
   </div>
@@ -262,7 +283,6 @@
           </select>
         </div>
 
-        <!-- VISITOR FIELDS -->
         <div id="req-visitor-fields">
           <div class="input-group">
             <label>Visit Date</label>
@@ -274,7 +294,6 @@
           <div class="input-group"><input type="text" id="req-vis-vehicle" class="input-field" placeholder="Vehicle Plate No. / Picture details"></div>
         </div>
 
-        <!-- CONTRACTOR FIELDS -->
         <div id="req-contractor-fields" class="hidden">
           <div class="input-group">
             <label>Contract Expiration (From - To)</label>
@@ -291,7 +310,6 @@
           <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
         </div>
 
-        <!-- PHOTO UPLOADS -->
         <div class="input-group">
           <label>Upload Iqama/ID Copy</label>
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -346,7 +364,6 @@
 
     <main class="admin-main">
       
-      <!-- GLOBAL ADMIN FILTER -->
       <div class="admin-filter-bar" id="admin-global-filter">
         <div style="display: flex; gap: 5px;">
             <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
@@ -385,8 +402,8 @@
         <div class="admin-card-title">Access & Gate History</div>
         <div style="overflow-x: auto;">
           <table>
-            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th></tr></thead>
-            <tbody id="admin-table-history"><tr><td colspan="8" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
+            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th><th>Action</th></tr></thead>
+            <tbody id="admin-table-history"><tr><td colspan="9" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -888,6 +905,11 @@
                 else if (isVisitorDone) { finalStatus = 'COMPLETED'; sColor = 'var(--success)'; }
                 else { finalStatus = row.Status; sColor = 'var(--success)'; }
 
+                let historyActionBtns = `<div style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;">
+                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
+                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                </div>`;
+
                 htmlHistory += `<tr>
                   <td style="color: var(--text-muted);">${dateStr}</td>
                   <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
@@ -897,6 +919,7 @@
                   <td style="color: var(--text-muted); font-size: 11px;">${row.CheckInTime ? formatTime(row.CheckInTime) : '-'}</td>
                   <td style="color: var(--text-muted); font-size: 11px;">${row.CheckOutTime ? formatTime(row.CheckOutTime) : '-'}</td>
                   <td style="color: var(--noon-yellow); font-size: 11px;">${row.ScannedByGuard || '-'}</td>
+                  <td>${historyActionBtns}</td>
                 </tr>`;
                 historyCount++;
             }
@@ -912,6 +935,7 @@
                 actionBtns += `<div style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}; margin-right: 10px;">${row.Status}</div>`;
             }
 
+            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>`;
             actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
 
             let cbHtml = '';
@@ -952,7 +976,7 @@
         });
 
         if (approvalsCount === 0) htmlApprovals = '<tr><td colspan="7" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
-        if (historyCount === 0) htmlHistory = '<tr><td colspan="8" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
+        if (historyCount === 0) htmlHistory = '<tr><td colspan="9" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
         if (guardCount === 0) htmlGuard = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
         tApprovals.innerHTML = htmlApprovals;
@@ -995,7 +1019,7 @@
           renderAdminData(JSON.parse(cached).reverse());
       } else if (!isSilent) {
           tApprovals.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-          tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
+          tHistory.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
           tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
       }
       
@@ -1024,6 +1048,55 @@
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_out', id: id, guardInfo: adminInfo }) });
         loadAdminData(false); 
       } catch (err) { alert("Failed to check out."); }
+    }
+
+    // --- EXTEND PASS LOGIC ---
+    function openExtendPass(id, type) {
+        document.getElementById('extend-id').value = id;
+        document.getElementById('extend-type').value = type;
+        if (type === 'Visitor') {
+            document.getElementById('extend-end-group').classList.add('hidden');
+        } else {
+            document.getElementById('extend-end-group').classList.remove('hidden');
+        }
+        document.getElementById('extend-pass-modal').classList.remove('hidden');
+    }
+
+    function closeExtendPass() {
+        document.getElementById('extend-pass-modal').classList.add('hidden');
+        document.getElementById('extend-start').value = '';
+        document.getElementById('extend-end').value = '';
+    }
+
+    async function submitExtendPass() {
+        const id = document.getElementById('extend-id').value;
+        const type = document.getElementById('extend-type').value;
+        const newStart = document.getElementById('extend-start').value;
+        const newEnd = type === 'Visitor' ? newStart : document.getElementById('extend-end').value;
+        const btn = document.getElementById('btn-submit-extend');
+
+        if (!newStart || (type === 'Contractor' && !newEnd)) return alert('Please select the new dates.');
+        if (!confirm(`Are you sure you want to extend pass ${id} and set it back to Approved status?`)) return;
+
+        btn.innerText = 'SAVING...';
+        btn.disabled = true;
+
+        try {
+            const payload = {
+                action: 'extend_pass',
+                id: id,
+                newStartDate: newStart,
+                newEndDate: newEnd
+            };
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            closeExtendPass();
+            loadAdminData(false);
+        } catch (err) {
+            alert('Failed to extend pass. Please try again.');
+        } finally {
+            btn.innerText = 'SAVE EXTENSION';
+            btn.disabled = false;
+        }
     }
 
     function openViewRecord(id) {
