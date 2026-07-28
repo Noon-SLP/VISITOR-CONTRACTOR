@@ -80,11 +80,6 @@
     .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
-    /* CUSTOM LIVE CAMERA MODAL UI */
-    #custom-camera-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
-    .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-    
     /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
@@ -117,7 +112,7 @@
     .admin-main::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background-image: url('logo.jpeg'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.03; pointer-events: none; z-index: 0; }
     
     .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px; position: relative; z-index: 1;}
-    .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); }
+    .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);}
     
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -147,6 +142,10 @@
     .record-img-box { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 15px; }
     .record-img-box div { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
     .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; }
+    
+    #custom-camera-modal { z-index: 99999; }
+    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
+    .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
 
     /* Custom Checkbox */
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
@@ -208,7 +207,7 @@
   </div>
 
   <!-- ================= CAMERA MODAL ================= -->
-  <div id="custom-camera-modal" class="hidden">
+  <div id="custom-camera-modal" class="popup-modal hidden">
     <video id="camera-video-stream" autoplay playsinline></video>
     <canvas id="camera-hidden-canvas" class="hidden"></canvas>
     <div class="cam-controls">
@@ -383,17 +382,29 @@
       </div>
 
       <div id="admin-sec-approvals" class="admin-card admin-section">
-        <div class="admin-card-title">
-            <span>Pending & Active Requests</span>
+        <!-- PENDING REQUESTS -->
+        <div class="admin-card-title"><span>Pending Requests</span></div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead><tr>
+                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
+            </tr></thead>
+            <tbody id="admin-table-pending"><tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+          </table>
+        </div>
+        
+        <!-- ACTIVE REQUESTS -->
+        <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
+            <span>Active Requests</span>
             <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
         </div>
         <div style="overflow-x: auto;">
           <table>
             <thead><tr>
                 <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox" class="print-checkbox" onclick="toggleSelectAll(this)"></th>
-                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Status</th><th>Action</th>
+                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
             </tr></thead>
-            <tbody id="admin-table-approvals"><tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+            <tbody id="admin-table-active"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -860,19 +871,21 @@
 
     function renderAdminData(data) {
         globalAdminData = data; 
-        const tApprovals = document.getElementById('admin-table-approvals');
+        const tPending = document.getElementById('admin-table-pending');
+        const tActive = document.getElementById('admin-table-active');
         const tHistory = document.getElementById('admin-table-history');
         const tGuard = document.getElementById('admin-table-guard-approvals');
 
-        let htmlApprovals = ''; let htmlHistory = ''; let htmlGuard = '';
+        let htmlPending = ''; let htmlActive = ''; let htmlHistory = ''; let htmlGuard = '';
         
         const today = new Date(); today.setHours(0,0,0,0);
         const fStart = document.getElementById('filter-start').value;
         const fEnd = document.getElementById('filter-end').value;
 
-        let approvalsCount = 0, historyCount = 0, guardCount = 0;
+        let pendingCount = 0, activeCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
+        // Data is reversed before being passed in, so newest is always first
         data.forEach(row => {
           if(!row.UniqueID) return;
           
@@ -882,7 +895,6 @@
           
           const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime;
           const isExpired = endDateObj < today;
-          
           const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
           
           const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
@@ -926,39 +938,41 @@
           } else {
             const isPending = row.Status === 'Pending';
             
-            let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;">`;
-            
             if (isPending) {
-                actionBtns += `<button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-                               <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>`;
-            } else {
-                actionBtns += `<div style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}; margin-right: 10px;">${row.Status}</div>`;
-            }
+                let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;">
+                  <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
+                  <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
+                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                </div>`;
 
-            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>`;
-            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
-
-            let cbHtml = '';
-            if (row.Status === 'Approved') {
+                htmlPending += `<tr>
+                  <td style="color: var(--text-muted);">${dateStr}</td>
+                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+                  <td>${row.Type}</td>
+                  <td>${row.Location}</td>
+                  <td>${actionBtns}</td>
+                </tr>`;
+                pendingCount++;
+            } else if (row.Status === 'Approved') {
                 const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
-                cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
+                let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 
-                actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
-                actionBtns += `<button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
+                let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;">
+                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>
+                  <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>
+                </div>`;
+
+                htmlActive += `<tr>
+                  <td>${cbHtml}</td>
+                  <td style="color: var(--text-muted);">${dateStr}</td>
+                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+                  <td>${row.Type}</td>
+                  <td>${row.Location}</td>
+                  <td>${actionBtns}</td>
+                </tr>`;
+                activeCount++;
             }
-
-            actionBtns += `</div>`;
-
-            htmlApprovals += `<tr>
-              <td>${cbHtml}</td>
-              <td style="color: var(--text-muted);">${dateStr}</td>
-              <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-              <td>${row.Type}</td>
-              <td>${row.Location}</td>
-              <td style="font-weight: 600; color: ${row.Status==='Approved'?'var(--success)': row.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)'}">${row.Status}</td>
-              <td>${actionBtns}</td>
-            </tr>`;
-            approvalsCount++;
           }
 
           if (row.CheckInTime && inRange) {
@@ -975,11 +989,13 @@
           }
         });
 
-        if (approvalsCount === 0) htmlApprovals = '<tr><td colspan="7" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
+        if (pendingCount === 0) htmlPending = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No pending requests.</td></tr>';
+        if (activeCount === 0) htmlActive = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
         if (historyCount === 0) htmlHistory = '<tr><td colspan="9" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
         if (guardCount === 0) htmlGuard = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
-        tApprovals.innerHTML = htmlApprovals;
+        tPending.innerHTML = htmlPending;
+        tActive.innerHTML = htmlActive;
         tHistory.innerHTML = htmlHistory;
         tGuard.innerHTML = htmlGuard;
 
@@ -1010,7 +1026,8 @@
     }
 
     async function loadAdminData(isSilent = false) {
-      const tApprovals = document.getElementById('admin-table-approvals');
+      const tPending = document.getElementById('admin-table-pending');
+      const tActive = document.getElementById('admin-table-active');
       const tHistory = document.getElementById('admin-table-history');
       const tGuard = document.getElementById('admin-table-guard-approvals');
       
@@ -1018,7 +1035,8 @@
       if (cached && !isSilent) {
           renderAdminData(JSON.parse(cached).reverse());
       } else if (!isSilent) {
-          tApprovals.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
+          tPending.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
+          tActive.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
           tHistory.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
           tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
       }
@@ -1027,7 +1045,7 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         localStorage.setItem('cached_admin_data', JSON.stringify(data));
-        renderAdminData(data.reverse());
+        renderAdminData(data.reverse()); // Reverse here so newest is processed first
       } catch (err) { 
          if (!isSilent && !cached) console.log(err); 
       }
@@ -1088,11 +1106,19 @@
                 newStartDate: newStart,
                 newEndDate: newEnd
             };
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            
+            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+            const data = await res.json();
+            
+            if (data.status === 'error') {
+                alert('Server Error: ' + data.message);
+                return;
+            }
+
             closeExtendPass();
-            loadAdminData(false);
+            loadAdminData(false); // Refreshes Admin Tables immediately
         } catch (err) {
-            alert('Failed to extend pass. Please try again.');
+            alert('Failed to extend pass. Please ensure you deployed the Apps Script as a NEW VERSION.');
         } finally {
             btn.innerText = 'SAVE EXTENSION';
             btn.disabled = false;
