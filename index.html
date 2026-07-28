@@ -140,7 +140,6 @@
 </head>
 <body>
 
-  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="hidden">
     <video id="camera-video-stream" autoplay playsinline></video>
     <canvas id="camera-hidden-canvas" class="hidden"></canvas>
@@ -151,7 +150,6 @@
     </div>
   </div>
 
-  <!-- ================= 1. LOGIN SCREEN ================= -->
   <div id="login-view" class="login-container">
     <div class="logo-box"></div>
     <div class="role-tabs">
@@ -188,7 +186,6 @@
     </div>
   </div>
 
-  <!-- ================= 2. VISITOR / CONTRACTOR DASHBOARD ================= -->
   <div id="dashboard-ops" class="dashboard hidden">
     <div class="header">
       <h2>Visitor & Contractor Portal</h2>
@@ -198,7 +195,16 @@
     <div class="ops-grid">
       <div class="ops-card">
         <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Request Access Pass</h3>
-        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Confirm Full Name"></div>
+        
+        <div class="input-group">
+          <label style="font-weight: 700; color: var(--noon-yellow);">Type</label>
+          <select id="req-type" class="input-field" onchange="toggleDateFields()">
+            <option value="Visitor">Visitor</option>
+            <option value="Contractor">Contractor</option>
+          </select>
+        </div>
+
+        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
         <div class="input-group">
           <select id="req-location" class="input-field">
             <option value="RUH01">Facility: RUH01</option>
@@ -206,23 +212,32 @@
             <option value="DXB01">Facility: DXB01</option>
           </select>
         </div>
-        <div class="input-group">
-          <select id="req-type" class="input-field" onchange="toggleDateFields()">
-            <option value="Visitor">Type: Visitor</option>
-            <option value="Contractor">Type: Contractor</option>
-          </select>
-        </div>
-        
-        <div class="input-group" id="date-visitor">
-          <label>Visit Date</label>
-          <input type="date" id="req-date-single" class="input-field">
-        </div>
-        <div class="input-group hidden" id="date-contractor">
-          <label>Contract Expiration (From - To)</label>
-          <div style="display: flex; gap: 10px;">
-            <input type="date" id="req-date-start" class="input-field">
-            <input type="date" id="req-date-end" class="input-field">
+
+        <div id="req-visitor-fields">
+          <div class="input-group">
+            <label>Visit Date</label>
+            <input type="date" id="req-date-single" class="input-field">
           </div>
+          <div class="input-group"><input type="text" id="req-vis-slp" class="input-field" placeholder="SLP Ticket No."></div>
+          <div class="input-group"><input type="text" id="req-vis-contact" class="input-field" placeholder="Contact No."></div>
+          <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field" placeholder="Invited by Whom"></div>
+          <div class="input-group"><input type="text" id="req-vis-vehicle" class="input-field" placeholder="Vehicle Plate No. / Picture details"></div>
+        </div>
+
+        <div id="req-contractor-fields" class="hidden">
+          <div class="input-group">
+            <label>Contract Expiration (From - To)</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="date" id="req-date-start" class="input-field">
+              <input type="date" id="req-date-end" class="input-field">
+            </div>
+          </div>
+          <div class="input-group"><input type="text" id="req-con-slp" class="input-field" placeholder="SLP Ticket No."></div>
+          <div class="input-group"><input type="text" id="req-con-contact" class="input-field" placeholder="Contact No."></div>
+          <div class="input-group"><input type="text" id="req-con-project" class="input-field" placeholder="Project Name"></div>
+          <div class="input-group"><input type="text" id="req-con-company" class="input-field" placeholder="Company / Contractor Name"></div>
+          <div class="input-group"><input type="text" id="req-con-pm" class="input-field" placeholder="Project Manager"></div>
+          <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
         </div>
 
         <div class="input-group">
@@ -258,7 +273,6 @@
     </div>
   </div>
 
-  <!-- ================= 3. ADMIN DASHBOARD ================= -->
   <div id="dashboard-admin" class="hidden admin-layout">
     <header class="admin-header-top">
       <div class="admin-brand-horizontal">
@@ -279,7 +293,6 @@
 
     <main class="admin-main">
       
-      <!-- GLOBAL ADMIN FILTER -->
       <div class="admin-filter-bar" id="admin-global-filter">
         <div style="display: flex; gap: 5px;">
             <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
@@ -339,7 +352,6 @@
     </main>
   </div>
 
-  <!-- ================= 4. GUARD DASHBOARD ================= -->
   <div id="dashboard-guard" class="dashboard hidden text-center">
     <div class="header">
       <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
@@ -377,13 +389,11 @@
     let currentAdminFilter = 'all';
     let autoRefreshTimer = null;
 
-    // Custom Live Camera Variables
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
     let capturedImages = { iqama: null, selfie: null };
 
-    // --- Custom Live Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -435,7 +445,6 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
-    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -495,7 +504,6 @@
         return true;
     }
 
-    // --- Session Persistence & Auto Refresh ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     function startAutoRefresh(role) {
@@ -592,8 +600,8 @@
 
     function toggleDateFields() {
       const type = document.getElementById('req-type').value;
-      document.getElementById('date-visitor').classList.toggle('hidden', type === 'Contractor');
-      document.getElementById('date-contractor').classList.toggle('hidden', type === 'Visitor');
+      document.getElementById('req-visitor-fields').classList.toggle('hidden', type === 'Contractor');
+      document.getElementById('req-contractor-fields').classList.toggle('hidden', type === 'Visitor');
     }
 
     function setAdminFilter(range, btnElement) {
@@ -650,7 +658,15 @@
           iqamaBase64: finalIqamaB64,
           iqamaMimeType: finalIqamaMime,
           selfieBase64: finalSelfieB64,
-          selfieMimeType: finalSelfieMime
+          selfieMimeType: finalSelfieMime,
+          slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
+          contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
+          invitedBy: type === 'Visitor' ? document.getElementById('req-vis-invitedby').value : '',
+          vehiclePlateNo: type === 'Visitor' ? document.getElementById('req-vis-vehicle').value : '',
+          projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
+          companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '',
+          projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : '',
+          fmPoc: type === 'Contractor' ? document.getElementById('req-con-fmpoc').value : ''
         };
         
         if(!payload.visitorName || !payload.startDate) {
@@ -822,7 +838,6 @@
               <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
             ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
 
-            // ALWAYS SHOW PRINT PASS & CHECK OUT FOR ALL APPROVED RECORDS
             if (row.Status === 'Approved') {
                 actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
                 actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
@@ -893,7 +908,6 @@
       } catch (err) { alert("Failed to check out."); }
     }
 
-    // --- Print QR Window ---
     function printQR(name, type, location, id, status) {
         const printWindow = window.open('', '', 'width=500,height=400');
         printWindow.document.write(`
@@ -943,7 +957,6 @@
         printWindow.document.close();
     }
 
-    // --- Guard Scanner Logic ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
