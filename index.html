@@ -731,15 +731,8 @@
       }
     }
 
-    async function loadMyPasses(isSilent = false) {
-      const listDiv = document.getElementById('my-passes-list');
-      if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
-        const data = await res.json();
-        if(!isSilent) listDiv.innerHTML = '';
-        else if (data.length === 0) return; 
-        
+    function renderMyPasses(data) {
+        const listDiv = document.getElementById('my-passes-list');
         let newHtml = '';
         if(data.length === 0) newHtml = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
         
@@ -806,39 +799,33 @@
                 if(qrElement) new QRCode(qrElement, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
             }
         });
-
-      } catch (err) { if(!isSilent) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
-    function handlePrintCheckbox(cb) {
-        if(cb.checked) checkedPrintIds.add(cb.value);
-        else checkedPrintIds.delete(cb.value);
-    }
-
-    function toggleSelectAll(source) {
-        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox');
-        checkboxes.forEach(cb => {
-            cb.checked = source.checked;
-            handlePrintCheckbox(cb);
-        });
-    }
-
-    async function loadAdminData(isSilent = false) {
-      const tApprovals = document.getElementById('admin-table-approvals');
-      const tHistory = document.getElementById('admin-table-history');
-      const tGuard = document.getElementById('admin-table-guard-approvals');
+    async function loadMyPasses(isSilent = false) {
+      const listDiv = document.getElementById('my-passes-list');
       
-      if (!isSilent) {
-          tApprovals.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-          tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
-          tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
+      const cached = localStorage.getItem('cached_passes_' + currentUser.email);
+      if (cached && !isSilent) {
+          renderMyPasses(JSON.parse(cached));
+      } else if (!isSilent) {
+          listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
       }
-      
+
       try {
-        const res = await fetch(SCRIPT_URL);
+        const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
         const data = await res.json();
-        
+        localStorage.setItem('cached_passes_' + currentUser.email, JSON.stringify(data));
+        renderMyPasses(data);
+      } catch (err) { 
+        if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; 
+      }
+    }
+
+    function renderAdminData(data) {
         globalAdminData = data; 
+        const tApprovals = document.getElementById('admin-table-approvals');
+        const tHistory = document.getElementById('admin-table-history');
+        const tGuard = document.getElementById('admin-table-guard-approvals');
 
         let htmlApprovals = ''; let htmlHistory = ''; let htmlGuard = '';
         
@@ -849,7 +836,7 @@
         let approvalsCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
-        data.reverse().forEach(row => {
+        data.forEach(row => {
           if(!row.UniqueID) return;
           
           let endDateObj = new Date(row.EndDate);
@@ -895,23 +882,31 @@
             }
           } else {
             const isPending = row.Status === 'Pending';
-            let actionBtns = isPending ? `
-              <button class="btn-primary btn-success btn-sm" style="width: auto; margin-right: 5px;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-              <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
-            ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
+            
+            // CLEANED UP ACTION BUTTONS UI
+            let actionBtns = `<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; max-width: 180px;">`;
+            
+            if (isPending) {
+                actionBtns += `<div style="display: flex; gap: 5px; width: 100%;">
+                  <button class="btn-primary btn-success btn-sm" style="flex: 1;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
+                  <button class="btn-primary btn-danger btn-sm" style="flex: 1;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
+                </div>`;
+            } else {
+                actionBtns += `<div style="width: 100%; font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'};">${row.Status}</div>`;
+            }
 
-            actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
+            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
 
             let cbHtml = '';
             if (row.Status === 'Approved') {
                 const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
-                // NEW: Added data-date to the checkbox to feed into the batch print
                 cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 
-                // NEW: Added dateStr variable to printQR
-                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
-                actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
+                actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
+                actionBtns += `<button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
+
+            actionBtns += `</div>`;
 
             htmlApprovals += `<tr>
               <td>${cbHtml}</td>
@@ -958,8 +953,43 @@
 
         let topDates = Object.entries(aDate).sort((a,b) => b[1]-a[1]).slice(0, 5);
         document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v} Passes</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
+    }
 
-      } catch (err) { console.log(err); }
+    function handlePrintCheckbox(cb) {
+        if(cb.checked) checkedPrintIds.add(cb.value);
+        else checkedPrintIds.delete(cb.value);
+    }
+
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = source.checked;
+            handlePrintCheckbox(cb);
+        });
+    }
+
+    async function loadAdminData(isSilent = false) {
+      const tApprovals = document.getElementById('admin-table-approvals');
+      const tHistory = document.getElementById('admin-table-history');
+      const tGuard = document.getElementById('admin-table-guard-approvals');
+      
+      const cached = localStorage.getItem('cached_admin_data');
+      if (cached && !isSilent) {
+          renderAdminData(JSON.parse(cached).reverse());
+      } else if (!isSilent) {
+          tApprovals.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
+          tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
+          tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
+      }
+      
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        localStorage.setItem('cached_admin_data', JSON.stringify(data));
+        renderAdminData(data.reverse());
+      } catch (err) { 
+         if (!isSilent && !cached) console.log(err); 
+      }
     }
 
     async function updateStatus(id, newStatus) {
