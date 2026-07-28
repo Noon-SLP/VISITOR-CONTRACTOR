@@ -46,7 +46,7 @@
     .mb-4 { margin-bottom: 16px; }
 
     /* Login Container */
-    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 10; }
+    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 10; margin: 20px; }
     .logo-box { width: 130px; height: 130px; margin: 0 auto 30px; background-color: #12151c; background-image: url('logo.jpeg'); background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 12px; }
     
     .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: #0b0e14; }
@@ -81,9 +81,9 @@
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
     /* CUSTOM LIVE CAMERA MODAL UI */
-    #custom-camera-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); }
-    .cam-controls { display: flex; gap: 15px; margin-top: 20px; }
+    #custom-camera-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
+    .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     
     /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
@@ -144,11 +144,31 @@
     .record-modal-content { padding: 25px; overflow-y: auto; font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-main); }
     .record-modal-content div { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
     .record-modal-content strong { color: var(--noon-yellow); display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
-    .record-img-box { grid-column: span 2; display: flex; gap: 15px; }
-    .record-img-box img { width: 50%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; }
+    .record-img-box { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 15px; }
+    .record-img-box div { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+    .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; }
 
     /* Custom Checkbox */
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
+
+    /* ================= RESPONSIVE (MOBILE & TABLET) FIXES ================= */
+    @media (max-width: 768px) {
+        .ops-grid { grid-template-columns: 1fr; gap: 15px; }
+        .analytics-grid { grid-template-columns: 1fr; gap: 15px; }
+        .admin-header-top { flex-direction: column; height: auto; padding: 15px; align-items: stretch; gap: 15px; }
+        .admin-brand-horizontal { margin-right: 0; text-align: center; width: 100%; }
+        .admin-nav-horizontal { flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; }
+        .admin-nav-horizontal li { padding: 10px; font-size: 11px; flex: 1 1 auto; text-align: center; }
+        .admin-user-info { justify-content: center; width: 100%; }
+        .admin-main { padding: 15px; }
+        .dashboard { margin-top: 20px; padding: 10px; }
+        .admin-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+        .admin-filter-bar > div { flex-wrap: wrap; justify-content: center; width: 100%; }
+        #custom-date-picker { flex-direction: column; align-items: stretch; width: 100%; }
+        .admin-card-title { flex-direction: column; gap: 10px; text-align: center; }
+        table th, table td { padding: 10px; }
+        .record-modal-content { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -883,27 +903,24 @@
           } else {
             const isPending = row.Status === 'Pending';
             
-            // CLEANED UP ACTION BUTTONS UI
-            let actionBtns = `<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; max-width: 180px;">`;
+            let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: center;">`;
             
             if (isPending) {
-                actionBtns += `<div style="display: flex; gap: 5px; width: 100%;">
-                  <button class="btn-primary btn-success btn-sm" style="flex: 1;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-                  <button class="btn-primary btn-danger btn-sm" style="flex: 1;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
-                </div>`;
+                actionBtns += `<button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
+                               <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>`;
             } else {
-                actionBtns += `<div style="width: 100%; font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'};">${row.Status}</div>`;
+                actionBtns += `<div style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}; margin-right: 10px;">${row.Status}</div>`;
             }
 
-            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
+            actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
 
             let cbHtml = '';
             if (row.Status === 'Approved') {
                 const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
                 cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 
-                actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
-                actionBtns += `<button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: 100%;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
+                actionBtns += `<button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>`;
+                actionBtns += `<button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
             actionBtns += `</div>`;
@@ -1069,7 +1086,7 @@
             const type = cb.getAttribute('data-type');
             const location = cb.getAttribute('data-location');
             const status = cb.getAttribute('data-status');
-            const date = cb.getAttribute('data-date'); // Gets date for batch print
+            const date = cb.getAttribute('data-date'); 
 
             cardsHtml += `
                 <div class="card">
@@ -1099,8 +1116,9 @@
         ` : `
             @media print {
                 @page { size: 85.6mm 54mm; margin: 0; }
-                body { display: block; margin: 0; }
-                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 100vw; height: 100vh; page-break-after: always; }
+                body { display: block; margin: 0; padding: 0; background: #fff;}
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-after: always; box-sizing: border-box; }
+                .card:last-child { page-break-after: auto; }
             }
         `;
 
@@ -1150,8 +1168,8 @@
         ` : `
             @media print {
                 @page { size: 85.6mm 54mm; margin: 0; }
-                body { display: block; margin: 0; }
-                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 100vw; height: 100vh; }
+                body { display: block; margin: 0; padding: 0; background: #fff;}
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-inside: avoid; box-sizing: border-box; }
             }
         `;
 
