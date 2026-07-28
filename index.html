@@ -117,7 +117,7 @@
     .admin-main::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background-image: url('logo.jpeg'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.03; pointer-events: none; z-index: 0; }
     
     .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px; position: relative; z-index: 1;}
-    .admin-card-title { padding: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); }
+    .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); }
     
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -136,10 +136,37 @@
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
     .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
+
+    /* VIEW RECORD MODAL */
+    #view-record-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
+    .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+    .record-modal-content { padding: 25px; overflow-y: auto; font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-main); }
+    .record-modal-content div { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+    .record-modal-content strong { color: var(--noon-yellow); display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
+    .record-img-box { grid-column: span 2; display: flex; gap: 15px; }
+    .record-img-box img { width: 50%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; }
+
+    /* Custom Checkbox */
+    .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
   </style>
 </head>
 <body>
 
+  <!-- ================= VIEW RECORD MODAL ================= -->
+  <div id="view-record-modal" class="hidden">
+    <div class="record-modal-box">
+        <div class="record-modal-header">
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Detailed Record View</h3>
+            <button onclick="closeViewRecord()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div id="view-record-content" class="record-modal-content">
+            <!-- Content injected here via JS -->
+        </div>
+    </div>
+  </div>
+
+  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="hidden">
     <video id="camera-video-stream" autoplay playsinline></video>
     <canvas id="camera-hidden-canvas" class="hidden"></canvas>
@@ -150,6 +177,7 @@
     </div>
   </div>
 
+  <!-- ================= 1. LOGIN SCREEN ================= -->
   <div id="login-view" class="login-container">
     <div class="logo-box"></div>
     <div class="role-tabs">
@@ -186,6 +214,7 @@
     </div>
   </div>
 
+  <!-- ================= 2. VISITOR / CONTRACTOR DASHBOARD ================= -->
   <div id="dashboard-ops" class="dashboard hidden">
     <div class="header">
       <h2>Visitor & Contractor Portal</h2>
@@ -213,6 +242,7 @@
           </select>
         </div>
 
+        <!-- VISITOR FIELDS -->
         <div id="req-visitor-fields">
           <div class="input-group">
             <label>Visit Date</label>
@@ -224,6 +254,7 @@
           <div class="input-group"><input type="text" id="req-vis-vehicle" class="input-field" placeholder="Vehicle Plate No. / Picture details"></div>
         </div>
 
+        <!-- CONTRACTOR FIELDS -->
         <div id="req-contractor-fields" class="hidden">
           <div class="input-group">
             <label>Contract Expiration (From - To)</label>
@@ -240,6 +271,7 @@
           <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
         </div>
 
+        <!-- PHOTO UPLOADS -->
         <div class="input-group">
           <label>Upload Iqama/ID Copy</label>
           <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -273,6 +305,7 @@
     </div>
   </div>
 
+  <!-- ================= 3. ADMIN DASHBOARD ================= -->
   <div id="dashboard-admin" class="hidden admin-layout">
     <header class="admin-header-top">
       <div class="admin-brand-horizontal">
@@ -293,6 +326,7 @@
 
     <main class="admin-main">
       
+      <!-- GLOBAL ADMIN FILTER -->
       <div class="admin-filter-bar" id="admin-global-filter">
         <div style="display: flex; gap: 5px;">
             <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
@@ -312,11 +346,17 @@
       </div>
 
       <div id="admin-sec-approvals" class="admin-card admin-section">
-        <div class="admin-card-title">Pending & Active Requests</div>
+        <div class="admin-card-title">
+            <span>Pending & Active Requests</span>
+            <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
+        </div>
         <div style="overflow-x: auto;">
           <table>
-            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="admin-table-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+            <thead><tr>
+                <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox" class="print-checkbox" onclick="toggleSelectAll(this)"></th>
+                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Status</th><th>Action</th>
+            </tr></thead>
+            <tbody id="admin-table-approvals"><tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -352,6 +392,7 @@
     </main>
   </div>
 
+  <!-- ================= 4. GUARD DASHBOARD ================= -->
   <div id="dashboard-guard" class="dashboard hidden text-center">
     <div class="header">
       <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
@@ -388,12 +429,17 @@
     let currentScanAction = 'check_in'; 
     let currentAdminFilter = 'all';
     let autoRefreshTimer = null;
+    
+    let globalAdminData = []; // Caches data so the View Record modal opens instantly
+    let checkedPrintIds = new Set(); // Saves checkboxes between auto-refreshes
 
+    // Custom Live Camera Variables
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
     let capturedImages = { iqama: null, selfie: null };
 
+    // --- Custom Live Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -445,6 +491,7 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
+    // --- Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -504,6 +551,7 @@
         return true;
     }
 
+    // --- Session Persistence & Auto Refresh ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     function startAutoRefresh(role) {
@@ -716,12 +764,16 @@
                 statusColor = 'var(--text-muted)';
             }
             
+            // NEW: Add Validity Stamp dynamically to Ops Portal
+            const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} to ${formatToDDMMYYYY(pass.EndDate)})`;
+
             let cardHtml = `
             <div class="pass-item">
                 <div class="pass-header">
                     <div>
                         <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
-                        <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span>
+                        <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span><br>
+                        <span style="font-size: 10px; color: var(--noon-yellow);">${validityText}</span>
                     </div>
                     <div style="text-align: right;">
                         <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${statusText}</span><br>
@@ -763,13 +815,27 @@
       } catch (err) { if(!isSilent) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
+    // Checkbox persistence handlers
+    function handlePrintCheckbox(cb) {
+        if(cb.checked) checkedPrintIds.add(cb.value);
+        else checkedPrintIds.delete(cb.value);
+    }
+
+    function toggleSelectAll(source) {
+        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = source.checked;
+            handlePrintCheckbox(cb);
+        });
+    }
+
     async function loadAdminData(isSilent = false) {
       const tApprovals = document.getElementById('admin-table-approvals');
       const tHistory = document.getElementById('admin-table-history');
       const tGuard = document.getElementById('admin-table-guard-approvals');
       
       if (!isSilent) {
-          tApprovals.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
+          tApprovals.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
           tHistory.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
           tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
       }
@@ -778,6 +844,8 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         
+        globalAdminData = data; // Cache data for the View Record modal
+
         let htmlApprovals = ''; let htmlHistory = ''; let htmlGuard = '';
         
         const today = new Date(); today.setHours(0,0,0,0);
@@ -838,12 +906,18 @@
               <button class="btn-primary btn-danger btn-sm" style="width: auto;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
             ` : `<span style="font-size: 12px; font-weight: bold; color: ${row.Status==='Approved'?'var(--success)':'var(--danger)'}">${row.Status}</span>`;
 
+            // Adding View Record Button for all
+            actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>`;
+
+            let cbHtml = '';
             if (row.Status === 'Approved') {
-                actionBtns += `<br><button class="btn-primary btn-outline btn-sm" style="margin-top: 10px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}')">🖨️ PRINT PASS</button>`;
+                const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
+                cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                 actionBtns += `<br><button class="btn-primary btn-warning btn-sm" style="margin-top: 5px; font-size: 10px; padding: 4px 8px; width: auto;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>`;
             }
 
             htmlApprovals += `<tr>
+              <td>${cbHtml}</td>
               <td style="color: var(--text-muted);">${dateStr}</td>
               <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
               <td>${row.Type}</td>
@@ -868,7 +942,7 @@
           }
         });
 
-        if (approvalsCount === 0) htmlApprovals = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
+        if (approvalsCount === 0) htmlApprovals = '<tr><td colspan="7" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
         if (historyCount === 0) htmlHistory = '<tr><td colspan="8" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
         if (guardCount === 0) htmlGuard = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
@@ -908,31 +982,68 @@
       } catch (err) { alert("Failed to check out."); }
     }
 
-    function printQR(name, type, location, id, status) {
-        const printWindow = window.open('', '', 'width=500,height=400');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Print QR Pass</title>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
-                <style>
-                    body { margin: 0; padding: 0; background: #0b0e14; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Inter', sans-serif; }
-                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; box-sizing: border-box; position: relative; }
-                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
-                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
-                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
-                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
-                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
-                    @media print {
-                        @page { size: 85.6mm 54mm; margin: 0; }
-                        body { background: white; display: block; align-items: flex-start; }
-                        .card { border-radius: 0; border: none; box-shadow: none; margin: 0; padding: 4mm; }
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    }
-                </style>
-            </head>
-            <body>
+    // --- VIEW FULL RECORD MODAL ---
+    function openViewRecord(id) {
+        const r = globalAdminData.find(x => x.UniqueID === id);
+        if (!r) return;
+
+        let contentHtml = `
+            <div><strong>Host Name</strong>${r.HostName || '-'}</div>
+            <div><strong>Host Email</strong>${r.HostEmail || '-'}</div>
+            <div><strong>Visitor Name</strong>${r.VisitorName || '-'}</div>
+            <div><strong>Type</strong>${r.Type || '-'}</div>
+            <div><strong>Location</strong>${r.Location || '-'}</div>
+            <div><strong>Validity Period</strong>${formatToDDMMYYYY(r.StartDate)} to ${formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
+            <div><strong>SLP Ticket No</strong>${r.SlpTicketNo || '-'}</div>
+            <div><strong>Contact No</strong>${r.ContactNo || '-'}</div>
+        `;
+
+        if (r.Type === 'Visitor') {
+            contentHtml += `
+                <div><strong>Invited By</strong>${r.InvitedBy || '-'}</div>
+                <div><strong>Vehicle Plate No</strong>${r.VehiclePlateNo || '-'}</div>
+            `;
+        } else {
+            contentHtml += `
+                <div><strong>Project Name</strong>${r.ProjectName || '-'}</div>
+                <div><strong>Company Name</strong>${r.CompanyName || '-'}</div>
+                <div><strong>Project Manager</strong>${r.ProjectManager || '-'}</div>
+                <div><strong>FM POC</strong>${r.FmPoc || '-'}</div>
+            `;
+        }
+
+        contentHtml += `
+            <div class="record-img-box">
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>IQAMA/ID COPY</strong><img src="${r.IqamaURL || ''}" alt="No Image"></div>
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>SELFIE PHOTO</strong><img src="${r.SelfieURL || ''}" alt="No Image"></div>
+            </div>
+        `;
+
+        document.getElementById('view-record-content').innerHTML = contentHtml;
+        document.getElementById('view-record-modal').classList.remove('hidden');
+    }
+
+    function closeViewRecord() {
+        document.getElementById('view-record-modal').classList.add('hidden');
+    }
+
+    // --- BATCH PRINT QR WINDOW ---
+    function printSelected() {
+        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox:checked');
+        if (checkboxes.length === 0) return alert("Please select at least one approved pass to print using the checkboxes.");
+
+        const printWindow = window.open('', '', 'width=800,height=600');
+        let cardsHtml = '';
+        let scripts = '';
+
+        checkboxes.forEach((cb, index) => {
+            const id = cb.value;
+            const name = cb.getAttribute('data-name');
+            const type = cb.getAttribute('data-type');
+            const location = cb.getAttribute('data-location');
+            const status = cb.getAttribute('data-status');
+
+            cardsHtml += `
                 <div class="card">
                     <div class="top-row">
                         <div>
@@ -944,12 +1055,40 @@
                             <p class="id">${id}</p>
                         </div>
                     </div>
-                    <div class="qr-box" id="qr-code"></div>
+                    <div class="qr-box" id="qr-code-${index}"></div>
                 </div>
+            `;
+            scripts += `new QRCode(document.getElementById("qr-code-${index}"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });\n`;
+        });
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Batch Print Passes</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+                <style>
+                    body { margin: 0; padding: 0; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; background: #333; padding-top: 20px;}
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; box-sizing: border-box; position: relative; border: 1px solid #ccc; margin-bottom: 20px; page-break-inside: avoid; }
+                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 50mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
+                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 3mm; }
+                    @media print {
+                        @page { size: 85.6mm 54mm; margin: 0; }
+                        body { background: white; display: block; align-items: flex-start; margin: 0; padding: 0; }
+                        .card { border-radius: 0; border: none; box-shadow: none; margin: 0; padding: 4mm; page-break-after: always; width: 100vw; height: 100vh;}
+                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${cardsHtml}
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
                 <script>
-                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
-                    setTimeout(() => { window.print(); window.close(); }, 800);
+                    ${scripts}
+                    setTimeout(() => { window.print(); window.close(); }, 1000);
                 <\/script>
             </body>
             </html>
@@ -957,6 +1096,7 @@
         printWindow.document.close();
     }
 
+    // --- Guard Scanner Logic ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
