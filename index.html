@@ -103,7 +103,7 @@
     .header h2 { color: var(--noon-yellow); font-size: 22px; margin: 0; display: flex; align-items: center; gap: 15px;}
     .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-    /* EXACT WIDTH RESTRICTIONS AS REQUESTED */
+    /* VIEW SPECIFIC WIDTHS */
     #dashboard-ops { max-width: 950px; margin-top: 20px; } 
     #dashboard-guard { max-width: 600px; margin-top: 20px; }
     #dashboard-admin { max-width: 100%; padding: 30px 2.5vw; padding-top: 0; }
@@ -329,7 +329,7 @@
       <!-- MAIN CONTENT AREA -->
       <main id="main-content">
           
-          <!-- 1. OPS PORTAL (950px Width, Exactly Centered) -->
+          <!-- 1. OPS PORTAL -->
           <div id="dashboard-ops" class="dashboard hidden">
             <div class="header">
               <h2 data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</h2>
@@ -438,7 +438,7 @@
           <!-- 2. GUARD SCANNER -->
           <div id="dashboard-guard" class="dashboard hidden text-center">
             <div class="header">
-              <h2 data-i18n="gate_scanner">Gate Scanner (<span id="guard-loc-display"></span>)</h2>
+              <h2><span data-i18n="gate_scanner">Gate Scanner</span> (<span id="guard-loc-display"></span>)</h2>
               <div class="header-controls">
                   <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button>
                   <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button>
@@ -700,10 +700,12 @@
 
     function switchMainView(viewId) {
         document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => e.classList.add('hidden'));
-        document.getElementById(`dashboard-${viewId}`).classList.remove('hidden');
+        const targetView = document.getElementById(`dashboard-${viewId}`);
+        if (targetView) targetView.classList.remove('hidden');
         
         document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-        if(document.getElementById(`nav-sidebar-${viewId}`)) document.getElementById(`nav-sidebar-${viewId}`).classList.add('active');
+        const activeNav = document.getElementById(`nav-sidebar-${viewId}`);
+        if(activeNav) activeNav.classList.add('active');
 
         if(window.innerWidth <= 900 && !document.getElementById('sidebar').classList.contains('minimized')) { toggleSidebar(); } 
 
@@ -892,35 +894,60 @@
     }
 
     function initApp() {
-        document.getElementById('login-view').classList.add('hidden');
-        document.getElementById('app-layout').classList.remove('hidden');
+        const loginView = document.getElementById('login-view');
+        if (loginView) loginView.classList.add('hidden');
+        
+        const appLayout = document.getElementById('app-layout');
+        if (appLayout) appLayout.classList.remove('hidden');
 
         if (currentUser.role === 'admin') {
-            document.getElementById('req-vname').value = '';
-            document.getElementById('req-admin-email').value = '';
-            document.getElementById('admin-email-group').classList.remove('hidden');
+            const vName = document.getElementById('req-vname');
+            if (vName) vName.value = '';
             
-            document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('header-admin-name').innerText = currentUser.name;
-            document.getElementById('sidebar-user-name').innerText = currentUser.name;
-            document.getElementById('nav-sidebar-admin').classList.remove('hidden');
+            const adminEmail = document.getElementById('req-admin-email');
+            if (adminEmail) adminEmail.value = '';
+            
+            const adminGroup = document.getElementById('admin-email-group');
+            if (adminGroup) adminGroup.classList.remove('hidden');
+            
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.style.display = 'flex';
+            
+            const headerAdminName = document.getElementById('header-admin-name');
+            if (headerAdminName) headerAdminName.innerText = currentUser.name;
+            
+            const sidebarUserName = document.getElementById('sidebar-user-name');
+            if (sidebarUserName) sidebarUserName.innerText = currentUser.name;
+            
+            const navAdmin = document.getElementById('nav-sidebar-admin');
+            if (navAdmin) navAdmin.classList.remove('hidden');
+            
             loadAdminData(false);
             switchMainView('admin');
         } else {
-            document.getElementById('req-vname').value = currentUser.name;
-            document.getElementById('admin-email-group').classList.add('hidden');
+            const vName = document.getElementById('req-vname');
+            if (vName && currentUser.name) vName.value = currentUser.name;
+            
+            const adminGroup = document.getElementById('admin-email-group');
+            if (adminGroup) adminGroup.classList.add('hidden');
 
-            document.getElementById('sidebar').style.display = 'none';
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.style.display = 'none';
             document.body.classList.add('sidebar-minimized');
-            document.getElementById('main-content').style.margin = '0';
+            
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) mainContent.style.margin = '0';
             
             if (currentUser.role === 'ops') {
                 switchMainView('ops');
                 loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
-                document.getElementById('guard-loc-display').innerText = currentUser.location || '';
+                const locDisplay = document.getElementById('guard-loc-display');
+                if (locDisplay) locDisplay.innerText = currentUser.location || '';
+                
                 document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => e.classList.add('hidden'));
-                document.getElementById('dashboard-guard').classList.remove('hidden');
+                const dashGuard = document.getElementById('dashboard-guard');
+                if (dashGuard) dashGuard.classList.remove('hidden');
             }
         }
         startAutoRefresh(currentUser.role);
