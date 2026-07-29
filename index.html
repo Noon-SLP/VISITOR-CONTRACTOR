@@ -97,16 +97,19 @@
     
     #main-content { flex: 1; height: 100vh; overflow-y: auto; position: relative; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
     
-    /* Dashboards (FULL SCREEN) */
-    .dashboard { width: 100%; max-width: 100%; padding: 2.5vw; margin: 0 auto; }
+    /* Dashboards General Formatting */
+    .dashboard { width: 100%; padding: 20px; margin: 0 auto; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 15px;}
     .header h2 { color: var(--noon-yellow); font-size: 22px; margin: 0; display: flex; align-items: center; gap: 15px;}
-    
-    /* Top Controls Row (For Header) */
     .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
+    /* EXACT WIDTH RESTRICTIONS AS REQUESTED */
+    #dashboard-ops { max-width: 950px; margin-top: 20px; } 
+    #dashboard-guard { max-width: 600px; margin-top: 20px; }
+    #dashboard-admin { max-width: 100%; padding: 30px 2.5vw; padding-top: 0; }
+
     /* OPS Portal Layout */
-    .ops-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 450px); gap: 2vw; align-items: start; }
+    .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     .ops-card { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     .pass-item { background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px; text-align: start; }
@@ -326,7 +329,7 @@
       <!-- MAIN CONTENT AREA -->
       <main id="main-content">
           
-          <!-- 1. OPS PORTAL -->
+          <!-- 1. OPS PORTAL (950px Width, Exactly Centered) -->
           <div id="dashboard-ops" class="dashboard hidden">
             <div class="header">
               <h2 data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</h2>
@@ -796,7 +799,7 @@
     function isDateInRange(dateStr, filterType, startStr, endStr) {
         if (filterType === 'all') return true;
         const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return true; // Include records with unparseable dates
+        if (isNaN(d.getTime())) return true;
         
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -904,7 +907,6 @@
             loadAdminData(false);
             switchMainView('admin');
         } else {
-            // Force sidebar hidden & reset margins for full screen
             document.getElementById('req-vname').value = currentUser.name;
             document.getElementById('admin-email-group').classList.add('hidden');
 
@@ -917,8 +919,6 @@
                 loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
                 document.getElementById('guard-loc-display').innerText = currentUser.location || '';
-                
-                // Explicitly unhide guard dashboard just in case switchMainView conflicts with sidebar logic
                 document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => e.classList.add('hidden'));
                 document.getElementById('dashboard-guard').classList.remove('hidden');
             }
@@ -1156,7 +1156,7 @@
             document.getElementById('custom-date-picker').classList.remove('hidden');
         } else {
             document.getElementById('custom-date-picker').classList.add('hidden');
-            renderAdminData(globalAdminData); // Renders instantly using memory
+            renderAdminData(globalAdminData);
         }
     }
 
