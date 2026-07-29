@@ -288,7 +288,8 @@
                </a>
            </nav>
            <div class="sidebar-footer">
-               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); font-weight: bold;" class="nav-text">Admin</div>
+               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); font-weight: bold; margin-bottom: 10px;" class="nav-text">Admin</div>
+               <button class="btn-primary btn-outline btn-sm" style="width: 100%;" onclick="logout()">LOGOUT</button>
            </div>
       </aside>
 
@@ -313,19 +314,14 @@
                     <option value="Contractor">Contractor</option>
                   </select>
                 </div>
-                
-                <!-- NEW EXPLICIT FIELDS SO ADMINS CAN REQUEST ON BEHALF OF OTHERS -->
-                <div class="input-group">
-                    <input type="text" id="req-host-name" class="input-field" placeholder="Requester / Host Name">
-                </div>
-                <div class="input-group">
-                    <input type="email" id="req-host-email" class="input-field" placeholder="Requester / Host Email (Pass tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false)">
-                </div>
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
-                <div class="input-group">
-                    <input type="text" id="req-vname" class="input-field" placeholder="Visitor / Contractor Full Name">
+                <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
+                
+                <!-- NEW: EMAIL FIELD (ONLY VISIBLE FOR ADMINS TO FETCH / ASSIGN PASSES) -->
+                <div class="input-group hidden" id="admin-email-group">
+                    <input type="email" id="req-admin-email" class="input-field" placeholder="Email Address" onchange="loadMyPasses(false)">
                 </div>
+                
                 <div class="input-group">
                   <select id="req-location" class="input-field">
                     <option value="RUH01">Facility: RUH01</option>
@@ -742,10 +738,11 @@
     function initApp() {
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
-        
+
         if (currentUser.role === 'admin') {
-            document.getElementById('req-host-name').value = "";
-            document.getElementById('req-host-email').value = "";
+            document.getElementById('req-vname').value = '';
+            document.getElementById('req-admin-email').value = '';
+            document.getElementById('admin-email-group').classList.remove('hidden');
             
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('header-admin-name').innerText = currentUser.name;
@@ -754,8 +751,8 @@
             loadAdminData(false);
             switchMainView('admin');
         } else {
-            document.getElementById('req-host-name').value = currentUser.name;
-            document.getElementById('req-host-email').value = currentUser.email;
+            document.getElementById('req-vname').value = currentUser.name;
+            document.getElementById('admin-email-group').classList.add('hidden');
 
             document.getElementById('sidebar').style.display = 'none';
             document.body.classList.add('sidebar-minimized');
@@ -821,11 +818,16 @@
           finalVehicleMime = vehicleInput.files[0].type;
       }
 
-      const hostNameVal = document.getElementById('req-host-name').value.trim();
-      const hostEmailVal = document.getElementById('req-host-email').value.toLowerCase().trim();
-      const visitorNameVal = document.getElementById('req-vname').value.trim();
+      let hostNameVal = currentUser.name;
+      let hostEmailVal = currentUser.email;
 
-      if(!hostEmailVal || !hostNameVal || !visitorNameVal) return alert("Requester Email/Name and Visitor Name are required fields.");
+      if (currentUser.role === 'admin') {
+          hostEmailVal = document.getElementById('req-admin-email').value.toLowerCase().trim();
+          if(!hostEmailVal) return alert("Please enter the Email Address for this pass.");
+      }
+
+      const visitorNameVal = document.getElementById('req-vname').value.trim();
+      if(!visitorNameVal) return alert("Full Name is a required field.");
 
       btn.innerText = 'Processing...';
       btn.disabled = true;
@@ -865,7 +867,8 @@
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
         
-        document.getElementById('req-vname').value = ""; 
+        if(currentUser.role === 'admin') document.getElementById('req-vname').value = ""; 
+        
         iqamaInput.value = ""; selfieInput.value = ""; if(vehicleInput) vehicleInput.value = "";
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
         loadMyPasses(false); 
@@ -950,11 +953,11 @@
       
       let targetEmail = currentUser.email;
       if (currentUser.role === 'admin') {
-          const inputEmail = document.getElementById('req-host-email').value.toLowerCase().trim();
+          const inputEmail = document.getElementById('req-admin-email').value.toLowerCase().trim();
           if (inputEmail) {
               targetEmail = inputEmail;
           } else {
-              if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Enter a Requester Email on the left to see their passes.</p>';
+              if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Enter an Email Address on the left to view passes.</p>';
               return;
           }
       }
