@@ -224,7 +224,6 @@
     </div>
   </div>
 
-
   <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
   <div id="login-view">
     <div class="login-container">
@@ -272,7 +271,7 @@
            <div class="sidebar-header">
                <div class="sidebar-brand">
                    <h1>NOON SLP</h1>
-                   <p>Gate Control</p>
+                   <p>System Admin</p>
                </div>
                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
            </div>
@@ -287,9 +286,6 @@
                    <span class="icon">⚙️</span><span class="nav-text">Admin Dashboard</span>
                </a>
            </nav>
-           <div class="sidebar-footer">
-               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); font-weight: bold;" class="nav-text">Admin</div>
-           </div>
       </aside>
 
       <!-- MAIN CONTENT AREA -->
@@ -313,8 +309,19 @@
                     <option value="Contractor">Contractor</option>
                   </select>
                 </div>
+                
+                <!-- NEW EXPLICIT FIELDS SO ADMINS CAN REQUEST ON BEHALF OF OTHERS -->
+                <div class="input-group">
+                    <input type="text" id="req-host-name" class="input-field" placeholder="Requester / Host Name">
+                </div>
+                <div class="input-group">
+                    <input type="email" id="req-host-email" class="input-field" placeholder="Requester / Host Email (Pass tracking)">
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
-                <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
+                <div class="input-group">
+                    <input type="text" id="req-vname" class="input-field" placeholder="Visitor / Contractor Full Name">
+                </div>
                 <div class="input-group">
                   <select id="req-location" class="input-field">
                     <option value="RUH01">Facility: RUH01</option>
@@ -456,6 +463,7 @@
 
             <!-- TAB: APPROVALS -->
             <div id="admin-sec-approvals" class="admin-card admin-section">
+                <!-- PENDING REQUESTS -->
                 <div class="admin-card-title"><span>Pending Requests</span></div>
                 <div style="overflow-x: auto;">
                   <table>
@@ -466,6 +474,7 @@
                   </table>
                 </div>
                 
+                <!-- ACTIVE REQUESTS -->
                 <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
                     <span>Active Requests</span>
                     <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
@@ -723,21 +732,22 @@
         document.getElementById('login-view').classList.add('hidden');
         document.getElementById('app-layout').classList.remove('hidden');
         
+        // Auto-fill host details based on login info
+        document.getElementById('req-host-name').value = currentUser.name;
+        document.getElementById('req-host-email').value = currentUser.email;
+
         if (currentUser.role === 'admin') {
             document.getElementById('sidebar').style.display = 'flex';
-            document.getElementById('sidebar-user-name').innerText = currentUser.name;
             document.getElementById('header-admin-name').innerText = currentUser.name;
             document.getElementById('nav-sidebar-admin').classList.remove('hidden');
             loadAdminData(false);
             switchMainView('admin');
         } else {
-            // Hide Sidebar for Non-Admins entirely
             document.getElementById('sidebar').style.display = 'none';
             document.body.classList.add('sidebar-minimized');
             document.getElementById('main-content').style.marginLeft = '0';
             
             if (currentUser.role === 'ops') {
-                document.getElementById('req-vname').value = currentUser.name;
                 switchMainView('ops');
                 loadMyPasses(false);
             } else if (currentUser.role === 'guard') {
@@ -797,15 +807,21 @@
           finalVehicleMime = vehicleInput.files[0].type;
       }
 
+      const hostNameVal = document.getElementById('req-host-name').value.trim();
+      const hostEmailVal = document.getElementById('req-host-email').value.toLowerCase().trim();
+      const visitorNameVal = document.getElementById('req-vname').value.trim();
+
+      if(!hostEmailVal || !hostNameVal || !visitorNameVal) return alert("Requester Email/Name and Visitor Name are required fields.");
+
       btn.innerText = 'Processing...';
       btn.disabled = true;
 
       try {
         const payload = {
           action: 'create',
-          hostName: currentUser.name,
-          hostEmail: currentUser.email, 
-          visitorName: document.getElementById('req-vname').value,
+          hostName: hostNameVal,
+          hostEmail: hostEmailVal, 
+          visitorName: visitorNameVal,
           type: type,
           location: document.getElementById('req-location').value,
           startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
@@ -826,15 +842,16 @@
           fmPoc: type === 'Contractor' ? document.getElementById('req-con-fmpoc').value : ''
         };
         
-        if(!payload.visitorName || !payload.startDate) {
+        if(!payload.startDate) {
             btn.innerText = 'Submit for Approval'; btn.disabled = false;
-            return alert("Fill required date and name fields");
+            return alert("Visit dates are required fields.");
         }
 
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
         
+        document.getElementById('req-vname').value = ""; // Only clear visitor name
         iqamaInput.value = ""; selfieInput.value = ""; if(vehicleInput) vehicleInput.value = "";
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
         loadMyPasses(false); 
@@ -1020,7 +1037,6 @@
           } else {
             const isPending = row.Status === 'Pending';
             
-            // FILTERS FIXED HERE: Wrapping Pending & Active inside the inRange check!
             if (inRange) {
                 if (isPending) {
                     let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
@@ -1056,7 +1072,7 @@
                       <td>${row.Type}</td>
                       <td>${row.Location}</td>
                       <td>${actionBtns}</td>
-                    </tr>`;
+                </tr>`;
                     activeCount++;
                 }
             }
