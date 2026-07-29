@@ -314,14 +314,16 @@
                     <option value="Contractor">Contractor</option>
                   </select>
                 </div>
-
-                <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
                 
-                <!-- NEW: EMAIL FIELD (ONLY VISIBLE FOR ADMINS TO FETCH / ASSIGN PASSES) -->
+                <!-- NEW EXPLICIT FIELDS SO ADMINS CAN REQUEST ON BEHALF OF OTHERS -->
                 <div class="input-group hidden" id="admin-email-group">
-                    <input type="email" id="req-admin-email" class="input-field" placeholder="Email Address" onchange="loadMyPasses(false)">
+                    <input type="email" id="req-admin-email" class="input-field" placeholder="Email Address (For Pass Tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false)">
                 </div>
-                
+
+                <div class="input-group">
+                    <input type="text" id="req-vname" class="input-field" placeholder="Visitor / Contractor Full Name">
+                </div>
+
                 <div class="input-group">
                   <select id="req-location" class="input-field">
                     <option value="RUH01">Facility: RUH01</option>
@@ -740,6 +742,7 @@
         document.getElementById('app-layout').classList.remove('hidden');
 
         if (currentUser.role === 'admin') {
+            // ADMIN LOGIN: Setup Admin form layout
             document.getElementById('req-vname').value = '';
             document.getElementById('req-admin-email').value = '';
             document.getElementById('admin-email-group').classList.remove('hidden');
@@ -751,6 +754,7 @@
             loadAdminData(false);
             switchMainView('admin');
         } else {
+            // NORMAL USER LOGIN: Setup standard layout
             document.getElementById('req-vname').value = currentUser.name;
             document.getElementById('admin-email-group').classList.add('hidden');
 
@@ -818,10 +822,11 @@
           finalVehicleMime = vehicleInput.files[0].type;
       }
 
-      let hostNameVal = currentUser.name;
+      let hostNameVal = '';
       let hostEmailVal = currentUser.email;
 
       if (currentUser.role === 'admin') {
+          hostNameVal = currentUser.name; 
           hostEmailVal = document.getElementById('req-admin-email').value.toLowerCase().trim();
           if(!hostEmailVal) return alert("Please enter the Email Address for this pass.");
       }
