@@ -132,7 +132,7 @@
     .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* VIEW RECORD / EXTEND PASS MODAL */
+    /* VIEW RECORD MODAL / EXTEND PASS MODAL */
     .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
@@ -140,7 +140,7 @@
     .record-modal-content div { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
     .record-modal-content strong { color: var(--noon-yellow); display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
     .record-img-box { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 15px; }
-    .record-img-box div { flex: 1; min-width: 200px; display: flex; flex-direction: column; }
+    .record-img-box div { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
     .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; }
     
     #custom-camera-modal { z-index: 99999; }
@@ -290,7 +290,16 @@
           <div class="input-group"><input type="text" id="req-vis-slp" class="input-field" placeholder="SLP Ticket No."></div>
           <div class="input-group"><input type="text" id="req-vis-contact" class="input-field" placeholder="Contact No."></div>
           <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field" placeholder="Invited by Whom"></div>
-          <div class="input-group"><input type="text" id="req-vis-vehicle" class="input-field" placeholder="Vehicle Plate No. / Picture details"></div>
+          
+          <!-- NEW: Vehicle Plate Image Upload -->
+          <div class="input-group">
+            <label>Upload Vehicle Plate / Picture (Optional)</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')">📷 Live Camera</button>
+              <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
+            </div>
+            <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
+          </div>
         </div>
 
         <div id="req-contractor-fields" class="hidden">
@@ -484,7 +493,9 @@
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
-    let capturedImages = { iqama: null, selfie: null };
+    
+    // NEW: Added vehicle field to memory
+    let capturedImages = { iqama: null, selfie: null, vehicle: null };
 
     async function openLiveCamera(type) {
         targetPhotoType = type;
@@ -713,10 +724,12 @@
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
+      const vehicleInput = document.getElementById('req-vehicle'); // NEW
       const btn = document.getElementById('btn-submit-req');
       
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
+      let finalVehicleB64 = ''; let finalVehicleMime = 'image/jpeg'; // NEW
 
       if (capturedImages.iqama) {
           finalIqamaB64 = capturedImages.iqama.split(',')[1];
@@ -733,6 +746,15 @@
           finalSelfieB64 = sFull.split(',')[1];
           finalSelfieMime = selfieInput.files[0].type;
       } else { return alert("Please provide the Selfie photo (Camera or Upload)."); }
+
+      // NEW: Handle Optional Vehicle Image Upload
+      if (capturedImages.vehicle) {
+          finalVehicleB64 = capturedImages.vehicle.split(',')[1];
+      } else if (vehicleInput && vehicleInput.files.length > 0) {
+          const vFull = await getBase64(vehicleInput.files[0]);
+          finalVehicleB64 = vFull.split(',')[1];
+          finalVehicleMime = vehicleInput.files[0].type;
+      }
 
       btn.innerText = 'Processing Images...';
       btn.disabled = true;
@@ -751,10 +773,13 @@
           iqamaMimeType: finalIqamaMime,
           selfieBase64: finalSelfieB64,
           selfieMimeType: finalSelfieMime,
+          // NEW: Send vehicle base64
+          vehicleBase64: finalVehicleB64,
+          vehicleMimeType: finalVehicleMime,
+          
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
           invitedBy: type === 'Visitor' ? document.getElementById('req-vis-invitedby').value : '',
-          vehiclePlateNo: type === 'Visitor' ? document.getElementById('req-vis-vehicle').value : '',
           projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
           companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '',
           projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : '',
@@ -770,8 +795,11 @@
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
-        iqamaInput.value = ""; selfieInput.value = "";
-        clearCapturedData('iqama'); clearCapturedData('selfie');
+        
+        // Reset fields
+        iqamaInput.value = ""; selfieInput.value = ""; 
+        if(vehicleInput) vehicleInput.value = "";
+        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
         loadMyPasses(false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
@@ -885,7 +913,6 @@
         let pendingCount = 0, activeCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
-        // Data is reversed before being passed in, so newest is always first
         data.forEach(row => {
           if(!row.UniqueID) return;
           
@@ -1047,7 +1074,7 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         localStorage.setItem('cached_admin_data', JSON.stringify(data));
-        renderAdminData(data.reverse()); // Reverse here so newest is processed first
+        renderAdminData(data.reverse()); 
       } catch (err) { 
          if (!isSilent && !cached) console.log(err); 
       }
@@ -1070,7 +1097,6 @@
       } catch (err) { alert("Failed to check out."); }
     }
 
-    // --- EXTEND PASS LOGIC ---
     function openExtendPass(id, type) {
         document.getElementById('extend-id').value = id;
         document.getElementById('extend-type').value = type;
@@ -1118,7 +1144,7 @@
             }
 
             closeExtendPass();
-            loadAdminData(false); // Refreshes Admin Tables immediately
+            loadAdminData(false); 
         } catch (err) {
             alert('Failed to extend pass. Please ensure you deployed the Apps Script as a NEW VERSION.');
         } finally {
@@ -1145,7 +1171,6 @@
         if (r.Type === 'Visitor') {
             contentHtml += `
                 <div><strong>Invited By</strong>${r.InvitedBy || '-'}</div>
-                <div><strong>Vehicle Plate No</strong>${r.VehiclePlateNo || '-'}</div>
             `;
         } else {
             contentHtml += `
@@ -1160,8 +1185,17 @@
             <div class="record-img-box">
                 <div style="flex:1; background:transparent; border:none; padding:0;"><strong>IQAMA/ID COPY</strong><img src="${r.IqamaURL || ''}" alt="No Image"></div>
                 <div style="flex:1; background:transparent; border:none; padding:0;"><strong>SELFIE PHOTO</strong><img src="${r.SelfieURL || ''}" alt="No Image"></div>
-            </div>
         `;
+
+        if (r.Type === 'Visitor') {
+             if (r.VehiclePlateNo && r.VehiclePlateNo.startsWith('http')) {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><img src="${r.VehiclePlateNo}" alt="No Image"></div>`;
+             } else {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo || 'N/A'}</div></div>`;
+             }
+        }
+
+        contentHtml += `</div>`;
 
         document.getElementById('view-record-content').innerHTML = contentHtml;
         document.getElementById('view-record-modal').classList.remove('hidden');
