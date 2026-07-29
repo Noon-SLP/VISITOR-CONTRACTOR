@@ -692,15 +692,25 @@
         if (currentUser && currentUser.role !== 'guard') loadMyPasses(false, true); 
     }
 
-    // --- Full Screen Toggle ---
+    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          alert(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
-        });
+      const doc = window.document;
+      const docEl = doc.documentElement;
+
+      const reqFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+      const exitFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+      if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if (reqFullScreen) {
+          reqFullScreen.call(docEl).catch(err => {
+            console.log("Fullscreen API Error / Mobile Block:", err);
+          });
+        } else {
+          alert("Fullscreen mode is not supported on this browser/device.");
+        }
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
+        if (exitFullScreen) {
+          exitFullScreen.call(doc).catch(err => console.log(err));
         }
       }
     }
@@ -794,18 +804,49 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
-    // --- Formatting Helpers ---
+    // --- Formatting Helpers & Robust Date Parsing ---
+    function parseFlexibleDate(dateStr) {
+        if (!dateStr) return null;
+        if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+        
+        let d = new Date(dateStr);
+        if (!isNaN(d.getTime())) return d;
+
+        if (typeof dateStr === 'string') {
+            const cleanStr = dateStr.trim();
+            const parts = cleanStr.split(/[\/\-\s]/);
+            if (parts.length >= 3) {
+                let p0 = parseInt(parts[0], 10);
+                let p1 = parseInt(parts[1], 10);
+                let p2 = parseInt(parts[2], 10);
+                if (p2 < 100) p2 += 2000;
+
+                // Handle DD-MM-YYYY or DD/MM/YYYY
+                if (p0 > 12) {
+                    d = new Date(p2, p1 - 1, p0);
+                } else if (p1 > 12) {
+                    d = new Date(p2, p0 - 1, p1);
+                } else {
+                    // Default assume DD-MM-YYYY
+                    d = new Date(p2, p1 - 1, p0);
+                }
+                if (!isNaN(d.getTime())) return d;
+            }
+        }
+        return null;
+    }
+
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
-        const d = new Date(dateString);
-        if (isNaN(d.getTime())) return '-';
+        const d = parseFlexibleDate(dateString);
+        if (!d) return '-';
         return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
     }
     
     function formatTime(dateString) {
         if (!dateString) return '-';
-        const d = new Date(dateString);
-        if (isNaN(d.getTime())) return '-';
+        const d = parseFlexibleDate(dateString);
+        if (!d) return '-';
         return d.toLocaleString();
     }
 
@@ -820,8 +861,9 @@
 
     function isDateInRange(dateStr, filterType, startStr, endStr) {
         if (filterType === 'all') return true;
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return true;
+        
+        const d = parseFlexibleDate(dateStr);
+        if (!d) return true; // Keep records with non-parseable dates visible so they don't vanish
         
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -847,9 +889,11 @@
             return d >= yearAgo && d <= todayEnd;
         } else if (filterType === 'custom') {
             if(!startStr || !endStr) return true;
-            const start = new Date(startStr); start.setHours(0,0,0,0);
-            const end = new Date(endStr); end.setHours(23,59,59,999);
-            return d >= start && d <= end;
+            const start = parseFlexibleDate(startStr);
+            const end = parseFlexibleDate(endStr);
+            if (start) start.setHours(0,0,0,0);
+            if (end) end.setHours(23,59,59,999);
+            if (start && end) return d >= start && d <= end;
         }
         return true;
     }
@@ -1099,8 +1143,9 @@
         
         data.reverse().forEach((pass) => {
             const todayNum = new Date().setHours(0,0,0,0);
-            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
-            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            
+            let endObj = parseFlexibleDate(pass.EndDate) || parseFlexibleDate(pass.StartDate);
+            let endNum = endObj ? endObj.setHours(0,0,0,0) : todayNum;
             
             const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
             const isExpired = todayNum > endNum;
@@ -1149,8 +1194,9 @@
 
         data.forEach((pass) => {
             const todayNum = new Date().setHours(0,0,0,0);
-            let endNum = new Date(pass.EndDate).setHours(0,0,0,0);
-            if(isNaN(endNum)) endNum = new Date(pass.StartDate).setHours(0,0,0,0);
+            let endObj = parseFlexibleDate(pass.EndDate) || parseFlexibleDate(pass.StartDate);
+            let endNum = endObj ? endObj.setHours(0,0,0,0) : todayNum;
+
             const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
             const isExpired = todayNum > endNum;
             const isCompleted = isVisitorDone || isExpired;
@@ -1235,8 +1281,7 @@
         data.forEach(row => {
           if(!row.UniqueID) return;
           
-          let endDateObj = new Date(row.EndDate);
-          if(isNaN(endDateObj.getTime())) { endDateObj = new Date(row.StartDate); }
+          let endDateObj = parseFlexibleDate(row.EndDate) || parseFlexibleDate(row.StartDate) || new Date();
           endDateObj.setHours(23,59,59,999); 
           
           const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime;
@@ -1727,8 +1772,12 @@
         const todayStr = formatToDDMMYYYY(new Date());
         const startStr = formatToDDMMYYYY(data.StartDate);
         const todayNum = new Date().setHours(0,0,0,0);
-        const startNum = new Date(data.StartDate).setHours(0,0,0,0);
-        const endNum = new Date(data.EndDate).setHours(0,0,0,0);
+        
+        let startObj = parseFlexibleDate(data.StartDate);
+        let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
+
+        let endObj = parseFlexibleDate(data.EndDate);
+        let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
 
         const isCheckedOut = !!data.CheckOutTime;
         const isInside = !!data.CheckInTime && !data.CheckOutTime;
