@@ -25,18 +25,9 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
     body { 
-      background-color: #0d0e12;
-      background-image: 
-        radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E");
-      background-size: cover, 56px 100px;
-      background-position: center;
-      background-repeat: no-repeat, repeat;
-      
+      background-color: var(--bg-dark);
       color: var(--text-main); 
       display: flex; 
-      justify-content: center; 
-      align-items: center; 
       min-height: 100vh; 
       overflow-x: hidden; 
     }
@@ -45,8 +36,9 @@
     .text-center { text-align: center; }
     .mb-4 { margin-bottom: 16px; }
 
-    /* Login Container */
-    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); z-index: 10; margin: 20px; }
+    /* ================= LOGIN VIEW (RESTORED TABS) ================= */
+    #login-view { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
+    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin: 20px; }
     .logo-box { width: 130px; height: 130px; margin: 0 auto 30px; background-color: #12151c; background-image: url('logo.jpeg'); background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 12px; }
     
     .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: #0b0e14; }
@@ -67,14 +59,37 @@
     .btn-danger { background: var(--danger); color: white; border: none; }
     .btn-warning { background: var(--noon-yellow); color: #000; border: none; }
     .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 4px; }
+
+    /* ================= MAIN APP LAYOUT ================= */
+    #app-layout { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
+    
+    .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
+    .sidebar.minimized { width: 75px; }
+    
+    .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border-color); }
+    .sidebar.minimized .sidebar-brand { display: none; }
+    .sidebar-brand h1 { font-size: 16px; color: var(--noon-yellow); margin-bottom: 2px; }
+    .sidebar-brand p { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+    .toggle-btn { background: transparent; color: white; border: none; font-size: 20px; cursor: pointer; padding: 5px; }
+    
+    .sidebar-nav { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 5px; }
+    .sidebar-nav a { display: flex; align-items: center; padding: 12px 20px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; border-left: 3px solid transparent; transition: 0.2s;}
+    .sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(255,199,0,0.05); color: var(--noon-yellow); border-left: 3px solid var(--noon-yellow); }
+    .sidebar-nav a .icon { font-size: 18px; min-width: 35px; }
+    .sidebar.minimized .nav-text { display: none; }
+    
+    .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); text-align: center; }
+    .sidebar.minimized .sidebar-footer { padding: 20px 10px; }
+    
+    #main-content { flex: 1; height: 100vh; overflow-y: auto; position: relative; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
     
     /* Dashboards */
-    .dashboard { width: 100%; max-width: 950px; padding: 20px; margin-top: 40px; align-self: flex-start; z-index: 10; }
+    .dashboard { width: 100%; max-width: 1100px; padding: 30px; margin: 0 auto; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-    .header h2 { color: var(--noon-yellow); font-size: 20px; }
+    .header h2 { color: var(--noon-yellow); font-size: 22px; }
     
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .ops-card { background: var(--card-bg); padding: 24px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .ops-card { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     .pass-item { background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px; text-align: left; }
     .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -83,10 +98,8 @@
     /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
-    #reader a:hover { background: rgba(255, 199, 0, 0.15); }
-    #reader button { background: var(--noon-yellow) !important; color: #000 !important; border: none; padding: 14px 28px; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer; margin: 15px 5px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 15px rgba(255, 199, 0, 0.2); }
+    #reader button { background: var(--noon-yellow) !important; color: #000 !important; border: none; padding: 14px 28px; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer; margin: 15px 5px; text-transform: uppercase; transition: 0.2s; }
     #reader select { padding: 12px; border-radius: 8px; background: var(--input-bg); color: white; border: 1px solid var(--border-color); font-size: 15px; margin: 15px 0; width: 100%; max-width: 300px; outline: none; }
-    #reader select:focus { border-color: var(--noon-yellow); }
     #reader span { font-size: 16px !important; color: var(--text-main); line-height: 1.5; }
 
     .scan-result-card { padding: 30px; border-radius: 12px; text-align: center; margin-top: 25px; color: white; font-weight: bold; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
@@ -95,23 +108,13 @@
     .bg-blue { background-color: #3b82f6; }
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
-    /* ================= ADMIN LAYOUT ================= */
-    .admin-layout { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-dark); z-index: 100; }
-    .admin-header-top { display: flex; align-items: center; padding: 0 32px; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
-    .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
-    .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; }
-    .admin-brand-horizontal p { font-size: 9px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-top: 2px;}
-
-    .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; height: 100%; align-items: flex-end; flex: 1; }
-    .admin-nav-horizontal li { padding: 16px 24px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; text-transform: uppercase; }
-    .admin-nav-horizontal li.active { color: var(--noon-yellow); border-bottom: 3px solid var(--noon-yellow); background: rgba(255, 199, 0, 0.05); }
-    .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.02); }
-    .admin-user-info { display: flex; align-items: center; gap: 15px; }
+    /* ADMIN DASHBOARD UI */
+    .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; overflow-x: auto;}
+    .admin-nav-horizontal li { padding: 12px 20px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; white-space: nowrap;}
+    .admin-nav-horizontal li.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
+    .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.05); }
     
-    .admin-main { flex: 1; overflow-y: auto; padding: 32px; position: relative; }
-    .admin-main::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background-image: url('logo.jpeg'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.03; pointer-events: none; z-index: 0; }
-    
-    .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px; position: relative; z-index: 1;}
+    .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px;}
     .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);}
     
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -119,17 +122,15 @@
     th { background: rgba(0,0,0,0.2); color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
     tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
 
-    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; z-index: 1;}
+    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px;}
     .analytics-box { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     .analytics-box-title { font-size: 12px; font-weight: 600; color: var(--noon-yellow); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
-    
     .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
     .stat-row:last-child { border-bottom: none; }
     .stat-val { font-weight: 700; color: var(--text-main); }
 
     .admin-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; background: var(--card-bg); padding: 15px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 24px; position: relative; z-index: 1;}
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
-    .btn-filter:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
     /* VIEW RECORD MODAL / EXTEND PASS MODAL */
@@ -146,334 +147,320 @@
     #custom-camera-modal { z-index: 99999; }
     #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-
-    /* Custom Checkbox */
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
 
     /* ================= RESPONSIVE (MOBILE & TABLET) FIXES ================= */
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         .ops-grid { grid-template-columns: 1fr; gap: 15px; }
         .analytics-grid { grid-template-columns: 1fr; gap: 15px; }
-        .admin-header-top { flex-direction: column; height: auto; padding: 15px; align-items: stretch; gap: 15px; }
-        .admin-brand-horizontal { margin-right: 0; text-align: center; width: 100%; }
-        .admin-nav-horizontal { flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; }
-        .admin-nav-horizontal li { padding: 10px; font-size: 11px; flex: 1 1 auto; text-align: center; }
-        .admin-user-info { justify-content: center; width: 100%; }
-        .admin-main { padding: 15px; }
-        .dashboard { margin-top: 20px; padding: 10px; }
+        .sidebar { position: fixed; height: 100vh; transform: translateX(0); }
+        .sidebar.minimized { transform: translateX(-100%); width: 240px; }
+        .dashboard { padding: 15px; margin-top: 10px;}
         .admin-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
         .admin-filter-bar > div { flex-wrap: wrap; justify-content: center; width: 100%; }
         #custom-date-picker { flex-direction: column; align-items: stretch; width: 100%; }
-        .admin-card-title { flex-direction: column; gap: 10px; text-align: center; }
         table th, table td { padding: 10px; }
         .record-modal-content { grid-template-columns: 1fr; }
+        
+        #main-content { transition: margin-left 0.3s; }
+        body:not(.sidebar-minimized) #main-content { margin-left: 240px; }
     }
   </style>
 </head>
-<body>
+<body class="sidebar-minimized"> 
 
-  <!-- ================= VIEW RECORD MODAL ================= -->
-  <div id="view-record-modal" class="popup-modal hidden">
-    <div class="record-modal-box">
-        <div class="record-modal-header">
-            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Detailed Record View</h3>
-            <button onclick="closeViewRecord()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
-        </div>
-        <div id="view-record-content" class="record-modal-content"></div>
-    </div>
-  </div>
-
-  <!-- ================= EXTEND PASS MODAL ================= -->
-  <div id="extend-pass-modal" class="popup-modal hidden">
-    <div class="record-modal-box" style="max-width: 400px; display: block;">
-        <div class="record-modal-header">
-            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Extend Pass Validity</h3>
-            <button onclick="closeExtendPass()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
-        </div>
-        <div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
-            <input type="hidden" id="extend-id">
-            <input type="hidden" id="extend-type">
-            <div class="input-group" id="extend-start-group">
-                <label style="color: var(--noon-yellow); font-size: 13px;">New Visit / Start Date</label>
-                <input type="date" id="extend-start" class="input-field">
-            </div>
-            <div class="input-group" id="extend-end-group">
-                <label style="color: var(--noon-yellow); font-size: 13px;">New End Date</label>
-                <input type="date" id="extend-end" class="input-field">
-            </div>
-            <button id="btn-submit-extend" class="btn-primary" onclick="submitExtendPass()">SAVE EXTENSION</button>
-        </div>
-    </div>
-  </div>
-
-  <!-- ================= CAMERA MODAL ================= -->
-  <div id="custom-camera-modal" class="popup-modal hidden">
-    <video id="camera-video-stream" autoplay playsinline></video>
-    <canvas id="camera-hidden-canvas" class="hidden"></canvas>
-    <div class="cam-controls">
-        <button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()">📸 CAPTURE</button>
-        <button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()">🔄 FLIP CAM</button>
-        <button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()">❌ CANCEL</button>
-    </div>
-  </div>
-
-  <!-- ================= 1. LOGIN SCREEN ================= -->
-  <div id="login-view" class="login-container">
-    <div class="logo-box"></div>
-    <div class="role-tabs">
-      <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')">🛡️ Guard</div>
-      <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')">📋 Visitor/Ops</div>
-      <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
-    </div>
-
-    <div id="login-guard" class="hidden">
-      <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
-      <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
-      <div class="input-group">
-        <select id="lg-location" class="input-field">
-          <option value="">Select Guard Location...</option>
-          <option value="RUH01">RUH01</option>
-          <option value="JED01">JED01</option>
-          <option value="DXB01">DXB01</option>
-        </select>
+  <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
+  <div id="login-view">
+    <div class="login-container">
+      <div class="logo-box"></div>
+      
+      <!-- ROLE TABS -->
+      <div class="role-tabs">
+        <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')">🛡️ Guard</div>
+        <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')">📋 Visitor/Ops</div>
+        <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
       </div>
-      <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
-    </div>
 
-    <div id="login-ops">
-      <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
-      <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
-      <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
-    </div>
+      <!-- GUARD LOGIN -->
+      <div id="login-guard" class="hidden">
+        <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
+        <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
+        <div class="input-group">
+          <select id="lg-location" class="input-field">
+            <option value="">Select Guard Location...</option>
+            <option value="RUH01">RUH01</option>
+            <option value="JED01">JED01</option>
+            <option value="DXB01">DXB01</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
+      </div>
 
-    <div id="login-admin" class="hidden">
-      <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
-      <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
-      <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Admin Password"></div>
-      <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
+      <!-- OPS LOGIN -->
+      <div id="login-ops">
+        <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
+        <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
+        <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
+      </div>
+
+      <!-- ADMIN LOGIN -->
+      <div id="login-admin" class="hidden">
+        <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
+        <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
+        <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Admin Password"></div>
+        <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
+      </div>
     </div>
   </div>
 
-  <!-- ================= 2. VISITOR / CONTRACTOR DASHBOARD ================= -->
-  <div id="dashboard-ops" class="dashboard hidden">
-    <div class="header">
-      <h2>Visitor & Contractor Portal</h2>
-      <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
-    </div>
-    
-    <div class="ops-grid">
-      <div class="ops-card">
-        <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Request Access Pass</h3>
-        
-        <div class="input-group">
-          <label style="font-weight: 700; color: var(--noon-yellow);">Type</label>
-          <select id="req-type" class="input-field" onchange="toggleDateFields()">
-            <option value="Visitor">Visitor</option>
-            <option value="Contractor">Contractor</option>
-          </select>
-        </div>
+  <!-- ================= MAIN APP LAYOUT ================= -->
+  <div id="app-layout" class="hidden">
+      <!-- SIDEBAR (ONLY FOR ADMINS) -->
+      <aside id="sidebar" class="sidebar">
+           <div class="sidebar-header">
+               <div class="sidebar-brand">
+                   <h1>NOON SLP</h1>
+                   <p>System Admin</p>
+               </div>
+               <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+           </div>
+           <nav class="sidebar-nav">
+               <a href="#" id="nav-sidebar-ops" onclick="switchMainView('ops')">
+                   <span class="icon">📝</span><span class="nav-text">Visitor Portal</span>
+               </a>
+               <a href="#" id="nav-sidebar-guard" onclick="switchMainView('guard')">
+                   <span class="icon">🛡️</span><span class="nav-text">Gate Scanner</span>
+               </a>
+               <a href="#" id="nav-sidebar-admin" class="active" onclick="switchMainView('admin')">
+                   <span class="icon">⚙️</span><span class="nav-text">Admin Dashboard</span>
+               </a>
+           </nav>
+           <div class="sidebar-footer">
+               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); margin-bottom: 10px; font-weight: bold;" class="nav-text">Admin</div>
+               <button class="btn-primary btn-outline btn-sm" style="width: 100%;" onclick="logout()">LOGOUT</button>
+           </div>
+      </aside>
 
-        <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
-        <div class="input-group">
-          <select id="req-location" class="input-field">
-            <option value="RUH01">Facility: RUH01</option>
-            <option value="JED01">Facility: JED01</option>
-            <option value="DXB01">Facility: DXB01</option>
-          </select>
-        </div>
-
-        <div id="req-visitor-fields">
-          <div class="input-group">
-            <label>Visit Date</label>
-            <input type="date" id="req-date-single" class="input-field">
-          </div>
-          <div class="input-group"><input type="text" id="req-vis-slp" class="input-field" placeholder="SLP Ticket No."></div>
-          <div class="input-group"><input type="text" id="req-vis-contact" class="input-field" placeholder="Contact No."></div>
-          <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field" placeholder="Invited by Whom"></div>
+      <!-- MAIN CONTENT AREA -->
+      <main id="main-content">
           
-          <!-- NEW: Vehicle Plate Image Upload -->
-          <div class="input-group">
-            <label>Upload Vehicle Plate / Picture (Optional)</label>
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-              <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')">📷 Live Camera</button>
-              <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
+          <!-- 1. OPS PORTAL -->
+          <div id="dashboard-ops" class="dashboard hidden">
+            <div class="header">
+              <h2>Visitor & Contractor Portal</h2>
+              <!-- Visible logout for non-admins -->
+              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
             </div>
-            <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
-          </div>
-        </div>
+            
+            <div class="ops-grid">
+              <div class="ops-card">
+                <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Submit New Request</h3>
+                
+                <div class="input-group">
+                  <label style="font-weight: 700; color: var(--noon-yellow);">Type</label>
+                  <select id="req-type" class="input-field" onchange="toggleDateFields()">
+                    <option value="Visitor">Visitor</option>
+                    <option value="Contractor">Contractor</option>
+                  </select>
+                </div>
 
-        <div id="req-contractor-fields" class="hidden">
-          <div class="input-group">
-            <label>Contract Expiration (From - To)</label>
-            <div style="display: flex; gap: 10px;">
-              <input type="date" id="req-date-start" class="input-field">
-              <input type="date" id="req-date-end" class="input-field">
+                <div class="input-group"><input type="text" id="req-vname" class="input-field" placeholder="Full Name"></div>
+                <div class="input-group">
+                  <select id="req-location" class="input-field">
+                    <option value="RUH01">Facility: RUH01</option>
+                    <option value="JED01">Facility: JED01</option>
+                    <option value="DXB01">Facility: DXB01</option>
+                  </select>
+                </div>
+
+                <div id="req-visitor-fields">
+                  <div class="input-group">
+                    <label>Visit Date</label>
+                    <input type="date" id="req-date-single" class="input-field">
+                  </div>
+                  <div class="input-group"><input type="text" id="req-vis-slp" class="input-field" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-contact" class="input-field" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field" placeholder="Invited by Whom"></div>
+                  <div class="input-group">
+                    <label>Vehicle Plate / Picture (Optional)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')">📷 Live Camera</button>
+                      <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
+                    </div>
+                    <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
+                  </div>
+                </div>
+
+                <div id="req-contractor-fields" class="hidden">
+                  <div class="input-group">
+                    <label>Contract Expiration (From - To)</label>
+                    <div style="display: flex; gap: 10px;">
+                      <input type="date" id="req-date-start" class="input-field">
+                      <input type="date" id="req-date-end" class="input-field">
+                    </div>
+                  </div>
+                  <div class="input-group"><input type="text" id="req-con-slp" class="input-field" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-con-contact" class="input-field" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-con-project" class="input-field" placeholder="Project Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-company" class="input-field" placeholder="Company / Contractor Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-pm" class="input-field" placeholder="Project Manager"></div>
+                  <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
+                </div>
+
+                <div class="input-group">
+                  <label>Upload Iqama/ID Copy</label>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')">📷 Live Camera</button>
+                    <input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')">
+                  </div>
+                  <img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
+                </div>
+
+                <div class="input-group">
+                  <label>Upload Selfie Photo</label>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')">📷 Live Camera</button>
+                    <input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')">
+                  </div>
+                  <img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
+                </div>
+
+                <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;">Submit for Approval</button>
+              </div>
+
+              <div class="ops-card text-center">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="color: var(--noon-yellow);">My Passes</h3>
+                    <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(false)">Refresh</button>
+                </div>
+                <div id="my-passes-list" style="max-height: 600px; overflow-y: auto;">
+                    <p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="input-group"><input type="text" id="req-con-slp" class="input-field" placeholder="SLP Ticket No."></div>
-          <div class="input-group"><input type="text" id="req-con-contact" class="input-field" placeholder="Contact No."></div>
-          <div class="input-group"><input type="text" id="req-con-project" class="input-field" placeholder="Project Name"></div>
-          <div class="input-group"><input type="text" id="req-con-company" class="input-field" placeholder="Company / Contractor Name"></div>
-          <div class="input-group"><input type="text" id="req-con-pm" class="input-field" placeholder="Project Manager"></div>
-          <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
-        </div>
 
-        <div class="input-group">
-          <label>Upload Iqama/ID Copy</label>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')">📷 Live Camera</button>
-            <input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')">
+          <!-- 2. GUARD SCANNER -->
+          <div id="dashboard-guard" class="dashboard hidden text-center">
+            <div class="header">
+              <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
+              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
+            </div>
+            
+            <div style="max-width: 450px; margin: 0 auto;">
+              <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;">START CAMERA SCANNER</button>
+              <div id="reader" class="hidden"></div>
+              
+              <div id="scan-result" class="scan-result-card hidden">
+                <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
+                <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
+                
+                <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
+
+                <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: left; font-size: 16px; line-height: 1.6;">
+                    <p><strong>Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
+                    <p><strong>Type:</strong> <span id="r-type">-</span></p>
+                    <p><strong>Location:</strong> <span id="r-location">-</span></p>
+                </div>
+                <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()">CONFIRM ACTION</button>
+              </div>
+            </div>
           </div>
-          <img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
-        </div>
 
-        <div class="input-group">
-          <label>Upload Selfie Photo</label>
-          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')">📷 Live Camera</button>
-            <input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')">
+          <!-- 3. ADMIN DASHBOARD -->
+          <div id="dashboard-admin" class="dashboard hidden">
+            <div class="header">
+              <h2>System Administration</h2>
+            </div>
+
+            <ul class="admin-nav-horizontal">
+                <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
+                <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
+                <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
+                <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
+            </ul>
+              
+            <div class="admin-filter-bar" id="admin-global-filter">
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
+                    <button class="btn-filter" onclick="setAdminFilter('today', this)">Today</button>
+                    <button class="btn-filter" onclick="setAdminFilter('weekly', this)">Weekly</button>
+                    <button class="btn-filter" onclick="setAdminFilter('monthly', this)">Monthly</button>
+                    <button class="btn-filter" onclick="setAdminFilter('6months', this)">6 Months</button>
+                    <button class="btn-filter" onclick="setAdminFilter('year', this)">1 Year</button>
+                    <button class="btn-filter" onclick="setAdminFilter('custom', this)">Custom</button>
+                </div>
+                <div id="custom-date-picker" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="date" id="filter-start" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
+                    <span style="color: var(--text-muted); font-size: 12px;">TO</span>
+                    <input type="date" id="filter-end" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
+                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData(false)">APPLY</button>
+                </div>
+            </div>
+
+            <!-- TAB: APPROVALS -->
+            <div id="admin-sec-approvals" class="admin-card admin-section">
+                <!-- PENDING REQUESTS -->
+                <div class="admin-card-title"><span>Pending Requests</span></div>
+                <div style="overflow-x: auto;">
+                  <table>
+                    <thead><tr>
+                        <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
+                    </tr></thead>
+                    <tbody id="admin-table-pending"><tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+                  </table>
+                </div>
+                
+                <!-- ACTIVE REQUESTS -->
+                <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
+                    <span>Active Requests</span>
+                    <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
+                </div>
+                <div style="overflow-x: auto;">
+                  <table>
+                    <thead><tr>
+                        <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox" class="print-checkbox" onclick="toggleSelectAll(this)"></th>
+                        <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
+                    </tr></thead>
+                    <tbody id="admin-table-active"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+                  </table>
+                </div>
+            </div>
+
+            <!-- TAB: HISTORY -->
+            <div id="admin-sec-history" class="admin-card admin-section hidden">
+                <div class="admin-card-title">Access & Gate History</div>
+                <div style="overflow-x: auto;">
+                  <table>
+                    <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th><th>Action</th></tr></thead>
+                    <tbody id="admin-table-history"><tr><td colspan="9" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
+                  </table>
+                </div>
+            </div>
+
+            <!-- TAB: GUARD APPROVALS -->
+            <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
+                <div class="admin-card-title">Live Gate Operations</div>
+                <div style="overflow-x: auto;">
+                  <table>
+                    <thead><tr><th>Check-In Time</th><th>Check-Out Time</th><th>Visitor Name</th><th>Type</th><th>Facility</th><th>Scanned By</th></tr></thead>
+                    <tbody id="admin-table-guard-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found.</td></tr></tbody>
+                  </table>
+                </div>
+            </div>
+
+            <!-- TAB: ANALYTICS -->
+            <div id="admin-sec-analytics" class="admin-section hidden">
+                <div class="analytics-grid">
+                  <div class="analytics-box"><div class="analytics-box-title">📅 Date Analytics</div><div id="stat-date"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title">👤 Type Analytics</div><div id="stat-type"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title">🏢 Facility Analytics</div><div id="stat-facility"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title">✅ Status Analytics</div><div id="stat-status"></div></div>
+                </div>
+            </div>
+            
           </div>
-          <img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
-        </div>
-
-        <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;">Submit for Approval</button>
-      </div>
-
-      <div class="ops-card text-center">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="color: var(--noon-yellow);">My Passes</h3>
-            <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(false)">Refresh</button>
-        </div>
-        <div id="my-passes-list" style="max-height: 550px; overflow-y: auto;">
-            <p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= 3. ADMIN DASHBOARD ================= -->
-  <div id="dashboard-admin" class="hidden admin-layout">
-    <header class="admin-header-top">
-      <div class="admin-brand-horizontal">
-        <h1>NOON SLP</h1>
-        <p>Visitor & Contractor Management</p>
-      </div>
-      <ul class="admin-nav-horizontal">
-        <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
-        <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
-        <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
-        <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
-      </ul>
-      <div class="admin-user-info">
-        <span style="font-size: 12px; color: var(--text-muted);">Admin Session</span>
-        <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()">SIGN OUT</button>
-      </div>
-    </header>
-
-    <main class="admin-main">
-      
-      <div class="admin-filter-bar" id="admin-global-filter">
-        <div style="display: flex; gap: 5px;">
-            <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
-            <button class="btn-filter" onclick="setAdminFilter('today', this)">Today</button>
-            <button class="btn-filter" onclick="setAdminFilter('weekly', this)">Weekly</button>
-            <button class="btn-filter" onclick="setAdminFilter('monthly', this)">Monthly</button>
-            <button class="btn-filter" onclick="setAdminFilter('6months', this)">6 Months</button>
-            <button class="btn-filter" onclick="setAdminFilter('year', this)">1 Year</button>
-            <button class="btn-filter" onclick="setAdminFilter('custom', this)">Custom</button>
-        </div>
-        <div id="custom-date-picker" class="hidden" style="display: flex; align-items: center; gap: 10px;">
-            <input type="date" id="filter-start" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
-            <span style="color: var(--text-muted); font-size: 12px;">TO</span>
-            <input type="date" id="filter-end" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
-            <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData(false)">APPLY</button>
-        </div>
-      </div>
-
-      <div id="admin-sec-approvals" class="admin-card admin-section">
-        <!-- PENDING REQUESTS -->
-        <div class="admin-card-title"><span>Pending Requests</span></div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead><tr>
-                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
-            </tr></thead>
-            <tbody id="admin-table-pending"><tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
-          </table>
-        </div>
-        
-        <!-- ACTIVE REQUESTS -->
-        <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
-            <span>Active Requests</span>
-            <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
-        </div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead><tr>
-                <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox" class="print-checkbox" onclick="toggleSelectAll(this)"></th>
-                <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
-            </tr></thead>
-            <tbody id="admin-table-active"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="admin-sec-history" class="admin-card admin-section hidden">
-        <div class="admin-card-title">Access & Gate History</div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th><th>Action</th></tr></thead>
-            <tbody id="admin-table-history"><tr><td colspan="9" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
-        <div class="admin-card-title">Live Gate Operations</div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead><tr><th>Check-In Time</th><th>Check-Out Time</th><th>Visitor Name</th><th>Type</th><th>Facility</th><th>Scanned By</th></tr></thead>
-            <tbody id="admin-table-guard-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found.</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="admin-sec-analytics" class="admin-section hidden">
-        <div class="analytics-grid">
-          <div class="analytics-box"><div class="analytics-box-title">📅 Date Analytics</div><div id="stat-date"></div></div>
-          <div class="analytics-box"><div class="analytics-box-title">👤 Type Analytics</div><div id="stat-type"></div></div>
-          <div class="analytics-box"><div class="analytics-box-title">🏢 Facility Analytics</div><div id="stat-facility"></div></div>
-          <div class="analytics-box"><div class="analytics-box-title">✅ Status Analytics</div><div id="stat-status"></div></div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- ================= 4. GUARD DASHBOARD ================= -->
-  <div id="dashboard-guard" class="dashboard hidden text-center">
-    <div class="header">
-      <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
-      <button class="btn-primary btn-outline" style="width: auto; padding: 8px 16px; font-size: 14px;" onclick="logout()">Logout</button>
-    </div>
-    
-    <div style="max-width: 450px; margin: 0 auto;">
-      <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;">START CAMERA SCANNER</button>
-      <div id="reader" class="hidden"></div>
-      
-      <div id="scan-result" class="scan-result-card hidden">
-        <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
-        <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
-        
-        <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
-
-        <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: left; font-size: 16px; line-height: 1.6;">
-            <p><strong>Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
-            <p><strong>Type:</strong> <span id="r-type">-</span></p>
-            <p><strong>Location:</strong> <span id="r-location">-</span></p>
-        </div>
-        <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()">CONFIRM ACTION</button>
-      </div>
-    </div>
+      </main>
   </div>
 
   <script>
@@ -493,10 +480,25 @@
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
-    
-    // NEW: Added vehicle field to memory
     let capturedImages = { iqama: null, selfie: null, vehicle: null };
 
+    // --- Core Navigation ---
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('minimized');
+        document.body.classList.toggle('sidebar-minimized');
+    }
+
+    function switchMainView(viewId) {
+        document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => e.classList.add('hidden'));
+        document.getElementById(`dashboard-${viewId}`).classList.remove('hidden');
+        
+        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        if(document.getElementById(`nav-sidebar-${viewId}`)) document.getElementById(`nav-sidebar-${viewId}`).classList.add('active');
+
+        if(window.innerWidth <= 900 && !document.getElementById('sidebar').classList.contains('minimized')) { toggleSidebar(); } 
+    }
+
+    // --- Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -548,6 +550,7 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
+    // --- Formatting Helpers ---
     function formatToDDMMYYYY(dateString) {
         if (!dateString) return '-';
         const d = new Date(dateString);
@@ -607,6 +610,7 @@
         return true;
     }
 
+    // --- Sessions & Auth ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     function startAutoRefresh(role) {
@@ -622,24 +626,19 @@
         if (session) {
             const parsed = JSON.parse(session);
             const hoursElapsed = (Date.now() - parsed.time) / (1000 * 60 * 60);
-            if (hoursElapsed < 6) {
+            if (hoursElapsed < 12) {
                 currentUser = parsed.user;
-                if (currentUser.role === 'guard') {
-                    document.getElementById('guard-loc-display').innerText = currentUser.location;
-                    showDashboard('dashboard-guard');
-                } else if (currentUser.role === 'ops') {
-                    document.getElementById('req-vname').value = currentUser.name;
-                    showDashboard('dashboard-ops');
-                    loadMyPasses(false);
-                    startAutoRefresh('ops');
-                } else if (currentUser.role === 'admin') {
-                    showDashboard('dashboard-admin');
-                    loadAdminData(false);
-                    startAutoRefresh('admin');
-                }
+                initApp();
             } else { localStorage.removeItem('noon_session'); }
         }
     };
+
+    function switchLoginTab(role) {
+      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
+      document.getElementById(`tab-${role}`).classList.add('active');
+      document.getElementById(`login-${role}`).classList.remove('hidden');
+    }
 
     function login(role) {
       if (role === 'guard') {
@@ -648,17 +647,11 @@
         const loc = document.getElementById('lg-location').value;
         if(!name || !id || !loc) return alert("Fill all Guard details");
         currentUser = { role: 'guard', name: name, id: id, location: loc };
-        document.getElementById('guard-loc-display').innerText = loc;
-        showDashboard('dashboard-guard');
       } else if (role === 'ops') {
         const name = document.getElementById('lo-name').value;
         const mail = document.getElementById('lo-mail').value.toLowerCase().trim();
         if(!name || !mail) return alert("Enter Name and Gmail");
         currentUser = { role: 'ops', name: name, email: mail };
-        document.getElementById('req-vname').value = name;
-        showDashboard('dashboard-ops');
-        loadMyPasses(false); 
-        startAutoRefresh('ops');
       } else if (role === 'admin') {
         const name = document.getElementById('la-name').value;
         const mail = document.getElementById('la-mail').value.toLowerCase().trim();
@@ -666,12 +659,38 @@
         if(!name || !mail || !pass) return alert("Enter all Admin details");
         if(pass === 'admin123') { 
             currentUser = { role: 'admin', name: name, email: mail };
-            showDashboard('dashboard-admin');
-            loadAdminData(false);
-            startAutoRefresh('admin');
         } else { return alert("Incorrect Password"); }
       }
       saveSession();
+      initApp();
+    }
+
+    function initApp() {
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('app-layout').classList.remove('hidden');
+        
+        if (currentUser.role === 'admin') {
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('sidebar-user-name').innerText = currentUser.name;
+            document.getElementById('nav-sidebar-admin').classList.remove('hidden');
+            loadAdminData(false);
+            switchMainView('admin');
+        } else {
+            // Hide Sidebar for Non-Admins entirely
+            document.getElementById('sidebar').style.display = 'none';
+            document.body.classList.add('sidebar-minimized');
+            document.getElementById('main-content').style.marginLeft = '0';
+            
+            if (currentUser.role === 'ops') {
+                document.getElementById('req-vname').value = currentUser.name;
+                switchMainView('ops');
+                loadMyPasses(false);
+            } else if (currentUser.role === 'guard') {
+                document.getElementById('guard-loc-display').innerText = currentUser.location;
+                switchMainView('guard');
+            }
+        }
+        startAutoRefresh(currentUser.role);
     }
 
     function logout() {
@@ -681,55 +700,23 @@
       location.reload(); 
     }
 
-    function switchLoginTab(role) {
-      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
-      document.getElementById(`tab-${role}`).classList.add('active');
-      document.getElementById(`login-${role}`).classList.remove('hidden');
-    }
-
-    function switchAdminTab(tabName) {
-      document.querySelectorAll('.admin-nav-horizontal li').forEach(t => t.classList.remove('active'));
-      document.getElementById(`nav-${tabName}`).classList.add('active');
-      document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
-      document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
-    }
-
-    function showDashboard(dashId) {
-      document.getElementById('login-view').classList.add('hidden');
-      document.querySelectorAll('.dashboard, .admin-layout').forEach(el => el.classList.add('hidden'));
-      document.getElementById(dashId).classList.remove('hidden');
-    }
-
+    // --- Ops Portal Logic ---
     function toggleDateFields() {
       const type = document.getElementById('req-type').value;
       document.getElementById('req-visitor-fields').classList.toggle('hidden', type === 'Contractor');
       document.getElementById('req-contractor-fields').classList.toggle('hidden', type === 'Visitor');
     }
 
-    function setAdminFilter(range, btnElement) {
-        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-        if(btnElement) btnElement.classList.add('active');
-        currentAdminFilter = range;
-        
-        if (range === 'custom') {
-            document.getElementById('custom-date-picker').classList.remove('hidden');
-        } else {
-            document.getElementById('custom-date-picker').classList.add('hidden');
-            loadAdminData(false);
-        }
-    }
-
     async function submitRequest() {
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
-      const vehicleInput = document.getElementById('req-vehicle'); // NEW
+      const vehicleInput = document.getElementById('req-vehicle');
       const btn = document.getElementById('btn-submit-req');
       
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
-      let finalVehicleB64 = ''; let finalVehicleMime = 'image/jpeg'; // NEW
+      let finalVehicleB64 = ''; let finalVehicleMime = 'image/jpeg';
 
       if (capturedImages.iqama) {
           finalIqamaB64 = capturedImages.iqama.split(',')[1];
@@ -747,7 +734,6 @@
           finalSelfieMime = selfieInput.files[0].type;
       } else { return alert("Please provide the Selfie photo (Camera or Upload)."); }
 
-      // NEW: Handle Optional Vehicle Image Upload
       if (capturedImages.vehicle) {
           finalVehicleB64 = capturedImages.vehicle.split(',')[1];
       } else if (vehicleInput && vehicleInput.files.length > 0) {
@@ -756,7 +742,7 @@
           finalVehicleMime = vehicleInput.files[0].type;
       }
 
-      btn.innerText = 'Processing Images...';
+      btn.innerText = 'Processing...';
       btn.disabled = true;
 
       try {
@@ -773,7 +759,6 @@
           iqamaMimeType: finalIqamaMime,
           selfieBase64: finalSelfieB64,
           selfieMimeType: finalSelfieMime,
-          // NEW: Send vehicle base64
           vehicleBase64: finalVehicleB64,
           vehicleMimeType: finalVehicleMime,
           
@@ -791,14 +776,11 @@
             return alert("Fill required date and name fields");
         }
 
-        btn.innerText = 'Uploading to Server...';
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
         btn.innerText = 'Submit for Approval'; btn.disabled = false;
         
-        // Reset fields
-        iqamaInput.value = ""; selfieInput.value = ""; 
-        if(vehicleInput) vehicleInput.value = "";
+        iqamaInput.value = ""; selfieInput.value = ""; if(vehicleInput) vehicleInput.value = "";
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
         loadMyPasses(false); 
       } catch (err) { 
@@ -879,13 +861,10 @@
 
     async function loadMyPasses(isSilent = false) {
       const listDiv = document.getElementById('my-passes-list');
-      
       const cached = localStorage.getItem('cached_passes_' + currentUser.email);
-      if (cached && !isSilent) {
-          renderMyPasses(JSON.parse(cached));
-      } else if (!isSilent) {
-          listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
-      }
+      
+      if (cached && !isSilent) renderMyPasses(JSON.parse(cached));
+      else if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>';
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(currentUser.email)}`);
@@ -895,6 +874,27 @@
       } catch (err) { 
         if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; 
       }
+    }
+
+    // --- Admin Portal Logic ---
+    function switchAdminTab(tabName) {
+      document.querySelectorAll('.admin-nav-horizontal li').forEach(t => t.classList.remove('active'));
+      document.getElementById(`nav-${tabName}`).classList.add('active');
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
+    }
+
+    function setAdminFilter(range, btnElement) {
+        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+        currentAdminFilter = range;
+        
+        if (range === 'custom') {
+            document.getElementById('custom-date-picker').classList.remove('hidden');
+        } else {
+            document.getElementById('custom-date-picker').classList.add('hidden');
+            loadAdminData(false);
+        }
     }
 
     function renderAdminData(data) {
@@ -1187,11 +1187,11 @@
                 <div style="flex:1; background:transparent; border:none; padding:0;"><strong>SELFIE PHOTO</strong><img src="${r.SelfieURL || ''}" alt="No Image"></div>
         `;
 
-        if (r.Type === 'Visitor') {
-             if (r.VehiclePlateNo && r.VehiclePlateNo.startsWith('http')) {
+        if (r.VehiclePlateNo) {
+             if (r.VehiclePlateNo.startsWith('http')) {
                  contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><img src="${r.VehiclePlateNo}" alt="No Image"></div>`;
              } else {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo || 'N/A'}</div></div>`;
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
              }
         }
 
@@ -1442,7 +1442,7 @@
       const btn = document.getElementById('btn-confirm-action');
       btn.innerText = "SAVING...";
       try {
-        const gInfo = `${currentUser.name} (${currentUser.id})`;
+        const gInfo = `${currentUser.name} (${currentUser.location})`;
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo }) });
         document.getElementById('scan-result').classList.add('hidden');
         html5QrcodeScanner.resume();
