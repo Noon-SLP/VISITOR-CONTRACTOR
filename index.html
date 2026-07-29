@@ -36,7 +36,7 @@
     .text-center { text-align: center; }
     .mb-4 { margin-bottom: 16px; }
 
-    /* ================= LOGIN VIEW (RESTORED TABS) ================= */
+    /* ================= LOGIN VIEW ================= */
     #login-view { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
     .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin: 20px; }
     .logo-box { width: 130px; height: 130px; margin: 0 auto 30px; background-color: #12151c; background-image: url('logo.jpeg'); background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 12px; }
@@ -45,7 +45,6 @@
     .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; transition: 0.2s;}
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
-    /* Inputs */
     .input-group { margin-bottom: 16px; }
     .input-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
     .input-field { width: 100%; padding: 14px; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: white; outline: none; font-size: 14px; }
@@ -109,10 +108,14 @@
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* ADMIN DASHBOARD UI */
+    .admin-header-top { display: flex; align-items: center; padding: 0 32px; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
+    .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
+    .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; margin:0; }
     .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; overflow-x: auto;}
     .admin-nav-horizontal li { padding: 12px 20px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; white-space: nowrap;}
     .admin-nav-horizontal li.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
     .admin-nav-horizontal li:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.05); }
+    .admin-user-info { display: flex; align-items: center; gap: 15px; }
     
     .admin-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.4); overflow: hidden; margin-bottom: 24px;}
     .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);}
@@ -133,8 +136,8 @@
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* VIEW RECORD MODAL / EXTEND PASS MODAL */
-    .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    /* VIEW RECORD MODAL / EXTEND PASS MODAL / CAMERA MODAL */
+    .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
     .record-modal-content { padding: 25px; overflow-y: auto; font-size: 13px; line-height: 1.6; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: var(--text-main); }
@@ -144,7 +147,6 @@
     .record-img-box div { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
     .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; }
     
-    #custom-camera-modal { z-index: 99999; }
     #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
@@ -156,12 +158,16 @@
         .sidebar { position: fixed; height: 100vh; transform: translateX(0); }
         .sidebar.minimized { transform: translateX(-100%); width: 240px; }
         .dashboard { padding: 15px; margin-top: 10px;}
+        .admin-header-top { flex-direction: column; height: auto; padding: 15px; align-items: stretch; gap: 15px; }
+        .admin-brand-horizontal { margin-right: 0; text-align: center; width: 100%; }
+        .admin-nav-horizontal { flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; }
+        .admin-nav-horizontal li { padding: 10px; font-size: 11px; flex: 1 1 auto; text-align: center; }
+        .admin-user-info { justify-content: center; width: 100%; }
         .admin-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
         .admin-filter-bar > div { flex-wrap: wrap; justify-content: center; width: 100%; }
         #custom-date-picker { flex-direction: column; align-items: stretch; width: 100%; }
         table th, table td { padding: 10px; }
         .record-modal-content { grid-template-columns: 1fr; }
-        
         #main-content { transition: margin-left 0.3s; }
         body:not(.sidebar-minimized) #main-content { margin-left: 240px; }
     }
@@ -169,19 +175,67 @@
 </head>
 <body class="sidebar-minimized"> 
 
+  <!-- ================= STRICTLY ONE SET OF MODALS AT THE TOP LEVEL ================= -->
+  
+  <!-- 1. View Record Modal -->
+  <div id="view-record-modal" class="popup-modal hidden">
+    <div class="record-modal-box">
+        <div class="record-modal-header">
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Detailed Record View</h3>
+            <button onclick="closeViewRecord()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div id="view-record-content" class="record-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- 2. Extend Pass Modal -->
+  <div id="extend-pass-modal" class="popup-modal hidden">
+    <div class="record-modal-box" style="max-width: 400px;">
+        <div class="record-modal-header">
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Extend Pass Validity</h3>
+            <button onclick="closeExtendPass()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
+            <input type="hidden" id="extend-id">
+            <input type="hidden" id="extend-type">
+            <div class="input-group" id="extend-start-group">
+                <label style="color: var(--noon-yellow); font-size: 13px;">New Visit / Start Date</label>
+                <input type="date" id="extend-start" class="input-field">
+            </div>
+            <div class="input-group" id="extend-end-group">
+                <label style="color: var(--noon-yellow); font-size: 13px;">New End Date</label>
+                <input type="date" id="extend-end" class="input-field">
+            </div>
+            <button id="btn-submit-extend" class="btn-primary" onclick="submitExtendPass()">SAVE EXTENSION</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- 3. Camera Modal -->
+  <div id="custom-camera-modal" class="popup-modal hidden">
+    <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <video id="camera-video-stream" autoplay playsinline></video>
+        <canvas id="camera-hidden-canvas" class="hidden"></canvas>
+        <div class="cam-controls">
+            <button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()">📸 CAPTURE</button>
+            <button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()">🔄 FLIP CAM</button>
+            <button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()">❌ CANCEL</button>
+        </div>
+    </div>
+  </div>
+
+
   <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
   <div id="login-view">
     <div class="login-container">
       <div class="logo-box"></div>
       
-      <!-- ROLE TABS -->
       <div class="role-tabs">
         <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')">🛡️ Guard</div>
         <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')">📋 Visitor/Ops</div>
         <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
       </div>
 
-      <!-- GUARD LOGIN -->
       <div id="login-guard" class="hidden">
         <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
         <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
@@ -196,14 +250,12 @@
         <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
       </div>
 
-      <!-- OPS LOGIN -->
       <div id="login-ops">
         <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
         <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
         <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
       </div>
 
-      <!-- ADMIN LOGIN -->
       <div id="login-admin" class="hidden">
         <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
         <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
@@ -220,7 +272,7 @@
            <div class="sidebar-header">
                <div class="sidebar-brand">
                    <h1>NOON SLP</h1>
-                   <p>System Admin</p>
+                   <p>Gate Control</p>
                </div>
                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
            </div>
@@ -236,8 +288,7 @@
                </a>
            </nav>
            <div class="sidebar-footer">
-               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); margin-bottom: 10px; font-weight: bold;" class="nav-text">Admin</div>
-               <button class="btn-primary btn-outline btn-sm" style="width: 100%;" onclick="logout()">LOGOUT</button>
+               <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); font-weight: bold;" class="nav-text">Admin</div>
            </div>
       </aside>
 
@@ -248,8 +299,7 @@
           <div id="dashboard-ops" class="dashboard hidden">
             <div class="header">
               <h2>Visitor & Contractor Portal</h2>
-              <!-- Visible logout for non-admins -->
-              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
+              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
             </div>
             
             <div class="ops-grid">
@@ -344,7 +394,7 @@
           <div id="dashboard-guard" class="dashboard hidden text-center">
             <div class="header">
               <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
-              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px;" onclick="logout()">Logout</button>
+              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
             </div>
             
             <div style="max-width: 450px; margin: 0 auto;">
@@ -368,10 +418,16 @@
           </div>
 
           <!-- 3. ADMIN DASHBOARD -->
-          <div id="dashboard-admin" class="dashboard hidden">
-            <div class="header">
-              <h2>System Administration</h2>
-            </div>
+          <div id="dashboard-admin" class="dashboard hidden" style="padding-top: 0;">
+            <header class="admin-header-top" style="margin: 0 -30px 20px -30px;">
+                <div class="admin-brand-horizontal">
+                    <h1>System Administration</h1>
+                </div>
+                <div class="admin-user-info">
+                    <span style="font-size: 12px; color: var(--text-muted);" id="header-admin-name">Admin Session</span>
+                    <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
+                </div>
+            </header>
 
             <ul class="admin-nav-horizontal">
                 <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
@@ -400,7 +456,6 @@
 
             <!-- TAB: APPROVALS -->
             <div id="admin-sec-approvals" class="admin-card admin-section">
-                <!-- PENDING REQUESTS -->
                 <div class="admin-card-title"><span>Pending Requests</span></div>
                 <div style="overflow-x: auto;">
                   <table>
@@ -411,7 +466,6 @@
                   </table>
                 </div>
                 
-                <!-- ACTIVE REQUESTS -->
                 <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
                     <span>Active Requests</span>
                     <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
@@ -672,6 +726,7 @@
         if (currentUser.role === 'admin') {
             document.getElementById('sidebar').style.display = 'flex';
             document.getElementById('sidebar-user-name').innerText = currentUser.name;
+            document.getElementById('header-admin-name').innerText = currentUser.name;
             document.getElementById('nav-sidebar-admin').classList.remove('hidden');
             loadAdminData(false);
             switchMainView('admin');
@@ -965,42 +1020,45 @@
           } else {
             const isPending = row.Status === 'Pending';
             
-            if (isPending) {
-                let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                  <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-                  <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
-                </div>`;
+            // FILTERS FIXED HERE: Wrapping Pending & Active inside the inRange check!
+            if (inRange) {
+                if (isPending) {
+                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
+                      <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
+                      <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                    </div>`;
 
-                htmlPending += `<tr>
-                  <td style="color: var(--text-muted);">${dateStr}</td>
-                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                  <td>${row.Type}</td>
-                  <td>${row.Location}</td>
-                  <td>${actionBtns}</td>
-                </tr>`;
-                pendingCount++;
-            } else if (row.Status === 'Approved') {
-                const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
-                let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
-                
-                let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>
-                  <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>
-                  <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
-                </div>`;
+                    htmlPending += `<tr>
+                      <td style="color: var(--text-muted);">${dateStr}</td>
+                      <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+                      <td>${row.Type}</td>
+                      <td>${row.Location}</td>
+                      <td>${actionBtns}</td>
+                    </tr>`;
+                    pendingCount++;
+                } else if (row.Status === 'Approved') {
+                    const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
+                    let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
+                    
+                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>
+                      <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
+                    </div>`;
 
-                htmlActive += `<tr>
-                  <td>${cbHtml}</td>
-                  <td style="color: var(--text-muted);">${dateStr}</td>
-                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                  <td>${row.Type}</td>
-                  <td>${row.Location}</td>
-                  <td>${actionBtns}</td>
-                </tr>`;
-                activeCount++;
+                    htmlActive += `<tr>
+                      <td>${cbHtml}</td>
+                      <td style="color: var(--text-muted);">${dateStr}</td>
+                      <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
+                      <td>${row.Type}</td>
+                      <td>${row.Location}</td>
+                      <td>${actionBtns}</td>
+                    </tr>`;
+                    activeCount++;
+                }
             }
           }
 
@@ -1018,8 +1076,8 @@
           }
         });
 
-        if (pendingCount === 0) htmlPending = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No pending requests.</td></tr>';
-        if (activeCount === 0) htmlActive = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests.</td></tr>';
+        if (pendingCount === 0) htmlPending = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No pending requests found in this timeframe.</td></tr>';
+        if (activeCount === 0) htmlActive = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests found in this timeframe.</td></tr>';
         if (historyCount === 0) htmlHistory = '<tr><td colspan="9" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
         if (guardCount === 0) htmlGuard = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
 
@@ -1154,7 +1212,7 @@
     }
 
     function openViewRecord(id) {
-        const r = globalAdminData.find(x => x.UniqueID === id);
+        const r = globalAdminData.find(x => String(x.UniqueID) === String(id));
         if (!r) return;
 
         let contentHtml = `
