@@ -103,7 +103,7 @@
     .header h2 { color: var(--noon-yellow); font-size: 22px; margin: 0; display: flex; align-items: center; gap: 15px;}
     .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-    /* VIEW SPECIFIC WIDTHS */
+    /* EXACT WIDTH RESTRICTIONS */
     #dashboard-ops { max-width: 950px; margin-top: 20px; } 
     #dashboard-guard { max-width: 600px; margin-top: 20px; }
     #dashboard-admin { max-width: 100%; padding: 30px 2.5vw; padding-top: 0; }
@@ -438,7 +438,18 @@
           <!-- 2. GUARD SCANNER -->
           <div id="dashboard-guard" class="dashboard hidden text-center">
             <div class="header">
-              <h2><span data-i18n="gate_scanner">Gate Scanner</span> (<span id="guard-loc-display"></span>)</h2>
+              <h2>
+                  <span data-i18n="gate_scanner">Gate Scanner</span>
+                  <span id="guard-loc-text" style="color: var(--text-muted); font-size: 18px;">(<span id="guard-loc-display"></span>)</span>
+                  
+                  <!-- ADMIN SPECIFIC DROPDOWN -->
+                  <select id="admin-guard-loc" class="input-field hidden" style="width: auto; padding: 6px 12px; font-size: 14px; margin: 0; min-width: 150px;" onchange="updateAdminGuardLoc()">
+                      <option value="" data-i18n="select_guard_loc">Select Guard Location...</option>
+                      <option value="RUH01">RUH01</option>
+                      <option value="JED01">JED01</option>
+                      <option value="DXB01">DXB01</option>
+                  </select>
+              </h2>
               <div class="header-controls">
                   <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button>
                   <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button>
@@ -620,7 +631,8 @@
         "lbl_host_name": "Host Name", "lbl_host_email": "Host Email", "lbl_validity": "Validity Period", "lbl_iqama": "IQAMA/ID COPY", "lbl_selfie": "SELFIE PHOTO", "lbl_vehicle": "VEHICLE PLATE",
         "status_approved": "Approved", "status_pending": "Pending", "status_rejected": "Rejected", "status_expired": "EXPIRED", "status_completed": "COMPLETED",
         "msg_no_pending": "No pending requests found in this timeframe.", "msg_no_active": "No active requests found in this timeframe.", "msg_no_history": "No history found in this timeframe.", "msg_no_gate": "No gate operations found in this timeframe.",
-        "msg_enter_email": "Enter an Email Address on the left to view passes.", "msg_loading": "Loading requests...", "msg_inside": "Inside Facility"
+        "msg_enter_email": "Enter an Email Address on the left to view passes.", "msg_loading": "Loading requests...", "msg_inside": "Inside Facility",
+        "msg_admin_select_loc": "Admin: Please select a facility first."
       },
       ar: {
         "guard": "🛡️ الحارس", "visitor_ops": "📋 الزوار/العمليات", "admin": "⚙️ الإدارة",
@@ -649,7 +661,8 @@
         "lbl_host_name": "اسم المضيف", "lbl_host_email": "بريد المضيف", "lbl_validity": "فترة الصلاحية", "lbl_iqama": "صورة الهوية/الإقامة", "lbl_selfie": "الصورة الشخصية", "lbl_vehicle": "لوحة السيارة",
         "status_approved": "مقبول", "status_pending": "قيد الانتظار", "status_rejected": "مرفوض", "status_expired": "منتهي", "status_completed": "مكتمل",
         "msg_no_pending": "لا توجد طلبات معلقة في هذه الفترة.", "msg_no_active": "لا توجد طلبات نشطة في هذه الفترة.", "msg_no_history": "لا يوجد سجل في هذه الفترة.", "msg_no_gate": "لا توجد عمليات بوابة في هذه الفترة.",
-        "msg_enter_email": "أدخل بريداً إلكترونياً لعرض التصاريح.", "msg_loading": "جاري التحميل...", "msg_inside": "داخل المنشأة"
+        "msg_enter_email": "أدخل بريداً إلكترونياً لعرض التصاريح.", "msg_loading": "جاري التحميل...", "msg_inside": "داخل المنشأة",
+        "msg_admin_select_loc": "المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية."
       }
     };
 
@@ -711,6 +724,13 @@
 
         if (viewId === 'ops' && currentUser && currentUser.role === 'admin') {
             loadMyPasses(false, false);
+        }
+    }
+
+    // --- Admin Guard Loc Updater ---
+    function updateAdminGuardLoc() {
+        if(currentUser && currentUser.role === 'admin') {
+            currentUser.location = document.getElementById('admin-guard-loc').value || '';
         }
     }
 
@@ -921,6 +941,11 @@
             
             const navAdmin = document.getElementById('nav-sidebar-admin');
             if (navAdmin) navAdmin.classList.remove('hidden');
+
+            // Setup Admin Gate Scanner UI
+            document.getElementById('guard-loc-text').classList.add('hidden');
+            document.getElementById('admin-guard-loc').classList.remove('hidden');
+            currentUser.location = document.getElementById('admin-guard-loc').value || '';
             
             loadAdminData(false);
             switchMainView('admin');
@@ -942,6 +967,10 @@
                 switchMainView('ops');
                 loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
+                // Setup Normal Guard UI
+                document.getElementById('guard-loc-text').classList.remove('hidden');
+                document.getElementById('admin-guard-loc').classList.add('hidden');
+
                 const locDisplay = document.getElementById('guard-loc-display');
                 if (locDisplay) locDisplay.innerText = currentUser.location || '';
                 
@@ -1703,6 +1732,10 @@
 
         const isCheckedOut = !!data.CheckOutTime;
         const isInside = !!data.CheckInTime && !data.CheckOutTime;
+
+        if (currentUser.role === 'admin' && !currentUser.location) {
+            return showScanResult("DENIED", t('msg_admin_select_loc') || "Admin: Please select a facility first.", "bg-red");
+        }
 
         if (data.Status !== 'Approved') {
             showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
