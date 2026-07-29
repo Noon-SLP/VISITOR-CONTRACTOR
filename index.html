@@ -30,19 +30,34 @@
       display: flex; 
       min-height: 100vh; 
       overflow-x: hidden; 
+      transition: all 0.3s ease;
     }
     
     .hidden { display: none !important; }
     .text-center { text-align: center; }
     .mb-4 { margin-bottom: 16px; }
 
+    /* RTL Support */
+    body[dir="rtl"] { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body[dir="rtl"] th, body[dir="rtl"] td { text-align: right; }
+    body[dir="rtl"] .sidebar-nav a { border-left: none; border-right: 3px solid transparent; }
+    body[dir="rtl"] .sidebar-nav a:hover, body[dir="rtl"] .sidebar-nav a.active { border-right: 3px solid var(--noon-yellow); }
+    body[dir="rtl"] .input-group label { text-align: right; }
+    body[dir="rtl"] .ops-card { text-align: right; }
+    body[dir="rtl"] .pass-item { text-align: right; }
+
+    /* Language Toggle Btn */
+    .lang-toggle { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid var(--noon-yellow); color: var(--noon-yellow); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; z-index: 1000; }
+    body[dir="rtl"] .lang-toggle { right: auto; left: 20px; }
+
     /* ================= LOGIN VIEW ================= */
     #login-view { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
-    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin: 20px; }
+    .login-container { width: 100%; max-width: 420px; background-color: var(--card-bg); padding: 40px 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin: 20px; position: relative; }
     .logo-box { width: 130px; height: 130px; margin: 0 auto 30px; background-color: #12151c; background-image: url('logo.jpeg'); background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 12px; }
     
     .role-tabs { display: flex; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 24px; background: #0b0e14; }
-    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-color); text-transform: uppercase; transition: 0.2s;}
+    .role-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-inline-end: 1px solid var(--border-color); text-transform: uppercase; transition: 0.2s;}
+    .role-tab:last-child { border-inline-end: none; }
     .role-tab.active { background: var(--noon-yellow); color: #000; }
     
     .input-group { margin-bottom: 16px; }
@@ -62,7 +77,7 @@
     /* ================= MAIN APP LAYOUT ================= */
     #app-layout { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
     
-    .sidebar { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
+    .sidebar { width: 240px; background: var(--sidebar-bg); border-inline-end: 1px solid var(--border-color); display: flex; flex-direction: column; transition: width 0.3s; z-index: 100;}
     .sidebar.minimized { width: 75px; }
     
     .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--border-color); }
@@ -82,16 +97,17 @@
     
     #main-content { flex: 1; height: 100vh; overflow-y: auto; position: relative; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
     
-    /* Dashboards */
-    .dashboard { width: 100%; max-width: 1100px; padding: 30px; margin: 0 auto; }
+    /* Dashboards (FULL SCREEN) */
+    .dashboard { width: 100%; max-width: 100%; padding: 2.5vw; margin: 0 auto; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-    .header h2 { color: var(--noon-yellow); font-size: 22px; }
+    .header h2 { color: var(--noon-yellow); font-size: 22px; margin: 0; display: flex; align-items: center; gap: 15px;}
     
-    .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    /* OPS Portal Layout */
+    .ops-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 450px); gap: 2vw; align-items: start; }
     .ops-card { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
-    .pass-item { background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px; text-align: left; }
-    .pass-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .pass-item { background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 12px; text-align: start; }
+    .pass-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px;}
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
     /* GUARD SCANNER UI */
@@ -108,8 +124,8 @@
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* ADMIN DASHBOARD UI */
-    .admin-header-top { display: flex; align-items: center; padding: 0 32px; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
-    .admin-brand-horizontal { display: flex; flex-direction: column; margin-right: 40px; }
+    .admin-header-top { display: flex; align-items: center; padding: 0 2.5vw; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; }
+    .admin-brand-horizontal { display: flex; flex-direction: column; }
     .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; margin:0; }
     .admin-nav-horizontal { list-style: none; display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; overflow-x: auto;}
     .admin-nav-horizontal li { padding: 12px 20px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: 0.2s; text-transform: uppercase; white-space: nowrap;}
@@ -121,11 +137,11 @@
     .admin-card-title { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);}
     
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-color); }
+    th, td { padding: 14px 20px; text-align: start; border-bottom: 1px solid var(--border-color); }
     th { background: rgba(0,0,0,0.2); color: var(--text-muted); text-transform: uppercase; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
     tr:hover td { background-color: rgba(255, 255, 255, 0.02); }
 
-    .analytics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px;}
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;}
     .analytics-box { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
     .analytics-box-title { font-size: 12px; font-weight: 600; color: var(--noon-yellow); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
     .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
@@ -136,7 +152,7 @@
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* VIEW RECORD MODAL / EXTEND PASS MODAL / CAMERA MODAL */
+    /* MODALS */
     .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
@@ -145,20 +161,23 @@
     .record-modal-content strong { color: var(--noon-yellow); display: block; font-size: 11px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;}
     .record-img-box { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 15px; }
     .record-img-box div { flex: 1; min-width: 180px; display: flex; flex-direction: column; }
-    .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; }
+    .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; cursor: pointer; transition: 0.2s;}
+    .record-img-box img:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(255,199,0,0.3); }
     
     #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
 
     /* ================= RESPONSIVE (MOBILE & TABLET) FIXES ================= */
+    @media (max-width: 1024px) {
+        .ops-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 900px) {
-        .ops-grid { grid-template-columns: 1fr; gap: 15px; }
-        .analytics-grid { grid-template-columns: 1fr; gap: 15px; }
         .sidebar { position: fixed; height: 100vh; transform: translateX(0); }
         .sidebar.minimized { transform: translateX(-100%); width: 240px; }
-        .dashboard { padding: 15px; margin-top: 10px;}
-        .admin-header-top { flex-direction: column; height: auto; padding: 15px; align-items: stretch; gap: 15px; }
+        body[dir="rtl"] .sidebar.minimized { transform: translateX(100%); }
+        .dashboard { padding: 4vw; margin-top: 10px;}
+        .admin-header-top { flex-direction: column; height: auto; padding: 15px; align-items: stretch; gap: 15px; margin: 0 -4vw 20px -4vw !important;}
         .admin-brand-horizontal { margin-right: 0; text-align: center; width: 100%; }
         .admin-nav-horizontal { flex-wrap: wrap; justify-content: center; gap: 5px; width: 100%; }
         .admin-nav-horizontal li { padding: 10px; font-size: 11px; flex: 1 1 auto; text-align: center; }
@@ -168,58 +187,64 @@
         #custom-date-picker { flex-direction: column; align-items: stretch; width: 100%; }
         table th, table td { padding: 10px; }
         .record-modal-content { grid-template-columns: 1fr; }
-        #main-content { transition: margin-left 0.3s; }
-        body:not(.sidebar-minimized) #main-content { margin-left: 240px; }
+        #main-content { transition: margin-left 0.3s, margin-right 0.3s; }
+        body:not(.sidebar-minimized) #main-content { margin-inline-start: 240px; }
     }
   </style>
 </head>
-<body class="sidebar-minimized"> 
+<body class="sidebar-minimized" dir="ltr"> 
 
-  <!-- ================= STRICTLY ONE SET OF MODALS AT THE TOP LEVEL ================= -->
-  
-  <!-- 1. View Record Modal -->
+  <button onclick="toggleLang()" class="lang-toggle" id="btn-lang-global">عربي / EN</button>
+
+  <!-- ================= FULL SCREEN IMAGE MODAL ================= -->
+  <div id="fullscreen-image-modal" class="popup-modal hidden" onclick="this.classList.add('hidden')" style="z-index: 9999999; cursor: zoom-out;">
+      <img id="fullscreen-img" src="" style="max-width: 95vw; max-height: 95vh; border-radius: 8px; object-fit: contain;">
+      <div style="position: absolute; bottom: 20px; color: white; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px;" data-i18n="click_to_close">Click anywhere to close</div>
+  </div>
+
+  <!-- ================= VIEW RECORD MODAL ================= -->
   <div id="view-record-modal" class="popup-modal hidden">
     <div class="record-modal-box">
         <div class="record-modal-header">
-            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Detailed Record View</h3>
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;" data-i18n="detailed_record">Detailed Record View</h3>
             <button onclick="closeViewRecord()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
         </div>
         <div id="view-record-content" class="record-modal-content"></div>
     </div>
   </div>
 
-  <!-- 2. Extend Pass Modal -->
+  <!-- ================= EXTEND PASS MODAL ================= -->
   <div id="extend-pass-modal" class="popup-modal hidden">
     <div class="record-modal-box" style="max-width: 400px;">
         <div class="record-modal-header">
-            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Extend Pass Validity</h3>
+            <h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;" data-i18n="extend_pass">Extend Pass Validity</h3>
             <button onclick="closeExtendPass()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
         </div>
         <div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;">
             <input type="hidden" id="extend-id">
             <input type="hidden" id="extend-type">
             <div class="input-group" id="extend-start-group">
-                <label style="color: var(--noon-yellow); font-size: 13px;">New Visit / Start Date</label>
+                <label style="color: var(--noon-yellow); font-size: 13px;" data-i18n="new_start_date">New Visit / Start Date</label>
                 <input type="date" id="extend-start" class="input-field">
             </div>
             <div class="input-group" id="extend-end-group">
-                <label style="color: var(--noon-yellow); font-size: 13px;">New End Date</label>
+                <label style="color: var(--noon-yellow); font-size: 13px;" data-i18n="new_end_date">New End Date</label>
                 <input type="date" id="extend-end" class="input-field">
             </div>
-            <button id="btn-submit-extend" class="btn-primary" onclick="submitExtendPass()">SAVE EXTENSION</button>
+            <button id="btn-submit-extend" class="btn-primary" onclick="submitExtendPass()" data-i18n="save_extension">SAVE EXTENSION</button>
         </div>
     </div>
   </div>
 
-  <!-- 3. Camera Modal -->
+  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="popup-modal hidden">
     <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
         <video id="camera-video-stream" autoplay playsinline></video>
         <canvas id="camera-hidden-canvas" class="hidden"></canvas>
         <div class="cam-controls">
-            <button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()">📸 CAPTURE</button>
-            <button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()">🔄 FLIP CAM</button>
-            <button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()">❌ CANCEL</button>
+            <button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()" data-i18n="capture">📸 CAPTURE</button>
+            <button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()" data-i18n="flip_cam">🔄 FLIP CAM</button>
+            <button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()" data-i18n="cancel">❌ CANCEL</button>
         </div>
     </div>
   </div>
@@ -231,36 +256,36 @@
       <div class="logo-box"></div>
       
       <div class="role-tabs">
-        <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')">🛡️ Guard</div>
-        <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')">📋 Visitor/Ops</div>
-        <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')">⚙️ Admin</div>
+        <div class="role-tab" id="tab-guard" onclick="switchLoginTab('guard')" data-i18n="guard">🛡️ Guard</div>
+        <div class="role-tab active" id="tab-ops" onclick="switchLoginTab('ops')" data-i18n="visitor_ops">📋 Visitor/Ops</div>
+        <div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')" data-i18n="admin">⚙️ Admin</div>
       </div>
 
       <div id="login-guard" class="hidden">
-        <div class="input-group"><input type="text" id="lg-name" class="input-field" placeholder="Name"></div>
-        <div class="input-group"><input type="text" id="lg-id" class="input-field" placeholder="Noon ID"></div>
+        <div class="input-group"><input type="text" id="lg-name" class="input-field t-ph" data-i18n="name" placeholder="Name"></div>
+        <div class="input-group"><input type="text" id="lg-id" class="input-field t-ph" data-i18n="noon_id" placeholder="Noon ID"></div>
         <div class="input-group">
           <select id="lg-location" class="input-field">
-            <option value="">Select Guard Location...</option>
+            <option value="" data-i18n="select_guard_loc">Select Guard Location...</option>
             <option value="RUH01">RUH01</option>
             <option value="JED01">JED01</option>
             <option value="DXB01">DXB01</option>
           </select>
         </div>
-        <button class="btn-primary" onclick="login('guard')">LOGIN TO GATE</button>
+        <button class="btn-primary" onclick="login('guard')" data-i18n="login_gate">LOGIN TO GATE</button>
       </div>
 
       <div id="login-ops">
-        <div class="input-group"><input type="text" id="lo-name" class="input-field" placeholder="Your Full Name"></div>
-        <div class="input-group"><input type="email" id="lo-mail" class="input-field" placeholder="Your Gmail / Email"></div>
-        <button class="btn-primary" onclick="login('ops')">LOGIN TO PORTAL</button>
+        <div class="input-group"><input type="text" id="lo-name" class="input-field t-ph" data-i18n="your_full_name" placeholder="Your Full Name"></div>
+        <div class="input-group"><input type="email" id="lo-mail" class="input-field t-ph" data-i18n="your_email" placeholder="Your Gmail / Email"></div>
+        <button class="btn-primary" onclick="login('ops')" data-i18n="login_portal">LOGIN TO PORTAL</button>
       </div>
 
       <div id="login-admin" class="hidden">
-        <div class="input-group"><input type="text" id="la-name" class="input-field" placeholder="Admin Name"></div>
-        <div class="input-group"><input type="email" id="la-mail" class="input-field" placeholder="Admin Gmail"></div>
-        <div class="input-group"><input type="password" id="la-pass" class="input-field" placeholder="Admin Password"></div>
-        <button class="btn-primary" onclick="login('admin')">LOGIN AS ADMIN</button>
+        <div class="input-group"><input type="text" id="la-name" class="input-field t-ph" data-i18n="admin_name" placeholder="Admin Name"></div>
+        <div class="input-group"><input type="email" id="la-mail" class="input-field t-ph" data-i18n="admin_email" placeholder="Admin Gmail"></div>
+        <div class="input-group"><input type="password" id="la-pass" class="input-field t-ph" data-i18n="admin_password" placeholder="Admin Password"></div>
+        <button class="btn-primary" onclick="login('admin')" data-i18n="login_admin">LOGIN AS ADMIN</button>
       </div>
     </div>
   </div>
@@ -272,24 +297,24 @@
            <div class="sidebar-header">
                <div class="sidebar-brand">
                    <h1>NOON SLP</h1>
-                   <p>System Admin</p>
+                   <p data-i18n="system_admin">System Admin</p>
                </div>
                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
            </div>
            <nav class="sidebar-nav">
                <a href="#" id="nav-sidebar-ops" onclick="switchMainView('ops')">
-                   <span class="icon">📝</span><span class="nav-text">Visitor Portal</span>
+                   <span class="icon">📝</span><span class="nav-text" data-i18n="visitor_portal">Visitor Portal</span>
                </a>
                <a href="#" id="nav-sidebar-guard" onclick="switchMainView('guard')">
-                   <span class="icon">🛡️</span><span class="nav-text">Gate Scanner</span>
+                   <span class="icon">🛡️</span><span class="nav-text" data-i18n="gate_scanner">Gate Scanner</span>
                </a>
                <a href="#" id="nav-sidebar-admin" class="active" onclick="switchMainView('admin')">
-                   <span class="icon">⚙️</span><span class="nav-text">Admin Dashboard</span>
+                   <span class="icon">⚙️</span><span class="nav-text" data-i18n="admin_dashboard">Admin Dashboard</span>
                </a>
            </nav>
            <div class="sidebar-footer">
                <div id="sidebar-user-name" style="font-size: 12px; color: var(--noon-yellow); font-weight: bold; margin-bottom: 10px;" class="nav-text">Admin</div>
-               <button class="btn-primary btn-outline btn-sm" style="width: 100%;" onclick="logout()">LOGOUT</button>
+               <button class="btn-primary btn-outline btn-sm" style="width: 100%;" onclick="logout()" data-i18n="logout">LOGOUT</button>
            </div>
       </aside>
 
@@ -299,29 +324,32 @@
           <!-- 1. OPS PORTAL -->
           <div id="dashboard-ops" class="dashboard hidden">
             <div class="header">
-              <h2>Visitor & Contractor Portal</h2>
-              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
+              <h2 data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</h2>
+              <div style="display: flex; gap: 10px;">
+                  <button class="lang-toggle" style="position:relative; top:0; right:0;" onclick="toggleLang()">عربي / EN</button>
+                  <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()" data-i18n="logout">LOGOUT</button>
+              </div>
             </div>
             
             <div class="ops-grid">
               <div class="ops-card">
-                <h3 style="margin-bottom: 16px; color: var(--noon-yellow);">Submit New Request</h3>
+                <h3 style="margin-bottom: 16px; color: var(--noon-yellow);" data-i18n="submit_new_request">Submit New Request</h3>
                 
                 <div class="input-group">
-                  <label style="font-weight: 700; color: var(--noon-yellow);">Type</label>
+                  <label style="font-weight: 700; color: var(--noon-yellow);" data-i18n="type">Type</label>
                   <select id="req-type" class="input-field" onchange="toggleDateFields()">
-                    <option value="Visitor">Visitor</option>
-                    <option value="Contractor">Contractor</option>
+                    <option value="Visitor" data-i18n="visitor">Visitor</option>
+                    <option value="Contractor" data-i18n="contractor">Contractor</option>
                   </select>
                 </div>
                 
                 <!-- NEW EXPLICIT FIELDS SO ADMINS CAN REQUEST ON BEHALF OF OTHERS -->
                 <div class="input-group hidden" id="admin-email-group">
-                    <input type="email" id="req-admin-email" class="input-field" placeholder="Email Address (For Pass Tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false)">
+                    <input type="email" id="req-admin-email" class="input-field t-ph" data-i18n="req_email_ph" placeholder="Email Address (For Pass Tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false, false)">
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="req-vname" class="input-field" placeholder="Visitor / Contractor Full Name">
+                    <input type="text" id="req-vname" class="input-field t-ph" data-i18n="req_vname_ph" placeholder="Visitor / Contractor Full Name">
                 </div>
 
                 <div class="input-group">
@@ -334,16 +362,16 @@
 
                 <div id="req-visitor-fields">
                   <div class="input-group">
-                    <label>Visit Date</label>
+                    <label data-i18n="visit_date">Visit Date</label>
                     <input type="date" id="req-date-single" class="input-field">
                   </div>
-                  <div class="input-group"><input type="text" id="req-vis-slp" class="input-field" placeholder="SLP Ticket No."></div>
-                  <div class="input-group"><input type="text" id="req-vis-contact" class="input-field" placeholder="Contact No."></div>
-                  <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field" placeholder="Invited by Whom"></div>
+                  <div class="input-group"><input type="text" id="req-vis-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
                   <div class="input-group">
-                    <label>Vehicle Plate / Picture (Optional)</label>
+                    <label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label>
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')">📷 Live Camera</button>
+                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')" data-i18n="live_camera">📷 Live Camera</button>
                       <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
                     </div>
                     <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
@@ -352,48 +380,49 @@
 
                 <div id="req-contractor-fields" class="hidden">
                   <div class="input-group">
-                    <label>Contract Expiration (From - To)</label>
+                    <label data-i18n="contract_exp">Contract Expiration (From - To)</label>
                     <div style="display: flex; gap: 10px;">
                       <input type="date" id="req-date-start" class="input-field">
                       <input type="date" id="req-date-end" class="input-field">
                     </div>
                   </div>
-                  <div class="input-group"><input type="text" id="req-con-slp" class="input-field" placeholder="SLP Ticket No."></div>
-                  <div class="input-group"><input type="text" id="req-con-contact" class="input-field" placeholder="Contact No."></div>
-                  <div class="input-group"><input type="text" id="req-con-project" class="input-field" placeholder="Project Name"></div>
-                  <div class="input-group"><input type="text" id="req-con-company" class="input-field" placeholder="Company / Contractor Name"></div>
-                  <div class="input-group"><input type="text" id="req-con-pm" class="input-field" placeholder="Project Manager"></div>
-                  <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field" placeholder="FM POC"></div>
+                  <div class="input-group"><input type="text" id="req-con-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-con-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-con-project" class="input-field t-ph" data-i18n="project_name" placeholder="Project Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
+                  <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field t-ph" data-i18n="fm_poc" placeholder="FM POC"></div>
                 </div>
 
                 <div class="input-group">
-                  <label>Upload Iqama/ID Copy</label>
+                  <label data-i18n="upload_iqama">Upload Iqama/ID Copy</label>
                   <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')">📷 Live Camera</button>
+                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')" data-i18n="live_camera">📷 Live Camera</button>
                     <input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')">
                   </div>
                   <img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
                 </div>
 
                 <div class="input-group">
-                  <label>Upload Selfie Photo</label>
+                  <label data-i18n="upload_selfie">Upload Selfie Photo</label>
                   <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')">📷 Live Camera</button>
+                    <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button>
                     <input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')">
                   </div>
                   <img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
                 </div>
 
-                <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;">Submit for Approval</button>
+                <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;" data-i18n="submit_approval">Submit for Approval</button>
               </div>
 
               <div class="ops-card text-center">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3 style="color: var(--noon-yellow);">My Passes</h3>
-                    <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(false)">Refresh</button>
+                    <h3 style="color: var(--noon-yellow);" data-i18n="my_passes">My Passes</h3>
+                    <!-- REFRESH BUTTON FIXED: Calls loadMyPasses with forceRefresh = true -->
+                    <button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(true, false)" data-i18n="refresh">Refresh</button>
                 </div>
                 <div id="my-passes-list" style="max-height: 600px; overflow-y: auto;">
-                    <p style="color: var(--text-muted); font-size: 13px;">Fetching your passes...</p>
+                    <p style="color: var(--text-muted); font-size: 13px;" data-i18n="fetching">Fetching your passes...</p>
                 </div>
               </div>
             </div>
@@ -402,12 +431,15 @@
           <!-- 2. GUARD SCANNER -->
           <div id="dashboard-guard" class="dashboard hidden text-center">
             <div class="header">
-              <h2>Gate Scanner (<span id="guard-loc-display"></span>)</h2>
-              <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
+              <h2 data-i18n="gate_scanner">Gate Scanner (<span id="guard-loc-display"></span>)</h2>
+              <div style="display: flex; gap: 10px;">
+                  <button class="lang-toggle" style="position:relative; top:0; right:0;" onclick="toggleLang()">عربي / EN</button>
+                  <button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px;" onclick="logout()" data-i18n="logout">LOGOUT</button>
+              </div>
             </div>
             
             <div style="max-width: 450px; margin: 0 auto;">
-              <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;">START CAMERA SCANNER</button>
+              <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;" data-i18n="start_camera">START CAMERA SCANNER</button>
               <div id="reader" class="hidden"></div>
               
               <div id="scan-result" class="scan-result-card hidden">
@@ -416,100 +448,102 @@
                 
                 <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
 
-                <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: left; font-size: 16px; line-height: 1.6;">
-                    <p><strong>Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
-                    <p><strong>Type:</strong> <span id="r-type">-</span></p>
-                    <p><strong>Location:</strong> <span id="r-location">-</span></p>
+                <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: start; font-size: 16px; line-height: 1.6;">
+                    <p><strong data-i18n="name_label">Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
+                    <p><strong data-i18n="type_label">Type:</strong> <span id="r-type">-</span></p>
+                    <p><strong data-i18n="location_label">Location:</strong> <span id="r-location">-</span></p>
                 </div>
-                <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()">CONFIRM ACTION</button>
+                <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()" data-i18n="confirm_action">CONFIRM ACTION</button>
               </div>
             </div>
           </div>
 
           <!-- 3. ADMIN DASHBOARD -->
           <div id="dashboard-admin" class="dashboard hidden" style="padding-top: 0;">
-            <header class="admin-header-top" style="margin: 0 -30px 20px -30px;">
+            <header class="admin-header-top" style="margin: 0 -2.5vw 20px -2.5vw;">
                 <div class="admin-brand-horizontal">
-                    <h1>System Administration</h1>
+                    <h1 data-i18n="system_admin">System Administration</h1>
                 </div>
                 <div class="admin-user-info">
+                    <button class="lang-toggle" style="position:relative; top:0; right:0;" onclick="toggleLang()">عربي / EN</button>
                     <span style="font-size: 12px; color: var(--text-muted);" id="header-admin-name">Admin Session</span>
-                    <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()">LOGOUT</button>
+                    <button class="btn-primary btn-outline btn-sm" style="width: auto; padding: 6px 16px;" onclick="logout()" data-i18n="logout">LOGOUT</button>
                 </div>
             </header>
 
             <ul class="admin-nav-horizontal">
-                <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')">📋 Access Approvals</li>
-                <li id="nav-history" onclick="switchAdminTab('history')">🕰️ History</li>
-                <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')">🛡️ Guard Approvals</li>
-                <li id="nav-analytics" onclick="switchAdminTab('analytics')">📊 Analytics</li>
+                <li id="nav-approvals" class="active" onclick="switchAdminTab('approvals')" data-i18n="access_approvals">📋 Access Approvals</li>
+                <li id="nav-history" onclick="switchAdminTab('history')" data-i18n="history">🕰️ History</li>
+                <li id="nav-guard-approvals" onclick="switchAdminTab('guard-approvals')" data-i18n="guard_approvals">🛡️ Guard Approvals</li>
+                <li id="nav-analytics" onclick="switchAdminTab('analytics')" data-i18n="analytics">📊 Analytics</li>
             </ul>
               
             <div class="admin-filter-bar" id="admin-global-filter">
                 <div style="display: flex; gap: 5px;">
-                    <button class="btn-filter active" onclick="setAdminFilter('all', this)">All Time</button>
-                    <button class="btn-filter" onclick="setAdminFilter('today', this)">Today</button>
-                    <button class="btn-filter" onclick="setAdminFilter('weekly', this)">Weekly</button>
-                    <button class="btn-filter" onclick="setAdminFilter('monthly', this)">Monthly</button>
-                    <button class="btn-filter" onclick="setAdminFilter('6months', this)">6 Months</button>
-                    <button class="btn-filter" onclick="setAdminFilter('year', this)">1 Year</button>
-                    <button class="btn-filter" onclick="setAdminFilter('custom', this)">Custom</button>
+                    <button class="btn-filter active" onclick="setAdminFilter('all', this)" data-i18n="all_time">All Time</button>
+                    <button class="btn-filter" onclick="setAdminFilter('today', this)" data-i18n="today">Today</button>
+                    <button class="btn-filter" onclick="setAdminFilter('weekly', this)" data-i18n="weekly">Weekly</button>
+                    <button class="btn-filter" onclick="setAdminFilter('monthly', this)" data-i18n="monthly">Monthly</button>
+                    <button class="btn-filter" onclick="setAdminFilter('6months', this)" data-i18n="6months">6 Months</button>
+                    <button class="btn-filter" onclick="setAdminFilter('year', this)" data-i18n="1year">1 Year</button>
+                    <button class="btn-filter" onclick="setAdminFilter('custom', this)" data-i18n="custom">Custom</button>
                 </div>
                 <div id="custom-date-picker" class="hidden" style="display: flex; align-items: center; gap: 10px;">
                     <input type="date" id="filter-start" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
-                    <span style="color: var(--text-muted); font-size: 12px;">TO</span>
+                    <span style="color: var(--text-muted); font-size: 12px;" data-i18n="to">TO</span>
                     <input type="date" id="filter-end" class="input-field" style="padding: 8px; width: 140px; font-size: 12px;">
-                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="loadAdminData(false)">APPLY</button>
+                    <!-- FILTER FIX: Calls renderAdminData instantly -->
+                    <button class="btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="renderAdminData(globalAdminData)" data-i18n="apply">APPLY</button>
                 </div>
             </div>
 
             <!-- TAB: APPROVALS -->
             <div id="admin-sec-approvals" class="admin-card admin-section">
                 <!-- PENDING REQUESTS -->
-                <div class="admin-card-title"><span>Pending Requests</span></div>
+                <div class="admin-card-title"><span data-i18n="pending_req">Pending Requests</span></div>
                 <div style="overflow-x: auto;">
                   <table>
                     <thead><tr>
-                        <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
+                        <th data-i18n="val_period">Validity Period</th><th data-i18n="name_header">Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th data-i18n="action">Action</th>
                     </tr></thead>
-                    <tbody id="admin-table-pending"><tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+                    <tbody id="admin-table-pending"><tr><td colspan="5" class="text-center" style="padding: 30px;" data-i18n="loading">Loading requests...</td></tr></tbody>
                   </table>
                 </div>
                 
                 <!-- ACTIVE REQUESTS -->
                 <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
-                    <span>Active Requests</span>
-                    <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()">🖨️ PRINT SELECTED</button>
+                    <span data-i18n="active_req">Active Requests</span>
+                    <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()" data-i18n="print_selected">🖨️ PRINT SELECTED</button>
                 </div>
                 <div style="overflow-x: auto;">
                   <table>
                     <thead><tr>
                         <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox" class="print-checkbox" onclick="toggleSelectAll(this)"></th>
-                        <th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Action</th>
+                        <th data-i18n="val_period">Validity Period</th><th data-i18n="name_header">Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th data-i18n="action">Action</th>
                     </tr></thead>
-                    <tbody id="admin-table-active"><tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr></tbody>
+                    <tbody id="admin-table-active"><tr><td colspan="6" class="text-center" style="padding: 30px;" data-i18n="loading">Loading requests...</td></tr></tbody>
                   </table>
                 </div>
             </div>
 
             <!-- TAB: HISTORY -->
             <div id="admin-sec-history" class="admin-card admin-section hidden">
-                <div class="admin-card-title">Access & Gate History</div>
+                <div class="admin-card-title" data-i18n="access_history">Access & Gate History</div>
                 <div style="overflow-x: auto;">
                   <table>
-                    <thead><tr><th>Validity Period</th><th>Name</th><th>Type</th><th>Facility</th><th>Final Status</th><th>Check-In</th><th>Check-Out</th><th>Scanned By</th><th>Action</th></tr></thead>
-                    <tbody id="admin-table-history"><tr><td colspan="9" class="text-center" style="padding: 30px;">No history found.</td></tr></tbody>
+                    <thead><tr><th data-i18n="val_period">Validity Period</th><th data-i18n="name_header">Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th data-i18n="final_status">Final Status</th><th data-i18n="check_in">Check-In</th><th data-i18n="check_out">Check-Out</th><th data-i18n="scanned_by">Scanned By</th><th data-i18n="action">Action</th></tr></thead>
+                    <tbody id="admin-table-history"><tr><td colspan="9" class="text-center" style="padding: 30px;" data-i18n="no_history">No history found.</td></tr></tbody>
                   </table>
                 </div>
             </div>
 
             <!-- TAB: GUARD APPROVALS -->
             <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
-                <div class="admin-card-title">Live Gate Operations</div>
+                <div class="admin-card-title" data-i18n="live_gate">Live Gate Operations</div>
                 <div style="overflow-x: auto;">
                   <table>
-                    <thead><tr><th>Check-In Time</th><th>Check-Out Time</th><th>Visitor Name</th><th>Type</th><th>Facility</th><th>Scanned By</th></tr></thead>
-                    <tbody id="admin-table-guard-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found.</td></tr></tbody>
+                    <thead><tr><th data-i18n="check_in_time">Check-In Time</th><th data-i18n="check_out_time">Check-Out Time</th><th data-i18n="visitor_name">Visitor Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th data-i18n="scanned_by">Scanned By</th></tr></thead>
+                    <tbody id="admin-table-guard-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;" data-i18n="no_gate_ops">No gate operations found.</td></tr></tbody>
                   </table>
                 </div>
             </div>
@@ -517,10 +551,10 @@
             <!-- TAB: ANALYTICS -->
             <div id="admin-sec-analytics" class="admin-section hidden">
                 <div class="analytics-grid">
-                  <div class="analytics-box"><div class="analytics-box-title">📅 Date Analytics</div><div id="stat-date"></div></div>
-                  <div class="analytics-box"><div class="analytics-box-title">👤 Type Analytics</div><div id="stat-type"></div></div>
-                  <div class="analytics-box"><div class="analytics-box-title">🏢 Facility Analytics</div><div id="stat-facility"></div></div>
-                  <div class="analytics-box"><div class="analytics-box-title">✅ Status Analytics</div><div id="stat-status"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title" data-i18n="date_analytics">📅 Date Analytics</div><div id="stat-date"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title" data-i18n="type_analytics">👤 Type Analytics</div><div id="stat-type"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title" data-i18n="facility_analytics">🏢 Facility Analytics</div><div id="stat-facility"></div></div>
+                  <div class="analytics-box"><div class="analytics-box-title" data-i18n="status_analytics">✅ Status Analytics</div><div id="stat-status"></div></div>
                 </div>
             </div>
             
@@ -547,6 +581,97 @@
     let targetPhotoType = '';
     let capturedImages = { iqama: null, selfie: null, vehicle: null };
 
+    // ==========================================
+    // TRANSLATION DICTIONARY (EN & AR)
+    // ==========================================
+    const dict = {
+      en: {
+        "guard": "🛡️ Guard", "visitor_ops": "📋 Visitor/Ops", "admin": "⚙️ Admin",
+        "name": "Name", "noon_id": "Noon ID", "select_guard_loc": "Select Guard Location...", "login_gate": "LOGIN TO GATE",
+        "your_full_name": "Your Full Name", "your_email": "Your Gmail / Email", "login_portal": "LOGIN TO PORTAL",
+        "admin_name": "Admin Name", "admin_email": "Admin Gmail", "admin_password": "Admin Password", "login_admin": "LOGIN AS ADMIN",
+        "system_admin": "System Admin", "visitor_portal": "Visitor Portal", "gate_scanner": "Gate Scanner", "admin_dashboard": "Admin Dashboard", "logout": "LOGOUT",
+        "visitor_contractor_portal": "Visitor & Contractor Portal", "submit_new_request": "Submit New Request", "type": "Type",
+        "visitor": "Visitor", "contractor": "Contractor", "req_email_ph": "Email Address (For Pass Tracking)", "req_vname_ph": "Visitor / Contractor Full Name",
+        "visit_date": "Visit Date", "slp_ticket": "SLP Ticket No.", "contact_no": "Contact No.", "invited_by": "Invited by Whom",
+        "vehicle_plate": "Vehicle Plate / Picture (Optional)", "live_camera": "📷 Live Camera", "contract_exp": "Contract Expiration (From - To)",
+        "project_name": "Project Name", "company_name": "Company / Contractor Name", "project_manager": "Project Manager", "fm_poc": "FM POC",
+        "upload_iqama": "Upload Iqama/ID Copy", "upload_selfie": "Upload Selfie Photo", "submit_approval": "Submit for Approval",
+        "my_passes": "My Passes", "refresh": "Refresh", "fetching": "Fetching your passes...", "start_camera": "START CAMERA SCANNER",
+        "name_label": "Name:", "type_label": "Type:", "location_label": "Location:", "confirm_action": "CONFIRM ACTION",
+        "access_approvals": "📋 Access Approvals", "history": "🕰️ History", "guard_approvals": "🛡️ Guard Approvals", "analytics": "📊 Analytics",
+        "all_time": "All Time", "today": "Today", "weekly": "Weekly", "monthly": "Monthly", "6months": "6 Months", "1year": "1 Year", "custom": "Custom", "to": "TO", "apply": "APPLY",
+        "pending_req": "Pending Requests", "active_req": "Active Requests", "print_selected": "🖨️ PRINT SELECTED",
+        "val_period": "Validity Period", "name_header": "Name", "type_header": "Type", "facility_header": "Facility", "action": "Action",
+        "access_history": "Access & Gate History", "final_status": "Final Status", "check_in": "Check-In", "check_out": "Check-Out", "scanned_by": "Scanned By",
+        "live_gate": "Live Gate Operations", "check_in_time": "Check-In Time", "check_out_time": "Check-Out Time", "visitor_name": "Visitor Name",
+        "date_analytics": "📅 Date Analytics", "type_analytics": "👤 Type Analytics", "facility_analytics": "🏢 Facility Analytics", "status_analytics": "✅ Status Analytics",
+        "detailed_record": "Detailed Record View", "extend_pass": "Extend Pass Validity", "new_start_date": "New Visit / Start Date", "new_end_date": "New End Date", "save_extension": "SAVE EXTENSION",
+        "capture": "📸 CAPTURE", "flip_cam": "🔄 FLIP CAM", "cancel": "❌ CANCEL", "click_to_close": "Click anywhere to close",
+        "btn_approve": "Approve", "btn_reject": "Reject", "btn_extend": "📅 EXTEND", "btn_view": "🔍 VIEW DATA", "btn_print": "🖨️ PRINT PASS", "btn_checkout": "🚪 CHECK OUT",
+        "lbl_host_name": "Host Name", "lbl_host_email": "Host Email", "lbl_validity": "Validity Period", "lbl_iqama": "IQAMA/ID COPY", "lbl_selfie": "SELFIE PHOTO", "lbl_vehicle": "VEHICLE PLATE",
+        "status_approved": "Approved", "status_pending": "Pending", "status_rejected": "Rejected", "status_expired": "EXPIRED", "status_completed": "COMPLETED",
+        "msg_no_pending": "No pending requests found in this timeframe.", "msg_no_active": "No active requests found in this timeframe.", "msg_no_history": "No history found in this timeframe.", "msg_no_gate": "No gate operations found in this timeframe.",
+        "msg_enter_email": "Enter an Email Address on the left to view passes.", "msg_loading": "Loading requests...", "msg_inside": "Inside Facility"
+      },
+      ar: {
+        "guard": "🛡️ الحارس", "visitor_ops": "📋 الزوار/العمليات", "admin": "⚙️ الإدارة",
+        "name": "الاسم", "noon_id": "الرقم الوظيفي (Noon ID)", "select_guard_loc": "اختر موقع الحارس...", "login_gate": "الدخول للبوابة",
+        "your_full_name": "الاسم الكامل", "your_email": "البريد الإلكتروني", "login_portal": "تسجيل الدخول للبوابة",
+        "admin_name": "اسم المشرف", "admin_email": "بريد المشرف", "admin_password": "كلمة المرور", "login_admin": "دخول كمسؤول",
+        "system_admin": "إدارة النظام", "visitor_portal": "بوابة الزوار", "gate_scanner": "ماسح البوابة", "admin_dashboard": "لوحة التحكم", "logout": "تسجيل خروج",
+        "visitor_contractor_portal": "بوابة الزوار والمقاولين", "submit_new_request": "تقديم طلب جديد", "type": "النوع",
+        "visitor": "زائر", "contractor": "مقاول", "req_email_ph": "البريد الإلكتروني (لتتبع التصريح)", "req_vname_ph": "الاسم الكامل للزائر/المقاول",
+        "visit_date": "تاريخ الزيارة", "slp_ticket": "رقم تذكرة SLP", "contact_no": "رقم الاتصال", "invited_by": "بدعوة من",
+        "vehicle_plate": "صورة / لوحة السيارة (اختياري)", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
+        "project_name": "اسم المشروع", "company_name": "اسم الشركة / المقاول", "project_manager": "مدير المشروع", "fm_poc": "مسؤول المرافق (FM POC)",
+        "upload_iqama": "رفع صورة الهوية/الإقامة", "upload_selfie": "رفع صورة شخصية", "submit_approval": "إرسال للموافقة",
+        "my_passes": "تصاريحي", "refresh": "تحديث", "fetching": "جاري جلب التصاريح...", "start_camera": "تشغيل ماسح الكاميرا",
+        "name_label": "الاسم:", "type_label": "النوع:", "location_label": "الموقع:", "confirm_action": "تأكيد الإجراء",
+        "access_approvals": "📋 موافقات الدخول", "history": "🕰️ السجل", "guard_approvals": "🛡️ عمليات البوابة", "analytics": "📊 الإحصائيات",
+        "all_time": "الكل", "today": "اليوم", "weekly": "أسبوعي", "monthly": "شهري", "6months": "٦ أشهر", "1year": "سنة", "custom": "مخصص", "to": "إلى", "apply": "تطبيق",
+        "pending_req": "الطلبات المعلقة", "active_req": "الطلبات النشطة", "print_selected": "🖨️ طباعة المحدد",
+        "val_period": "فترة الصلاحية", "name_header": "الاسم", "type_header": "النوع", "facility_header": "المنشأة", "action": "الإجراء",
+        "access_history": "سجل الدخول والبوابة", "final_status": "الحالة النهائية", "check_in": "دخول", "check_out": "خروج", "scanned_by": "تم المسح بواسطة",
+        "live_gate": "عمليات البوابة المباشرة", "check_in_time": "وقت الدخول", "check_out_time": "وقت الخروج", "visitor_name": "اسم الزائر",
+        "date_analytics": "📅 إحصائيات التواريخ", "type_analytics": "👤 إحصائيات الأنواع", "facility_analytics": "🏢 إحصائيات المنشآت", "status_analytics": "✅ إحصائيات الحالات",
+        "detailed_record": "عرض السجل التفصيلي", "extend_pass": "تمديد صلاحية التصريح", "new_start_date": "تاريخ الزيارة/البداية الجديد", "new_end_date": "تاريخ النهاية الجديد", "save_extension": "حفظ التمديد",
+        "capture": "📸 التقاط", "flip_cam": "🔄 قلب الكاميرا", "cancel": "❌ إلغاء", "click_to_close": "انقر في أي مكان للإغلاق",
+        "btn_approve": "موافقة", "btn_reject": "رفض", "btn_extend": "📅 تمديد", "btn_view": "🔍 عرض البيانات", "btn_print": "🖨️ طباعة", "btn_checkout": "🚪 خروج",
+        "lbl_host_name": "اسم المضيف", "lbl_host_email": "بريد المضيف", "lbl_validity": "فترة الصلاحية", "lbl_iqama": "صورة الهوية/الإقامة", "lbl_selfie": "الصورة الشخصية", "lbl_vehicle": "لوحة السيارة",
+        "status_approved": "مقبول", "status_pending": "قيد الانتظار", "status_rejected": "مرفوض", "status_expired": "منتهي", "status_completed": "مكتمل",
+        "msg_no_pending": "لا توجد طلبات معلقة في هذه الفترة.", "msg_no_active": "لا توجد طلبات نشطة في هذه الفترة.", "msg_no_history": "لا يوجد سجل في هذه الفترة.", "msg_no_gate": "لا توجد عمليات بوابة في هذه الفترة.",
+        "msg_enter_email": "أدخل بريداً إلكترونياً على اليسار لعرض التصاريح.", "msg_loading": "جاري التحميل...", "msg_inside": "داخل المنشأة"
+      }
+    };
+
+    let currentLang = 'en';
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'ar' : 'en';
+        document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+        updateUI();
+    }
+
+    function t(key) {
+        return dict[currentLang][key] || key;
+    }
+
+    function updateUI() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(dict[currentLang][key]) { el.innerHTML = dict[currentLang][key]; }
+        });
+        document.querySelectorAll('.t-ph').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(dict[currentLang][key]) { el.placeholder = dict[currentLang][key]; }
+        });
+
+        // Re-render JS dynamic tables to translate dynamic buttons/texts
+        if (currentUser && currentUser.role === 'admin') renderAdminData(globalAdminData);
+        if (currentUser) loadMyPasses(false, true); 
+    }
+
     // --- Core Navigation ---
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('minimized');
@@ -563,8 +688,15 @@
         if(window.innerWidth <= 900 && !document.getElementById('sidebar').classList.contains('minimized')) { toggleSidebar(); } 
 
         if (viewId === 'ops' && currentUser && currentUser.role === 'admin') {
-            loadMyPasses(false);
+            loadMyPasses(false, false);
         }
+    }
+
+    // --- Full Screen Image Utility ---
+    function openFullscreenImage(src) {
+        if(!src || src === '') return;
+        document.getElementById('fullscreen-img').src = src;
+        document.getElementById('fullscreen-image-modal').classList.remove('hidden');
     }
 
     // --- Camera Logic ---
@@ -603,6 +735,7 @@
         const preview = document.getElementById(`preview-${targetPhotoType}`);
         preview.src = b64;
         preview.classList.remove('hidden');
+        preview.onclick = () => openFullscreenImage(b64); // Allow full screen of captured preview
         
         document.getElementById(`req-${targetPhotoType}`).value = "";
         closeLiveCamera();
@@ -685,15 +818,16 @@
     function startAutoRefresh(role) {
         if (autoRefreshTimer) clearInterval(autoRefreshTimer);
         autoRefreshTimer = setInterval(() => {
-            if (role === 'ops') loadMyPasses(true);
+            if (role === 'ops') loadMyPasses(false, true);
             else if (role === 'admin') {
                 loadAdminData(true);
-                loadMyPasses(true); 
+                loadMyPasses(false, true); 
             }
         }, 15000); 
     }
 
     window.onload = function() {
+        updateUI(); // Setup default EN language
         const session = localStorage.getItem('noon_session');
         if (session) {
             const parsed = JSON.parse(session);
@@ -742,7 +876,6 @@
         document.getElementById('app-layout').classList.remove('hidden');
 
         if (currentUser.role === 'admin') {
-            // ADMIN LOGIN: Setup Admin form layout
             document.getElementById('req-vname').value = '';
             document.getElementById('req-admin-email').value = '';
             document.getElementById('admin-email-group').classList.remove('hidden');
@@ -754,17 +887,16 @@
             loadAdminData(false);
             switchMainView('admin');
         } else {
-            // NORMAL USER LOGIN: Setup standard layout
             document.getElementById('req-vname').value = currentUser.name;
             document.getElementById('admin-email-group').classList.add('hidden');
 
             document.getElementById('sidebar').style.display = 'none';
             document.body.classList.add('sidebar-minimized');
-            document.getElementById('main-content').style.marginLeft = '0';
+            document.getElementById('main-content').style.margin = '0';
             
             if (currentUser.role === 'ops') {
                 switchMainView('ops');
-                loadMyPasses(false);
+                loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
                 document.getElementById('guard-loc-display').innerText = currentUser.location;
                 switchMainView('guard');
@@ -864,29 +996,29 @@
         };
         
         if(!payload.startDate) {
-            btn.innerText = 'Submit for Approval'; btn.disabled = false;
+            btn.innerText = t("submit_approval"); btn.disabled = false;
             return alert("Visit dates are required fields.");
         }
 
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
-        btn.innerText = 'Submit for Approval'; btn.disabled = false;
+        btn.innerText = t("submit_approval"); btn.disabled = false;
         
         if(currentUser.role === 'admin') document.getElementById('req-vname').value = ""; 
         
         iqamaInput.value = ""; selfieInput.value = ""; if(vehicleInput) vehicleInput.value = "";
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
-        loadMyPasses(false); 
+        loadMyPasses(true, false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
-        btn.innerText = 'Submit for Approval'; btn.disabled = false;
+        btn.innerText = t("submit_approval"); btn.disabled = false;
       }
     }
 
     function renderMyPasses(data) {
         const listDiv = document.getElementById('my-passes-list');
         let newHtml = '';
-        if(data.length === 0) newHtml = '<p style="color: var(--text-muted); font-size: 13px;">No passes requested yet.</p>';
+        if(data.length === 0) newHtml = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_no_history")}</p>`;
         
         data.reverse().forEach((pass) => {
             const todayNum = new Date().setHours(0,0,0,0);
@@ -897,25 +1029,25 @@
             const isExpired = todayNum > endNum;
             const isCompleted = isVisitorDone || isExpired;
             
-            let statusText = pass.Status;
+            let statusText = t(pass.Status === 'Approved' ? 'status_approved' : pass.Status === 'Rejected' ? 'status_rejected' : 'status_pending');
             let statusColor = (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
 
             if (isCompleted) {
-                statusText = isExpired ? 'EXPIRED' : 'COMPLETED';
+                statusText = t(isExpired ? 'status_expired' : 'status_completed');
                 statusColor = 'var(--text-muted)';
             }
             
-            const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} to ${formatToDDMMYYYY(pass.EndDate)})`;
+            const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate)})`;
 
             let cardHtml = `
             <div class="pass-item">
                 <div class="pass-header">
                     <div>
                         <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
-                        <span style="font-size: 11px; color: var(--text-muted);">${pass.Type} • ${pass.Location}</span><br>
+                        <span style="font-size: 11px; color: var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br>
                         <span style="font-size: 10px; color: var(--noon-yellow);">${validityText}</span>
                     </div>
-                    <div style="text-align: right;">
+                    <div>
                         <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${statusText}</span><br>
                         <span style="font-size: 10px; color: var(--text-muted);">${pass.UniqueID}</span>
                     </div>
@@ -929,7 +1061,7 @@
                     </div>
                 `;
             } else if (isCompleted) {
-                let textStr = isExpired ? "Pass Expired" : `Checked Out: ${formatTime(pass.CheckOutTime)}`;
+                let textStr = isExpired ? t("status_expired") : `${t("check_out_time")}: ${formatTime(pass.CheckOutTime)}`;
                 cardHtml += `<div style="text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);"><em>${textStr}</em></div>`;
             }
             cardHtml += `</div>`;
@@ -953,7 +1085,8 @@
         });
     }
 
-    async function loadMyPasses(isSilent = false) {
+    // FIXED REFRESH LOGIC
+    async function loadMyPasses(forceRefresh = false, isSilent = false) {
       const listDiv = document.getElementById('my-passes-list');
       
       let targetEmail = currentUser.email;
@@ -962,7 +1095,7 @@
           if (inputEmail) {
               targetEmail = inputEmail;
           } else {
-              if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Enter an Email Address on the left to view passes.</p>';
+              if (!isSilent) listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_enter_email")}</p>`;
               return;
           }
       }
@@ -970,8 +1103,12 @@
       const cachedKey = 'cached_passes_' + targetEmail;
       const cached = localStorage.getItem(cachedKey);
       
-      if (cached && !isSilent) renderMyPasses(JSON.parse(cached));
-      else if (!isSilent) listDiv.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Fetching passes...</p>';
+      // If forceRefresh is TRUE, skip cache entirely and show fetching
+      if (!forceRefresh && cached && !isSilent) {
+          renderMyPasses(JSON.parse(cached));
+      } else if (!isSilent || forceRefresh) {
+          listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("fetching")}</p>`;
+      }
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
@@ -991,6 +1128,7 @@
       document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
     }
 
+    // FIXED FILTER LOGIC
     function setAdminFilter(range, btnElement) {
         document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
         if(btnElement) btnElement.classList.add('active');
@@ -1000,7 +1138,7 @@
             document.getElementById('custom-date-picker').classList.remove('hidden');
         } else {
             document.getElementById('custom-date-picker').classList.add('hidden');
-            loadAdminData(false);
+            renderAdminData(globalAdminData); // Instantly filter without network call!
         }
     }
 
@@ -1046,20 +1184,20 @@
             if(inRange) {
                 let finalStatus = row.Status;
                 let sColor = 'var(--noon-yellow)';
-                if (row.Status === 'Rejected') { finalStatus = 'REJECTED'; sColor = 'var(--danger)'; }
-                else if (isExpired) { finalStatus = 'EXPIRED'; sColor = 'var(--danger)'; }
-                else if (isVisitorDone) { finalStatus = 'COMPLETED'; sColor = 'var(--success)'; }
-                else { finalStatus = row.Status; sColor = 'var(--success)'; }
+                if (row.Status === 'Rejected') { finalStatus = t('status_rejected'); sColor = 'var(--danger)'; }
+                else if (isExpired) { finalStatus = t('status_expired'); sColor = 'var(--danger)'; }
+                else if (isVisitorDone) { finalStatus = t('status_completed'); sColor = 'var(--success)'; }
+                else { finalStatus = t('status_approved'); sColor = 'var(--success)'; }
 
                 let historyActionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
-                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
+                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
                 </div>`;
 
                 htmlHistory += `<tr>
                   <td style="color: var(--text-muted);">${dateStr}</td>
                   <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                  <td>${row.Type}</td>
+                  <td>${t(row.Type.toLowerCase())}</td>
                   <td>${row.Location}</td>
                   <td style="font-weight: 600; color: ${sColor}">${finalStatus}</td>
                   <td style="color: var(--text-muted); font-size: 11px;">${row.CheckInTime ? formatTime(row.CheckInTime) : '-'}</td>
@@ -1075,16 +1213,16 @@
             if (inRange) {
                 if (isPending) {
                     let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                      <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">Approve</button>
-                      <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">Reject</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
+                      <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">${t('btn_approve')}</button>
+                      <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">${t('btn_reject')}</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
                     </div>`;
 
                     htmlPending += `<tr>
                       <td style="color: var(--text-muted);">${dateStr}</td>
                       <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                      <td>${row.Type}</td>
+                      <td>${t(row.Type.toLowerCase())}</td>
                       <td>${row.Location}</td>
                       <td>${actionBtns}</td>
                     </tr>`;
@@ -1094,17 +1232,17 @@
                     let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                     
                     let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">🔍 VIEW DATA</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">🖨️ PRINT PASS</button>
-                      <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">🚪 CHECK OUT</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">📅 EXTEND</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">${t('btn_print')}</button>
+                      <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">${t('btn_checkout')}</button>
+                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
                     </div>`;
 
                     htmlActive += `<tr>
                       <td>${cbHtml}</td>
                       <td style="color: var(--text-muted);">${dateStr}</td>
                       <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                      <td>${row.Type}</td>
+                      <td>${t(row.Type.toLowerCase())}</td>
                       <td>${row.Location}</td>
                       <td>${actionBtns}</td>
                     </tr>`;
@@ -1114,40 +1252,40 @@
           }
 
           if (row.CheckInTime && inRange) {
-             const checkOutText = row.CheckOutTime ? formatTime(row.CheckOutTime) : '<span style="color:var(--noon-yellow)">Inside Facility</span>';
+             const checkOutText = row.CheckOutTime ? formatTime(row.CheckOutTime) : `<span style="color:var(--noon-yellow)">${t('msg_inside')}</span>`;
              htmlGuard += `<tr>
                 <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
                 <td style="color: var(--text-muted);">${checkOutText}</td>
                 <td><strong>${row.VisitorName}</strong></td>
-                <td>${row.Type}</td>
+                <td>${t(row.Type.toLowerCase())}</td>
                 <td>${row.Location}</td>
-                <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || 'Unknown Guard'}</td>
+                <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || '-'}</td>
              </tr>`;
              guardCount++;
           }
         });
 
-        if (pendingCount === 0) htmlPending = '<tr><td colspan="5" class="text-center" style="padding: 30px;">No pending requests found in this timeframe.</td></tr>';
-        if (activeCount === 0) htmlActive = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No active requests found in this timeframe.</td></tr>';
-        if (historyCount === 0) htmlHistory = '<tr><td colspan="9" class="text-center" style="padding: 30px;">No history found in this timeframe.</td></tr>';
-        if (guardCount === 0) htmlGuard = '<tr><td colspan="6" class="text-center" style="padding: 30px;">No gate operations found in this timeframe.</td></tr>';
+        if (pendingCount === 0) htmlPending = `<tr><td colspan="5" class="text-center" style="padding: 30px;">${t("msg_no_pending")}</td></tr>`;
+        if (activeCount === 0) htmlActive = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_no_active")}</td></tr>`;
+        if (historyCount === 0) htmlHistory = `<tr><td colspan="9" class="text-center" style="padding: 30px;">${t("msg_no_history")}</td></tr>`;
+        if (guardCount === 0) htmlGuard = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_no_gate")}</td></tr>`;
 
         tPending.innerHTML = htmlPending;
         tActive.innerHTML = htmlActive;
         tHistory.innerHTML = htmlHistory;
         tGuard.innerHTML = htmlGuard;
 
-        document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
-        document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
+        document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${t(k.toLowerCase())}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
+        document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
         
         let statusHtml = '';
-        if(aStatus['Approved']) statusHtml += `<div class="stat-row"><span style="color:var(--success)">Approved</span> <span class="stat-val">${aStatus['Approved']}</span></div>`;
-        if(aStatus['Pending']) statusHtml += `<div class="stat-row"><span style="color:var(--noon-yellow)">Pending</span> <span class="stat-val">${aStatus['Pending']}</span></div>`;
-        if(aStatus['Rejected']) statusHtml += `<div class="stat-row"><span style="color:var(--danger)">Rejected</span> <span class="stat-val">${aStatus['Rejected']}</span></div>`;
-        document.getElementById('stat-status').innerHTML = statusHtml || '<div class="stat-row"><span>No Data</span></div>';
+        if(aStatus['Approved']) statusHtml += `<div class="stat-row"><span style="color:var(--success)">${t('status_approved')}</span> <span class="stat-val">${aStatus['Approved']}</span></div>`;
+        if(aStatus['Pending']) statusHtml += `<div class="stat-row"><span style="color:var(--noon-yellow)">${t('status_pending')}</span> <span class="stat-val">${aStatus['Pending']}</span></div>`;
+        if(aStatus['Rejected']) statusHtml += `<div class="stat-row"><span style="color:var(--danger)">${t('status_rejected')}</span> <span class="stat-val">${aStatus['Rejected']}</span></div>`;
+        document.getElementById('stat-status').innerHTML = statusHtml || '<div class="stat-row"><span>-</span></div>';
 
         let topDates = Object.entries(aDate).sort((a,b) => b[1]-a[1]).slice(0, 5);
-        document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v} Passes</span></div>`).join('') || '<div class="stat-row"><span>No Data</span></div>';
+        document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
     }
 
     function handlePrintCheckbox(cb) {
@@ -1173,10 +1311,10 @@
       if (cached && !isSilent) {
           renderAdminData(JSON.parse(cached).reverse());
       } else if (!isSilent) {
-          tPending.innerHTML = '<tr><td colspan="5" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-          tActive.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading requests...</td></tr>';
-          tHistory.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 30px;">Loading history...</td></tr>';
-          tGuard.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 30px;">Loading records...</td></tr>';
+          tPending.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
+          tActive.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
+          tHistory.innerHTML = `<tr><td colspan="9" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
+          tGuard.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
       }
       
       try {
@@ -1257,7 +1395,7 @@
         } catch (err) {
             alert('Failed to extend pass. Please ensure you deployed the Apps Script as a NEW VERSION.');
         } finally {
-            btn.innerText = 'SAVE EXTENSION';
+            btn.innerText = t("save_extension");
             btn.disabled = false;
         }
     }
@@ -1267,40 +1405,41 @@
         if (!r) return;
 
         let contentHtml = `
-            <div><strong>Host Name</strong>${r.HostName || '-'}</div>
-            <div><strong>Host Email</strong>${r.HostEmail || '-'}</div>
-            <div><strong>Visitor Name</strong>${r.VisitorName || '-'}</div>
-            <div><strong>Type</strong>${r.Type || '-'}</div>
-            <div><strong>Location</strong>${r.Location || '-'}</div>
-            <div><strong>Validity Period</strong>${r.Type === 'Visitor' ? formatToDDMMYYYY(r.StartDate) : formatToDDMMYYYY(r.StartDate) + ' to ' + formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
-            <div><strong>SLP Ticket No</strong>${r.SlpTicketNo || '-'}</div>
-            <div><strong>Contact No</strong>${r.ContactNo || '-'}</div>
+            <div><strong>${t('lbl_host_name')}</strong>${r.HostName || '-'}</div>
+            <div><strong>${t('lbl_host_email')}</strong>${r.HostEmail || '-'}</div>
+            <div><strong>${t('visitor_name')}</strong>${r.VisitorName || '-'}</div>
+            <div><strong>${t('type_header')}</strong>${t(r.Type.toLowerCase()) || '-'}</div>
+            <div><strong>${t('location_label')}</strong>${r.Location || '-'}</div>
+            <div><strong>${t('lbl_validity')}</strong>${r.Type === 'Visitor' ? formatToDDMMYYYY(r.StartDate) : formatToDDMMYYYY(r.StartDate) + ' - ' + formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
+            <div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo || '-'}</div>
+            <div><strong>${t('contact_no')}</strong>${r.ContactNo || '-'}</div>
         `;
 
         if (r.Type === 'Visitor') {
             contentHtml += `
-                <div><strong>Invited By</strong>${r.InvitedBy || '-'}</div>
+                <div><strong>${t('invited_by')}</strong>${r.InvitedBy || '-'}</div>
             `;
         } else {
             contentHtml += `
-                <div><strong>Project Name</strong>${r.ProjectName || '-'}</div>
-                <div><strong>Company Name</strong>${r.CompanyName || '-'}</div>
-                <div><strong>Project Manager</strong>${r.ProjectManager || '-'}</div>
-                <div><strong>FM POC</strong>${r.FmPoc || '-'}</div>
+                <div><strong>${t('project_name')}</strong>${r.ProjectName || '-'}</div>
+                <div><strong>${t('company_name')}</strong>${r.CompanyName || '-'}</div>
+                <div><strong>${t('project_manager')}</strong>${r.ProjectManager || '-'}</div>
+                <div><strong>${t('fm_poc')}</strong>${r.FmPoc || '-'}</div>
             `;
         }
 
+        // Added onclick events for Full Screen
         contentHtml += `
             <div class="record-img-box">
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>IQAMA/ID COPY</strong><img src="${r.IqamaURL || ''}" alt="No Image"></div>
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>SELFIE PHOTO</strong><img src="${r.SelfieURL || ''}" alt="No Image"></div>
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_iqama')}</strong><img src="${r.IqamaURL || ''}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')}</strong><img src="${r.SelfieURL || ''}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>
         `;
 
         if (r.VehiclePlateNo) {
-             if (r.VehiclePlateNo.startsWith('http')) {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><img src="${r.VehiclePlateNo}" alt="No Image"></div>`;
+             if (r.VehiclePlateNo.startsWith('http') || r.VehiclePlateNo.startsWith('data:image')) {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
              } else {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>VEHICLE PLATE</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
              }
         }
 
@@ -1504,7 +1643,7 @@
         if (data.error) { return showScanResult("DENIED", "Invalid QR Code", "bg-red"); }
 
         document.getElementById('r-name').innerText = data.VisitorName;
-        document.getElementById('r-type').innerText = data.Type;
+        document.getElementById('r-type').innerText = t(data.Type.toLowerCase());
         document.getElementById('r-location').innerText = data.Location;
 
         if(data.SelfieBase64) {
@@ -1534,13 +1673,13 @@
         } else if (isInside) {
             currentScanAction = 'check_out';
             showScanResult("CHECK OUT", "Visitor/Contractor is exiting facility.<br><br><span style='color:#ffc700; font-size:14px;'>⚠️ PLEASE TAKE THE ID CARD FROM THE PERSON AFTER CHECK OUT.</span>", "bg-blue");
-            confirmBtn.innerText = "CONFIRM CHECK OUT";
+            confirmBtn.innerText = t("btn_checkout");
             confirmBtn.className = "btn-primary btn-warning hidden"; 
             confirmBtn.classList.remove('hidden');
         } else {
             currentScanAction = 'check_in';
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
-            confirmBtn.innerText = "CONFIRM ENTRY";
+            confirmBtn.innerText = t("confirm_action");
             confirmBtn.className = "btn-primary btn-success hidden"; 
             confirmBtn.classList.remove('hidden');
         }
@@ -1557,7 +1696,7 @@
         html5QrcodeScanner.resume();
       } catch (err) { 
         alert("Failed to log entry/exit."); 
-        btn.innerText = "TRY AGAIN";
+        btn.innerText = t("confirm_action");
       }
     }
   </script>
