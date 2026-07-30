@@ -129,6 +129,12 @@
     .bg-blue { background-color: #3b82f6; }
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
+    /* TEAM ROSTER UI */
+    .team-roster { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .team-member-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+    .team-member-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;}
+    .team-member-img:hover { border-color: var(--noon-yellow); }
+
     /* ADMIN DASHBOARD UI */
     .admin-header-top { display: flex; align-items: center; padding: 0 2.5vw; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; flex-wrap: wrap; gap: 15px;}
     .admin-brand-horizontal { display: flex; flex-direction: column; }
@@ -170,7 +176,7 @@
     .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; cursor: pointer; transition: 0.2s;}
     .record-img-box img:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(255,199,0,0.3); }
     
-    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
+    #camera-video-stream, #team-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
 
@@ -240,7 +246,7 @@
     </div>
   </div>
 
-  <!-- ================= CAMERA MODAL ================= -->
+  <!-- ================= NORMAL CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="popup-modal hidden">
     <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
         <video id="camera-video-stream" autoplay playsinline></video>
@@ -253,6 +259,33 @@
     </div>
   </div>
 
+  <!-- ================= TEAM CONTINUOUS CAMERA MODAL ================= -->
+  <div id="team-camera-modal" class="popup-modal hidden">
+    <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); width:100%; max-width: 500px;">
+        
+        <h3 id="team-cam-title" style="color: var(--noon-yellow); margin-bottom: 15px; font-size: 18px; text-transform: uppercase;">Person 1: Capture Iqama</h3>
+        
+        <video id="team-video-stream" autoplay playsinline></video>
+        <img id="team-preview" class="hidden" style="width: 100%; max-width: 500px; max-height: 70vh; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover;">
+        <canvas id="team-hidden-canvas" class="hidden"></canvas>
+        
+        <div id="team-capture-actions" class="cam-controls">
+            <button class="btn-primary btn-success" style="width: auto;" onclick="captureTeamPhoto()">📸 CAPTURE</button>
+            <button class="btn-primary btn-outline" style="width: auto;" onclick="switchTeamCamera()">🔄 FLIP CAM</button>
+            <button class="btn-primary btn-danger" style="width: auto;" onclick="closeTeamCamera()">❌ CANCEL</button>
+        </div>
+
+        <div id="team-preview-actions" class="cam-controls hidden">
+            <button class="btn-primary btn-success" style="width: auto;" onclick="confirmTeamPhoto()">✅ CONFIRM & NEXT</button>
+            <button class="btn-primary btn-outline" style="width: auto;" onclick="retakeTeamPhoto()">🔁 RETAKE</button>
+        </div>
+        
+        <div style="margin-top: 20px; width: 100%; border-top: 1px solid #333; padding-top: 15px;">
+            <button class="btn-primary btn-warning" style="width: 100%;" onclick="finishTeamCapture()">✅ DONE (FINISH TEAM ROSTER)</button>
+            <p style="color: var(--text-muted); font-size: 11px; text-align: center; margin-top: 10px;">Click this when you have finished adding all team members.</p>
+        </div>
+    </div>
+  </div>
 
   <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
   <div id="login-view">
@@ -377,14 +410,8 @@
                   <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
                   <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
                   
-                  <!-- RESTORED: Vehicle Image Upload UI -->
                   <div class="input-group">
-                    <label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')" data-i18n="live_camera">📷 Live Camera</button>
-                      <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
-                    </div>
-                    <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+                    <input type="text" id="req-vehicle-text" class="input-field t-ph" data-i18n="vehicle_plate" placeholder="Vehicle Plate No. / Picture details">
                   </div>
                 </div>
 
@@ -410,10 +437,20 @@
                     </div>
                     <img id="preview-fmpoc" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
                   </div>
+
+                  <!-- NEW TEAM MEMBERS UI -->
+                  <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                      <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;">TEAM MEMBERS (OPTIONAL)</label>
+                      <button type="button" class="btn-primary btn-outline" style="font-size: 12px;" onclick="openTeamCamera()">➕ ADD TEAM MEMBER (LIVE CAPTURE)</button>
+                      
+                      <div id="team-roster-display" class="team-roster hidden">
+                          <!-- Team members injected here dynamically -->
+                      </div>
+                  </div>
                 </div>
 
-                <div class="input-group">
-                  <label data-i18n="upload_iqama">Upload Iqama/ID Copy</label>
+                <div class="input-group" style="margin-top: 20px;">
+                  <label data-i18n="upload_iqama">Upload Lead Iqama/ID Copy</label>
                   <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')" data-i18n="live_camera">📷 Live Camera</button>
                     <input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')">
@@ -422,7 +459,7 @@
                 </div>
 
                 <div class="input-group">
-                  <label data-i18n="upload_selfie">Upload Selfie Photo</label>
+                  <label data-i18n="upload_selfie">Upload Lead Selfie Photo</label>
                   <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button>
                     <input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')">
@@ -452,7 +489,6 @@
                   <span data-i18n="gate_scanner">Gate Scanner</span>
                   <span id="guard-loc-text" style="color: var(--text-muted); font-size: 18px;">(<span id="guard-loc-display"></span>)</span>
                   
-                  <!-- ADMIN SPECIFIC DROPDOWN -->
                   <select id="admin-guard-loc" class="input-field hidden" style="width: auto; padding: 6px 12px; font-size: 14px; margin: 0; min-width: 150px;" onchange="updateAdminGuardLoc()">
                       <option value="" data-i18n="select_guard_loc">Select Guard Location...</option>
                       <option value="RUH01">RUH01</option>
@@ -482,6 +518,18 @@
                     <p><strong data-i18n="type_label">Type:</strong> <span id="r-type">-</span></p>
                     <p><strong data-i18n="location_label">Location:</strong> <span id="r-location">-</span></p>
                 </div>
+
+                <!-- GUARD TEAM ROSTER & HEADCOUNT INPUT -->
+                <div id="guard-team-section" class="hidden" style="margin-top: 20px; text-align: left;">
+                    <h3 style="color: var(--noon-yellow); font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">TEAM ROSTER (<span id="guard-team-count">0</span>)</h3>
+                    <div id="guard-team-roster" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;"></div>
+                    
+                    <div class="input-group" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                        <label style="color: white; font-weight: bold;">Number of Workers Present Today:</label>
+                        <input type="number" id="guard-headcount" class="input-field" placeholder="E.g., 8" style="font-size: 18px; font-weight: bold; text-align: center;">
+                    </div>
+                </div>
+
                 <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()" data-i18n="confirm_action">CONFIRM ACTION</button>
               </div>
             </div>
@@ -526,9 +574,7 @@
                 </div>
             </div>
 
-            <!-- TAB: APPROVALS -->
             <div id="admin-sec-approvals" class="admin-card admin-section">
-                <!-- PENDING REQUESTS -->
                 <div class="admin-card-title"><span data-i18n="pending_req">Pending Requests</span></div>
                 <div style="overflow-x: auto;">
                   <table>
@@ -539,7 +585,6 @@
                   </table>
                 </div>
                 
-                <!-- ACTIVE REQUESTS -->
                 <div class="admin-card-title" style="margin-top: 15px; border-top: 1px solid var(--border-color);">
                     <span data-i18n="active_req">Active Requests</span>
                     <button class="btn-primary" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="printSelected()" data-i18n="print_selected">🖨️ PRINT SELECTED</button>
@@ -555,7 +600,6 @@
                 </div>
             </div>
 
-            <!-- TAB: HISTORY -->
             <div id="admin-sec-history" class="admin-card admin-section hidden">
                 <div class="admin-card-title" data-i18n="access_history">Access & Gate History</div>
                 <div style="overflow-x: auto;">
@@ -566,18 +610,16 @@
                 </div>
             </div>
 
-            <!-- TAB: GUARD APPROVALS -->
             <div id="admin-sec-guard-approvals" class="admin-card admin-section hidden">
                 <div class="admin-card-title" data-i18n="live_gate">Live Gate Operations</div>
                 <div style="overflow-x: auto;">
                   <table>
-                    <thead><tr><th data-i18n="check_in_time">Check-In Time</th><th data-i18n="check_out_time">Check-Out Time</th><th data-i18n="visitor_name">Visitor Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th data-i18n="scanned_by">Scanned By</th></tr></thead>
-                    <tbody id="admin-table-guard-approvals"><tr><td colspan="6" class="text-center" style="padding: 30px;" data-i18n="no_gate_ops">No gate operations found.</td></tr></tbody>
+                    <thead><tr><th data-i18n="check_in_time">Time</th><th>Action</th><th data-i18n="visitor_name">Visitor Name</th><th data-i18n="type_header">Type</th><th data-i18n="facility_header">Facility</th><th>Headcount</th><th data-i18n="scanned_by">Scanned By</th></tr></thead>
+                    <tbody id="admin-table-guard-approvals"><tr><td colspan="7" class="text-center" style="padding: 30px;" data-i18n="no_gate_ops">No gate operations found.</td></tr></tbody>
                   </table>
                 </div>
             </div>
 
-            <!-- TAB: ANALYTICS -->
             <div id="admin-sec-analytics" class="admin-section hidden">
                 <div class="analytics-grid">
                   <div class="analytics-box"><div class="analytics-box-title" data-i18n="date_analytics">📅 Date Analytics</div><div id="stat-date"></div></div>
@@ -586,7 +628,6 @@
                   <div class="analytics-box"><div class="analytics-box-title" data-i18n="status_analytics">✅ Status Analytics</div><div id="stat-status"></div></div>
                 </div>
             </div>
-            
           </div>
       </main>
   </div>
@@ -605,14 +646,20 @@
     let globalAdminData = []; 
     let checkedPrintIds = new Set(); 
 
+    // --- Media Variables ---
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
-    
     let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
+    // --- Team Loop Variables ---
+    let teamList = []; 
+    let currentTeamIndex = 1;
+    let currentTeamStep = 'iqama'; // 'iqama' -> 'selfie' -> loop
+    let tempTeamData = { iqama: null, selfie: null };
+
     // ==========================================
-    // TRANSLATION DICTIONARY (EN & AR)
+    // TRANSLATION DICTIONARY
     // ==========================================
     const dict = {
       en: {
@@ -654,7 +701,7 @@
         "visitor_contractor_portal": "بوابة الزوار والمقاولين", "submit_new_request": "تقديم طلب جديد", "type": "النوع",
         "visitor": "زائر", "contractor": "مقاول", "req_email_ph": "البريد الإلكتروني (لتتبع التصريح)", "req_vname_ph": "الاسم الكامل للزائر/المقاول",
         "visit_date": "تاريخ الزيارة", "slp_ticket": "رقم تذكرة SLP", "contact_no": "رقم الاتصال", "invited_by": "بدعوة من",
-        "vehicle_plate": "صورة / لوحة السيارة (اختياري)", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
+        "vehicle_plate": "رقم لوحة السيارة / تفاصيل أخرى", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
         "project_name": "اسم المشروع", "company_name": "اسم الشركة / المقاول", "project_manager": "مدير المشروع", "fm_poc": "مسؤول المرافق (FM POC)",
         "upload_iqama": "رفع صورة الهوية/الإقامة", "upload_selfie": "رفع صورة شخصية", "upload_fmpoc": "رفع مسؤول المرافق (FM POC)", "submit_approval": "إرسال للموافقة",
         "my_passes": "تصاريحي", "refresh": "تحديث", "fetching": "جاري جلب التصاريح...", "start_camera": "تشغيل ماسح الكاميرا",
@@ -703,7 +750,6 @@
         if (currentUser && currentUser.role !== 'guard') loadMyPasses(false, true); 
     }
 
-    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
       const doc = window.document;
       const docEl = doc.documentElement;
@@ -713,9 +759,7 @@
 
       if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
         if (reqFullScreen) {
-          reqFullScreen.call(docEl).catch(err => {
-            console.log("Fullscreen API Error / Mobile Block:", err);
-          });
+          reqFullScreen.call(docEl).catch(err => { console.log("Fullscreen API Error / Mobile Block:", err); });
         } else {
           alert("Fullscreen mode is not supported on this browser/device.");
         }
@@ -726,7 +770,6 @@
       }
     }
 
-    // --- Core Navigation ---
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('minimized');
         document.body.classList.toggle('sidebar-minimized');
@@ -748,41 +791,30 @@
         }
     }
 
-    // --- Admin Guard Loc Updater ---
     function updateAdminGuardLoc() {
         if(currentUser && currentUser.role === 'admin') {
             currentUser.location = document.getElementById('admin-guard-loc').value || '';
         }
     }
 
-    // --- Full Screen Image Utility ---
     function openFullscreenImage(src) {
         if(!src || src === '') return;
         document.getElementById('fullscreen-img').src = src;
         document.getElementById('fullscreen-image-modal').classList.remove('hidden');
     }
 
-    // --- Camera Logic ---
+    // ==========================================
+    // STANDARD SINGLE-CAPTURE CAMERA
+    // ==========================================
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
-        await startStream();
-    }
-
-    async function startStream() {
-        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); }
-        try {
-            liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
-            document.getElementById('camera-video-stream').srcObject = liveStream;
-        } catch (err) {
-            alert("Camera access denied or not available on this device.");
-            closeLiveCamera();
-        }
+        await startStream('camera-video-stream');
     }
 
     function switchLiveCamera() {
         currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-        startStream();
+        startStream('camera-video-stream');
     }
 
     function captureLivePhoto() {
@@ -815,32 +847,144 @@
         document.getElementById(`preview-${type}`).src = "";
     }
 
-    // --- Formatting Helpers & Robust Date Parsing ---
+    async function startStream(videoId) {
+        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); }
+        try {
+            liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
+            document.getElementById(videoId).srcObject = liveStream;
+        } catch (err) {
+            alert("Camera access denied or not available on this device.");
+            if(videoId === 'camera-video-stream') closeLiveCamera();
+            else closeTeamCamera();
+        }
+    }
+
+    // ==========================================
+    // NEW: CONTINUOUS TEAM CAPTURE LOOP
+    // ==========================================
+    function updateTeamTitle() {
+        const t = document.getElementById('team-cam-title');
+        t.innerText = `PERSON ${currentTeamIndex}: CAPTURE ${currentTeamStep.toUpperCase()}`;
+    }
+
+    async function openTeamCamera() {
+        currentTeamStep = 'iqama';
+        tempTeamData = { iqama: null, selfie: null };
+        document.getElementById('team-camera-modal').classList.remove('hidden');
+        document.getElementById('team-preview').classList.add('hidden');
+        document.getElementById('team-video-stream').classList.remove('hidden');
+        document.getElementById('team-capture-actions').classList.remove('hidden');
+        document.getElementById('team-preview-actions').classList.add('hidden');
+        updateTeamTitle();
+        await startStream('team-video-stream');
+    }
+
+    function switchTeamCamera() {
+        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+        startStream('team-video-stream');
+    }
+
+    function captureTeamPhoto() {
+        const video = document.getElementById('team-video-stream');
+        const canvas = document.getElementById('team-hidden-canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        const b64 = canvas.toDataURL('image/jpeg', 0.8);
+        if (currentTeamStep === 'iqama') { tempTeamData.iqama = b64; } 
+        else { tempTeamData.selfie = b64; }
+        
+        const preview = document.getElementById('team-preview');
+        preview.src = b64;
+        
+        video.classList.add('hidden');
+        preview.classList.remove('hidden');
+        document.getElementById('team-capture-actions').classList.add('hidden');
+        document.getElementById('team-preview-actions').classList.remove('hidden');
+    }
+
+    function retakeTeamPhoto() {
+        document.getElementById('team-video-stream').classList.remove('hidden');
+        document.getElementById('team-preview').classList.add('hidden');
+        document.getElementById('team-capture-actions').classList.remove('hidden');
+        document.getElementById('team-preview-actions').classList.add('hidden');
+    }
+
+    function confirmTeamPhoto() {
+        if (currentTeamStep === 'iqama') {
+            currentTeamStep = 'selfie';
+            retakeTeamPhoto(); // Resets view for selfie
+            updateTeamTitle();
+        } else {
+            // Push to team array!
+            teamList.push({ iqama: tempTeamData.iqama, selfie: tempTeamData.selfie });
+            renderTeamRoster();
+            
+            // Loop for next person
+            currentTeamIndex++;
+            currentTeamStep = 'iqama';
+            tempTeamData = { iqama: null, selfie: null };
+            retakeTeamPhoto();
+            updateTeamTitle();
+        }
+    }
+
+    function closeTeamCamera() {
+        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
+        document.getElementById('team-camera-modal').classList.add('hidden');
+    }
+
+    function finishTeamCapture() {
+        closeTeamCamera();
+    }
+
+    function renderTeamRoster() {
+        const div = document.getElementById('team-roster-display');
+        if(teamList.length > 0) {
+            div.classList.remove('hidden');
+            let html = '';
+            teamList.forEach((mem, idx) => {
+                html += `
+                <div class="team-member-row">
+                    <span style="color:white; font-size:13px; font-weight:bold;">Person ${idx+1}</span>
+                    <div style="display:flex; gap:10px;">
+                        <img src="${mem.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Iqama">
+                        <img src="${mem.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Selfie">
+                        <button style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="removeTeamMember(${idx})">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } else {
+            div.classList.add('hidden');
+        }
+    }
+
+    function removeTeamMember(idx) {
+        teamList.splice(idx, 1);
+        currentTeamIndex = teamList.length + 1;
+        renderTeamRoster();
+    }
+
+    // ==========================================
+    // UTILITIES
+    // ==========================================
     function parseFlexibleDate(dateStr) {
         if (!dateStr) return null;
         if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
-        
         let d = new Date(dateStr);
         if (!isNaN(d.getTime())) return d;
-
         if (typeof dateStr === 'string') {
-            const cleanStr = dateStr.trim();
-            const parts = cleanStr.split(/[\/\-\s]/);
+            const parts = dateStr.trim().split(/[\/\-\s]/);
             if (parts.length >= 3) {
                 let p0 = parseInt(parts[0], 10);
                 let p1 = parseInt(parts[1], 10);
                 let p2 = parseInt(parts[2], 10);
                 if (p2 < 100) p2 += 2000;
-
-                // Handle DD-MM-YYYY or DD/MM/YYYY
-                if (p0 > 12) {
-                    d = new Date(p2, p1 - 1, p0);
-                } else if (p1 > 12) {
-                    d = new Date(p2, p0 - 1, p1);
-                } else {
-                    // Default assume DD-MM-YYYY
-                    d = new Date(p2, p1 - 1, p0);
-                }
+                if (p0 > 12) d = new Date(p2, p1 - 1, p0);
+                else if (p1 > 12) d = new Date(p2, p0 - 1, p1);
+                else d = new Date(p2, p1 - 1, p0);
                 if (!isNaN(d.getTime())) return d;
             }
         }
@@ -874,36 +1018,21 @@
         if (filterType === 'all') return true;
         
         const d = parseFlexibleDate(dateStr);
-        if (!d) return true; // Keep records with non-parseable dates visible so they don't vanish
+        if (!d) return true; 
         
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        if (filterType === 'today') {
-            return d >= todayStart && d <= todayEnd;
-        } else if (filterType === 'weekly') {
-            const weekAgo = new Date(todayStart);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return d >= weekAgo && d <= todayEnd;
-        } else if (filterType === 'monthly') {
-            const monthAgo = new Date(todayStart);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return d >= monthAgo && d <= todayEnd;
-        } else if (filterType === '6months') {
-            const sixAgo = new Date(todayStart);
-            sixAgo.setMonth(sixAgo.getMonth() - 6);
-            return d >= sixAgo && d <= todayEnd;
-        } else if (filterType === 'year') {
-            const yearAgo = new Date(todayStart);
-            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-            return d >= yearAgo && d <= todayEnd;
-        } else if (filterType === 'custom') {
+        if (filterType === 'today') return d >= todayStart && d <= todayEnd;
+        else if (filterType === 'weekly') { const w = new Date(todayStart); w.setDate(w.getDate() - 7); return d >= w && d <= todayEnd; }
+        else if (filterType === 'monthly') { const m = new Date(todayStart); m.setMonth(m.getMonth() - 1); return d >= m && d <= todayEnd; }
+        else if (filterType === '6months') { const m6 = new Date(todayStart); m6.setMonth(m6.getMonth() - 6); return d >= m6 && d <= todayEnd; }
+        else if (filterType === 'year') { const y = new Date(todayStart); y.setFullYear(y.getFullYear() - 1); return d >= y && d <= todayEnd; }
+        else if (filterType === 'custom') {
             if(!startStr || !endStr) return true;
-            const start = parseFlexibleDate(startStr);
-            const end = parseFlexibleDate(endStr);
-            if (start) start.setHours(0,0,0,0);
-            if (end) end.setHours(23,59,59,999);
+            const start = parseFlexibleDate(startStr); const end = parseFlexibleDate(endStr);
+            if (start) start.setHours(0,0,0,0); if (end) end.setHours(23,59,59,999);
             if (start && end) return d >= start && d <= end;
         }
         return true;
@@ -997,7 +1126,6 @@
             const navAdmin = document.getElementById('nav-sidebar-admin');
             if (navAdmin) navAdmin.classList.remove('hidden');
 
-            // Setup Admin Gate Scanner UI
             document.getElementById('guard-loc-text').classList.add('hidden');
             document.getElementById('admin-guard-loc').classList.remove('hidden');
             currentUser.location = document.getElementById('admin-guard-loc').value || '';
@@ -1022,10 +1150,8 @@
                 switchMainView('ops');
                 loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
-                // Setup Normal Guard UI
                 document.getElementById('guard-loc-text').classList.remove('hidden');
                 document.getElementById('admin-guard-loc').classList.add('hidden');
-
                 const locDisplay = document.getElementById('guard-loc-display');
                 if (locDisplay) locDisplay.innerText = currentUser.location || '';
                 
@@ -1055,14 +1181,10 @@
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
-      const fmpocInput = document.getElementById('req-fmpoc');
-      const vehicleInput = document.getElementById('req-vehicle');
       const btn = document.getElementById('btn-submit-req');
       
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
-      let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg';
-      let finalVehicleB64 = ''; let finalVehicleMime = 'image/jpeg';
 
       if (capturedImages.iqama) {
           finalIqamaB64 = capturedImages.iqama.split(',')[1];
@@ -1070,7 +1192,7 @@
           const iFull = await getBase64(iqamaInput.files[0]);
           finalIqamaB64 = iFull.split(',')[1];
           finalIqamaMime = iqamaInput.files[0].type;
-      } else { return alert("Please provide the Iqama/ID photo (Camera or Upload)."); }
+      } else { return alert("Please provide the Lead Iqama/ID photo."); }
 
       if (capturedImages.selfie) {
           finalSelfieB64 = capturedImages.selfie.split(',')[1];
@@ -1078,29 +1200,33 @@
           const sFull = await getBase64(selfieInput.files[0]);
           finalSelfieB64 = sFull.split(',')[1];
           finalSelfieMime = selfieInput.files[0].type;
-      } else { return alert("Please provide the Selfie photo (Camera or Upload)."); }
+      } else { return alert("Please provide the Lead Selfie photo."); }
 
-      // Contractor FM POC Image processing
+      // Package everything based on Type
+      let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg';
+      let finalVehicleVal = ''; let finalVehicleMime = '';
+
       if (type === 'Contractor') {
+          const fmpocInput = document.getElementById('req-fmpoc');
           if (capturedImages.fmpoc) {
               finalFmpocB64 = capturedImages.fmpoc.split(',')[1];
           } else if (fmpocInput && fmpocInput.files.length > 0) {
               const fFull = await getBase64(fmpocInput.files[0]);
               finalFmpocB64 = fFull.split(',')[1];
               finalFmpocMime = fmpocInput.files[0].type;
-          } else { 
-              return alert("Please provide the FM POC photo (Camera or Upload)."); 
-          }
+          } else { return alert("Please provide the FM POC photo."); }
+      } else {
+          finalVehicleVal = document.getElementById('req-vehicle-text').value;
       }
 
-      // Restored Vehicle Upload processing
-      if (capturedImages.vehicle) {
-          finalVehicleB64 = capturedImages.vehicle.split(',')[1];
-      } else if (vehicleInput && vehicleInput.files.length > 0) {
-          const vFull = await getBase64(vehicleInput.files[0]);
-          finalVehicleB64 = vFull.split(',')[1];
-          finalVehicleMime = vehicleInput.files[0].type;
-      }
+      // Format Team Members Array (Strip headers)
+      let cleanTeamList = [];
+      teamList.forEach(m => {
+          cleanTeamList.push({
+              iqama: m.iqama ? m.iqama.split(',')[1] : null,
+              selfie: m.selfie ? m.selfie.split(',')[1] : null
+          });
+      });
 
       let hostNameVal = '';
       let hostEmailVal = currentUser.email;
@@ -1127,14 +1253,11 @@
           location: document.getElementById('req-location').value,
           startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
           endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value,
-          iqamaBase64: finalIqamaB64,
-          iqamaMimeType: finalIqamaMime,
-          selfieBase64: finalSelfieB64,
-          selfieMimeType: finalSelfieMime,
-          fmpocBase64: finalFmpocB64,
-          fmpocMimeType: finalFmpocMime,
-          vehicleBase64: finalVehicleB64,      // Back to sending base64 vehicle image!
-          vehicleMimeType: finalVehicleMime, // Back to sending mime!
+          iqamaBase64: finalIqamaB64, iqamaMimeType: finalIqamaMime,
+          selfieBase64: finalSelfieB64, selfieMimeType: finalSelfieMime,
+          fmpocBase64: finalFmpocB64, fmpocMimeType: finalFmpocMime,
+          vehiclePlateNo: finalVehicleVal,
+          team: cleanTeamList, // SENT TO BACKEND!
           
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
@@ -1156,11 +1279,12 @@
         
         if(currentUser.role === 'admin') document.getElementById('req-vname').value = ""; 
         
-        iqamaInput.value = ""; selfieInput.value = ""; 
-        if(fmpocInput) fmpocInput.value = ""; 
-        if(vehicleInput) vehicleInput.value = "";
+        iqamaInput.value = ""; selfieInput.value = ""; document.getElementById('req-vehicle-text').value = "";
+        const fmpocI = document.getElementById('req-fmpoc'); if(fmpocI) fmpocI.value = "";
 
-        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc'); clearCapturedData('vehicle');
+        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc');
+        teamList = []; currentTeamIndex = 1; renderTeamRoster(); // clear roster
+        
         loadMyPasses(true, false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
@@ -1175,7 +1299,6 @@
         
         data.reverse().forEach((pass) => {
             const todayNum = new Date().setHours(0,0,0,0);
-            
             let endObj = parseFlexibleDate(pass.EndDate) || parseFlexibleDate(pass.StartDate);
             let endNum = endObj ? endObj.setHours(0,0,0,0) : todayNum;
             
@@ -1242,35 +1365,24 @@
 
     async function loadMyPasses(forceRefresh = false, isSilent = false) {
       const listDiv = document.getElementById('my-passes-list');
-      
       let targetEmail = currentUser.email;
       if (currentUser.role === 'admin') {
           const inputEmail = document.getElementById('req-admin-email').value.toLowerCase().trim();
-          if (inputEmail) {
-              targetEmail = inputEmail;
-          } else {
-              if (!isSilent) listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_enter_email")}</p>`;
-              return;
-          }
+          if (inputEmail) { targetEmail = inputEmail; } 
+          else { if (!isSilent) listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_enter_email")}</p>`; return; }
       }
-
       const cachedKey = 'cached_passes_' + targetEmail;
       const cached = localStorage.getItem(cachedKey);
       
-      if (!forceRefresh && cached && !isSilent) {
-          renderMyPasses(JSON.parse(cached));
-      } else if (!isSilent || forceRefresh) {
-          listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("fetching")}</p>`;
-      }
+      if (!forceRefresh && cached && !isSilent) { renderMyPasses(JSON.parse(cached)); } 
+      else if (!isSilent || forceRefresh) { listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("fetching")}</p>`; }
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
         const data = await res.json();
         localStorage.setItem(cachedKey, JSON.stringify(data));
         renderMyPasses(data);
-      } catch (err) { 
-        if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; 
-      }
+      } catch (err) { if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
     }
 
     // --- Admin Portal Logic ---
@@ -1286,12 +1398,8 @@
         if(btnElement) btnElement.classList.add('active');
         currentAdminFilter = range;
         
-        if (range === 'custom') {
-            document.getElementById('custom-date-picker').classList.remove('hidden');
-        } else {
-            document.getElementById('custom-date-picker').classList.add('hidden');
-            renderAdminData(globalAdminData);
-        }
+        if (range === 'custom') { document.getElementById('custom-date-picker').classList.remove('hidden'); } 
+        else { document.getElementById('custom-date-picker').classList.add('hidden'); renderAdminData(globalAdminData); }
     }
 
     function renderAdminData(data) {
@@ -1302,7 +1410,6 @@
         const tGuard = document.getElementById('admin-table-guard-approvals');
 
         let htmlPending = ''; let htmlActive = ''; let htmlHistory = ''; let htmlGuard = '';
-        
         const today = new Date(); today.setHours(0,0,0,0);
         const fStart = document.getElementById('filter-start').value;
         const fEnd = document.getElementById('filter-end').value;
@@ -1333,8 +1440,7 @@
 
           if (isHistory) {
             if(inRange) {
-                let finalStatus = row.Status;
-                let sColor = 'var(--noon-yellow)';
+                let finalStatus = row.Status; let sColor = 'var(--noon-yellow)';
                 if (row.Status === 'Rejected') { finalStatus = t('status_rejected'); sColor = 'var(--danger)'; }
                 else if (isExpired) { finalStatus = t('status_expired'); sColor = 'var(--danger)'; }
                 else if (isVisitorDone) { finalStatus = t('status_completed'); sColor = 'var(--success)'; }
@@ -1360,7 +1466,6 @@
             }
           } else {
             const isPending = row.Status === 'Pending';
-            
             if (inRange) {
                 if (isPending) {
                     let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
@@ -1381,7 +1486,6 @@
                 } else if (row.Status === 'Approved') {
                     const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
                     let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
-                    
                     let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
                       <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
                       <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">${t('btn_print')}</button>
@@ -1402,29 +1506,48 @@
             }
           }
 
-          if (row.CheckInTime && inRange) {
-             const checkOutText = row.CheckOutTime ? formatTime(row.CheckOutTime) : `<span style="color:var(--noon-yellow)">${t('msg_inside')}</span>`;
-             htmlGuard += `<tr>
-                <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
-                <td style="color: var(--text-muted);">${checkOutText}</td>
-                <td><strong>${row.VisitorName}</strong></td>
-                <td>${t(row.Type.toLowerCase())}</td>
-                <td>${row.Location}</td>
-                <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || '-'}</td>
-             </tr>`;
-             guardCount++;
+          // GUARD LOG PARSING (Daily History)
+          if (row.GateLogs && inRange) {
+              let logs = [];
+              try { logs = JSON.parse(row.GateLogs); } catch(e){}
+              logs.forEach(log => {
+                 let hc = log.count ? `<strong style="color:var(--noon-yellow)">${log.count} Present</strong>` : '-';
+                 let aColor = log.action === 'IN' ? 'var(--success)' : 'var(--danger)';
+                 htmlGuard += `<tr>
+                    <td style="color: var(--text-muted);">${formatTime(log.time)}</td>
+                    <td style="color: ${aColor}; font-weight:bold;">${log.action}</td>
+                    <td><strong>${row.VisitorName}</strong></td>
+                    <td>${t(row.Type.toLowerCase())}</td>
+                    <td>${row.Location}</td>
+                    <td>${hc}</td>
+                    <td style="color: var(--noon-yellow); font-weight: 600;">${log.guard || '-'}</td>
+                 </tr>`;
+                 guardCount++;
+              });
+              
+              // Fallback for old single checkins without JSON logs
+              if(logs.length === 0 && row.CheckInTime) {
+                  htmlGuard += `<tr>
+                    <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
+                    <td style="color: var(--success); font-weight:bold;">IN</td>
+                    <td><strong>${row.VisitorName}</strong></td>
+                    <td>${t(row.Type.toLowerCase())}</td>
+                    <td>${row.Location}</td>
+                    <td>-</td>
+                    <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || '-'}</td>
+                 </tr>`;
+                 guardCount++;
+              }
           }
         });
 
         if (pendingCount === 0) htmlPending = `<tr><td colspan="5" class="text-center" style="padding: 30px;">${t("msg_no_pending")}</td></tr>`;
         if (activeCount === 0) htmlActive = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_no_active")}</td></tr>`;
         if (historyCount === 0) htmlHistory = `<tr><td colspan="9" class="text-center" style="padding: 30px;">${t("msg_no_history")}</td></tr>`;
-        if (guardCount === 0) htmlGuard = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_no_gate")}</td></tr>`;
+        if (guardCount === 0) htmlGuard = `<tr><td colspan="7" class="text-center" style="padding: 30px;">${t("msg_no_gate")}</td></tr>`;
 
-        tPending.innerHTML = htmlPending;
-        tActive.innerHTML = htmlActive;
-        tHistory.innerHTML = htmlHistory;
-        tGuard.innerHTML = htmlGuard;
+        tPending.innerHTML = htmlPending; tActive.innerHTML = htmlActive;
+        tHistory.innerHTML = htmlHistory; tGuard.innerHTML = htmlGuard;
 
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${t(k.toLowerCase())}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
         document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
@@ -1443,39 +1566,21 @@
         if(cb.checked) checkedPrintIds.add(cb.value);
         else checkedPrintIds.delete(cb.value);
     }
-
     function toggleSelectAll(source) {
         const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox');
-        checkboxes.forEach(cb => {
-            cb.checked = source.checked;
-            handlePrintCheckbox(cb);
-        });
+        checkboxes.forEach(cb => { cb.checked = source.checked; handlePrintCheckbox(cb); });
     }
 
     async function loadAdminData(isSilent = false) {
-      const tPending = document.getElementById('admin-table-pending');
-      const tActive = document.getElementById('admin-table-active');
-      const tHistory = document.getElementById('admin-table-history');
-      const tGuard = document.getElementById('admin-table-guard-approvals');
-      
       const cached = localStorage.getItem('cached_admin_data');
-      if (cached && !isSilent) {
-          renderAdminData(JSON.parse(cached).reverse());
-      } else if (!isSilent) {
-          tPending.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
-          tActive.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
-          tHistory.innerHTML = `<tr><td colspan="9" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
-          tGuard.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">${t("msg_loading")}</td></tr>`;
-      }
+      if (cached && !isSilent) { renderAdminData(JSON.parse(cached).reverse()); } 
       
       try {
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         localStorage.setItem('cached_admin_data', JSON.stringify(data));
         renderAdminData(data.reverse()); 
-      } catch (err) { 
-         if (!isSilent && !cached) console.log(err); 
-      }
+      } catch (err) { if (!isSilent && !cached) console.log(err); }
     }
 
     async function updateStatus(id, newStatus) {
@@ -1490,7 +1595,7 @@
       if(!confirm(`Force check-out for pass ${id}?`)) return;
       try {
         const adminInfo = `Admin: ${currentUser.name} (${currentUser.email})`;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_out', id: id, guardInfo: adminInfo }) });
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_out', id: id, guardInfo: adminInfo, headCount: 1 }) });
         loadAdminData(false); 
       } catch (err) { alert("Failed to check out."); }
     }
@@ -1498,18 +1603,12 @@
     function openExtendPass(id, type) {
         document.getElementById('extend-id').value = id;
         document.getElementById('extend-type').value = type;
-        if (type === 'Visitor') {
-            document.getElementById('extend-end-group').classList.add('hidden');
-        } else {
-            document.getElementById('extend-end-group').classList.remove('hidden');
-        }
+        if (type === 'Visitor') document.getElementById('extend-end-group').classList.add('hidden');
+        else document.getElementById('extend-end-group').classList.remove('hidden');
         document.getElementById('extend-pass-modal').classList.remove('hidden');
     }
-
     function closeExtendPass() {
         document.getElementById('extend-pass-modal').classList.add('hidden');
-        document.getElementById('extend-start').value = '';
-        document.getElementById('extend-end').value = '';
     }
 
     async function submitExtendPass() {
@@ -1522,33 +1621,12 @@
         if (!newStart || (type === 'Contractor' && !newEnd)) return alert('Please select the new dates.');
         if (!confirm(`Are you sure you want to extend pass ${id} and set it back to Approved status?`)) return;
 
-        btn.innerText = 'SAVING...';
-        btn.disabled = true;
+        btn.innerText = 'SAVING...'; btn.disabled = true;
 
         try {
-            const payload = {
-                action: 'extend_pass',
-                id: id,
-                newStartDate: newStart,
-                newEndDate: newEnd
-            };
-            
-            const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-            const data = await res.json();
-            
-            if (data.status === 'error') {
-                alert('Server Error: ' + data.message);
-                return;
-            }
-
-            closeExtendPass();
-            loadAdminData(false); 
-        } catch (err) {
-            alert('Failed to extend pass. Please ensure you deployed the Apps Script as a NEW VERSION.');
-        } finally {
-            btn.innerText = t("save_extension");
-            btn.disabled = false;
-        }
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'extend_pass', id: id, newStartDate: newStart, newEndDate: newEnd }) });
+            closeExtendPass(); loadAdminData(false); 
+        } catch (err) { alert('Error.'); } finally { btn.innerText = t("save_extension"); btn.disabled = false; }
     }
 
     function openViewRecord(id) {
@@ -1567,9 +1645,7 @@
         `;
 
         if (r.Type === 'Visitor') {
-            contentHtml += `
-                <div><strong>${t('invited_by')}</strong>${r.InvitedBy || '-'}</div>
-            `;
+            contentHtml += `<div><strong>${t('invited_by')}</strong>${r.InvitedBy || '-'}</div>`;
         } else {
             contentHtml += `
                 <div><strong>${t('project_name')}</strong>${r.ProjectName || '-'}</div>
@@ -1579,185 +1655,54 @@
         }
 
         contentHtml += `
-            <div class="record-img-box">
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_iqama')}</strong><img src="${r.IqamaURL || ''}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')}</strong><img src="${r.SelfieURL || ''}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>
+            <div class="record-img-box" style="margin-top: 15px;">
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_iqama')} (Lead)</strong><img src="${r.IqamaURL || ''}" onclick="openFullscreenImage(this.src)"></div>
+                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')} (Lead)</strong><img src="${r.SelfieURL || ''}" onclick="openFullscreenImage(this.src)"></div>
         `;
 
         if (r.Type === 'Contractor') {
              if (r.FmPoc && (r.FmPoc.startsWith('http') || r.FmPoc.startsWith('data:image'))) {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" onclick="openFullscreenImage(this.src)"></div>`;
              } else {
                  contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.FmPoc || '-'}</div></div>`;
              }
         }
 
         if (r.VehiclePlateNo) {
-             if (r.VehiclePlateNo.startsWith('http') || r.VehiclePlateNo.startsWith('data:image')) {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
-             } else {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
-             }
+             contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
         }
-
         contentHtml += `</div>`;
+
+        // INJECT TEAM ROSTER INTO VIEW DATA
+        if (r.TeamMembers && r.TeamMembers !== "[]") {
+            let teamData = [];
+            try { teamData = JSON.parse(r.TeamMembers); } catch(e){}
+            if (teamData.length > 0) {
+               contentHtml += `<div style="grid-column: span 2; background: transparent; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 10px;">
+                   <strong style="font-size: 14px; margin-bottom: 15px;">TEAM MEMBERS (${teamData.length})</strong>
+                   <div style="display: flex; flex-direction: column; gap: 10px;">
+               `;
+               teamData.forEach(m => {
+                   contentHtml += `
+                   <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                       <span style="color:var(--noon-yellow); font-weight:bold;">Person ${m.person}</span>
+                       <div style="display:flex; gap:10px;">
+                           <img src="${m.iqama}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama">
+                           <img src="${m.selfie}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie">
+                       </div>
+                   </div>`;
+               });
+               contentHtml += `</div></div>`;
+            }
+        }
 
         document.getElementById('view-record-content').innerHTML = contentHtml;
         document.getElementById('view-record-modal').classList.remove('hidden');
     }
 
-    function closeViewRecord() {
-        document.getElementById('view-record-modal').classList.add('hidden');
-    }
+    function closeViewRecord() { document.getElementById('view-record-modal').classList.add('hidden'); }
 
-    function printSelected() {
-        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox:checked');
-        if (checkboxes.length === 0) return alert("Please select at least one approved pass to print using the checkboxes.");
-
-        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = MULTIPLE passes per page (Standard A4/Letter)\n[Cancel] = SINGLE pass per page (ID Card Printer)");
-
-        const printWindow = window.open('', '', 'width=800,height=600');
-        let cardsHtml = '';
-        let scripts = '';
-
-        checkboxes.forEach((cb, index) => {
-            const id = cb.value;
-            const name = cb.getAttribute('data-name');
-            const type = cb.getAttribute('data-type');
-            const location = cb.getAttribute('data-location');
-            const status = cb.getAttribute('data-status');
-            const date = cb.getAttribute('data-date'); 
-
-            cardsHtml += `
-                <div class="card">
-                    <div class="top-row">
-                        <div>
-                            <p class="name">${name}</p>
-                            <p class="sub">${type} &bull; ${location}</p>
-                            <p class="date">Valid: ${date}</p>
-                        </div>
-                        <div>
-                            <p class="status">${status}</p>
-                            <p class="id">${id}</p>
-                        </div>
-                    </div>
-                    <div class="qr-box" id="qr-code-batch-${index}"></div>
-                </div>
-            `;
-            scripts += `new QRCode(document.getElementById("qr-code-batch-${index}"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });\n`;
-        });
-
-        let printStyles = printModeMultiple ? `
-            @media print {
-                @page { margin: 10mm; }
-                body { display: flex; flex-wrap: wrap; gap: 5mm; align-content: flex-start; justify-content: flex-start; }
-                .card { page-break-inside: avoid; border: 1px solid #ccc !important; }
-            }
-        ` : `
-            @media print {
-                @page { size: 85.6mm 54mm; margin: 0; }
-                body { display: block; margin: 0; padding: 0; background: #fff;}
-                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-after: always; box-sizing: border-box; }
-                .card:last-child { page-break-after: auto; }
-            }
-        `;
-
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Batch Print Passes</title>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
-                <style>
-                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-wrap: wrap; gap: 15px; }
-                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
-                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
-                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
-                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
-                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
-                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
-                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
-                    ${printStyles}
-                </style>
-            </head>
-            <body>
-                ${cardsHtml}
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                <script>
-                    ${scripts}
-                    setTimeout(() => { window.print(); window.close(); }, 1000);
-                <\/script>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-    }
-
-    function printQR(name, type, location, id, status, date) {
-        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = Standard Printer (A4/Letter, prints top-left)\n[Cancel] = ID Card Printer (85.6x54mm format)");
-        
-        const printWindow = window.open('', '', 'width=800,height=600');
-        
-        let printStyles = printModeMultiple ? `
-            @media print {
-                @page { margin: 10mm; }
-                body { display: flex; align-items: flex-start; justify-content: flex-start; }
-                .card { border: 1px solid #ccc !important; }
-            }
-        ` : `
-            @media print {
-                @page { size: 85.6mm 54mm; margin: 0; }
-                body { display: block; margin: 0; padding: 0; background: #fff;}
-                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-inside: avoid; box-sizing: border-box; }
-            }
-        `;
-
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Print QR Pass</title>
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
-                <style>
-                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; }
-                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
-                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
-                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
-                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
-                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
-                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
-                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
-                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
-                    ${printStyles}
-                </style>
-            </head>
-            <body>
-                <div class="card">
-                    <div class="top-row">
-                        <div>
-                            <p class="name">${name}</p>
-                            <p class="sub">${type} &bull; ${location}</p>
-                            <p class="date">Valid: ${date}</p>
-                        </div>
-                        <div>
-                            <p class="status">${status}</p>
-                            <p class="id">${id}</p>
-                        </div>
-                    </div>
-                    <div class="qr-box" id="qr-code"></div>
-                </div>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                <script>
-                    new QRCode(document.getElementById("qr-code"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });
-                    setTimeout(() => { window.print(); window.close(); }, 800);
-                <\/script>
-            </body>
-            </html>
-        `);
-        printWindow.document.close();
-    }
-
+    // --- GUARD SCANNER LOGIC ---
     function startScanner() {
       document.getElementById('btn-start-scan').classList.add('hidden');
       document.getElementById('reader').classList.remove('hidden');
@@ -1769,12 +1714,8 @@
         document.getElementById('r-decision').innerText = decision;
         document.getElementById('r-reason').innerHTML = reasonHtml; 
         document.getElementById('scan-result').className = `scan-result-card ${colorClass}`;
-        
         if (decision === "DENIED") {
-            setTimeout(() => {
-                document.getElementById('scan-result').classList.add('hidden');
-                html5QrcodeScanner.resume();
-            }, 3500);
+            setTimeout(() => { document.getElementById('scan-result').classList.add('hidden'); html5QrcodeScanner.resume(); }, 3500);
         }
     }
 
@@ -1783,61 +1724,65 @@
       const resultCard = document.getElementById('scan-result');
       const selfieImg = document.getElementById('r-selfie');
       const confirmBtn = document.getElementById('btn-confirm-action');
+      const teamSec = document.getElementById('guard-team-section');
       
       resultCard.classList.remove('hidden');
-      confirmBtn.classList.add('hidden');
-      document.getElementById('r-decision').innerText = "VERIFYING...";
-      document.getElementById('r-reason').innerHTML = "";
-      
-      selfieImg.style.display = 'none'; 
-      selfieImg.src = ""; 
+      confirmBtn.classList.add('hidden'); teamSec.classList.add('hidden');
+      document.getElementById('r-decision').innerText = "VERIFYING..."; document.getElementById('r-reason').innerHTML = "";
+      selfieImg.style.display = 'none'; selfieImg.src = ""; 
       currentScannedID = decodedText;
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
         const data = await res.json();
-
-        if (data.error) { return showScanResult("DENIED", "Invalid QR Code", "bg-red"); }
+        if (data.error) return showScanResult("DENIED", "Invalid QR Code", "bg-red");
 
         document.getElementById('r-name').innerText = data.VisitorName;
         document.getElementById('r-type').innerText = t(data.Type.toLowerCase());
         document.getElementById('r-location').innerText = data.Location;
 
-        if(data.SelfieBase64) {
-            selfieImg.src = data.SelfieBase64;
-            selfieImg.style.display = 'block';
-        }
+        if(data.SelfieBase64) { selfieImg.src = data.SelfieBase64; selfieImg.style.display = 'block'; }
 
         const todayStr = formatToDDMMYYYY(new Date());
         const startStr = formatToDDMMYYYY(data.StartDate);
         const todayNum = new Date().setHours(0,0,0,0);
         
-        let startObj = parseFlexibleDate(data.StartDate);
-        let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
-
-        let endObj = parseFlexibleDate(data.EndDate);
-        let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
+        let startObj = parseFlexibleDate(data.StartDate); let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
+        let endObj = parseFlexibleDate(data.EndDate); let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
 
         const isCheckedOut = !!data.CheckOutTime;
         const isInside = !!data.CheckInTime && !data.CheckOutTime;
 
-        if (currentUser.role === 'admin' && !currentUser.location) {
-            return showScanResult("DENIED", t('msg_admin_select_loc') || "Admin: Please select a facility first.", "bg-red");
+        if (currentUser.role === 'admin' && !currentUser.location) return showScanResult("DENIED", t('msg_admin_select_loc') || "Admin: Please select a facility first.", "bg-red");
+        if (data.Status !== 'Approved') return showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
+        if (data.Location !== currentUser.location) return showScanResult("DENIED", `Wrong Facility (Pass is for ${data.Location})`, "bg-red");
+        if (data.Type === 'Visitor' && startStr !== todayStr) return showScanResult("DENIED", "Pass is not valid for today", "bg-red");
+        if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) return showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
+        
+        // CHECK IF IT HAS A TEAM
+        let teamData = [];
+        let maxWorkers = 1;
+        if(data.TeamMembers && data.TeamMembers !== "[]") {
+            try { teamData = JSON.parse(data.TeamMembers); maxWorkers = teamData.length + 1; } catch(e){}
         }
 
-        if (data.Status !== 'Approved') {
-            showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
-        } else if (data.Location !== currentUser.location) {
-            showScanResult("DENIED", `Wrong Facility (Pass is for ${data.Location})`, "bg-red");
-        } else if (data.Type === 'Visitor' && startStr !== todayStr) {
-            showScanResult("DENIED", "Pass is not valid for today", "bg-red");
-        } else if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) {
-            showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
-        } else if (data.Type === 'Visitor' && isCheckedOut) {
-            showScanResult("DENIED", "Pass already used / Visitor checked out", "bg-red");
-        } else if (isInside) {
+        if (teamData.length > 0) {
+            teamSec.classList.remove('hidden');
+            document.getElementById('guard-team-count').innerText = maxWorkers;
+            document.getElementById('guard-headcount').value = maxWorkers; 
+            
+            let rosterHtml = `
+               <img src="${data.SelfieBase64 || data.SelfieURL}" style="width: 45px; height: 45px; border-radius: 5px; object-fit: cover; border: 2px solid var(--noon-yellow); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Lead">
+            `;
+            teamData.forEach(m => {
+               rosterHtml += `<img src="${m.selfie}" style="width: 45px; height: 45px; border-radius: 5px; object-fit: cover; border: 1px solid var(--text-muted); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Person ${m.person}">`;
+            });
+            document.getElementById('guard-team-roster').innerHTML = rosterHtml;
+        }
+
+        if (isInside) {
             currentScanAction = 'check_out';
-            showScanResult("CHECK OUT", "Visitor/Contractor is exiting facility.<br><br><span style='color:#ffc700; font-size:14px;'>⚠️ PLEASE TAKE THE ID CARD FROM THE PERSON AFTER CHECK OUT.</span>", "bg-blue");
+            showScanResult("CHECK OUT", "Scanning Out.<br><span style='color:#ffc700; font-size:14px;'>⚠️ TAKE ID CARD FROM LEAD.</span>", "bg-blue");
             confirmBtn.innerText = t("btn_checkout");
             confirmBtn.className = "btn-primary btn-warning hidden"; 
             confirmBtn.classList.remove('hidden');
@@ -1853,10 +1798,19 @@
 
     async function confirmAction() {
       const btn = document.getElementById('btn-confirm-action');
+      const hcInput = document.getElementById('guard-headcount');
+      const teamSec = document.getElementById('guard-team-section');
+      
+      let hcVal = 1;
+      if (!teamSec.classList.contains('hidden')) {
+          hcVal = hcInput.value;
+          if(!hcVal || hcVal < 1) return alert("Please enter the number of workers present.");
+      }
+
       btn.innerText = "SAVING...";
       try {
         const gInfo = `${currentUser.name} (${currentUser.location})`;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo }) });
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo, headCount: hcVal }) });
         document.getElementById('scan-result').classList.add('hidden');
         html5QrcodeScanner.resume();
       } catch (err) { 
