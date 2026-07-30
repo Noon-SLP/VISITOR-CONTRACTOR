@@ -377,12 +377,7 @@
                   <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
                   <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
                   <div class="input-group">
-                    <label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')" data-i18n="live_camera">📷 Live Camera</button>
-                      <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
-                    </div>
-                    <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+                    <input type="text" id="req-vehicle-text" class="input-field t-ph" data-i18n="vehicle_plate" placeholder="Vehicle Plate No. / Picture details">
                   </div>
                 </div>
 
@@ -399,7 +394,16 @@
                   <div class="input-group"><input type="text" id="req-con-project" class="input-field t-ph" data-i18n="project_name" placeholder="Project Name"></div>
                   <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
                   <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
-                  <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field t-ph" data-i18n="fm_poc" placeholder="FM POC"></div>
+                  
+                  <!-- NEW: FM POC IMAGE UPLOAD -->
+                  <div class="input-group">
+                    <label data-i18n="upload_fmpoc">Upload FM POC</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('fmpoc')" data-i18n="live_camera">📷 Live Camera</button>
+                      <input type="file" id="req-fmpoc" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('fmpoc')">
+                    </div>
+                    <img id="preview-fmpoc" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+                  </div>
                 </div>
 
                 <div class="input-group">
@@ -598,7 +602,9 @@
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
-    let capturedImages = { iqama: null, selfie: null, vehicle: null };
+    
+    // NEW: Added fmpoc to the payload storage
+    let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
     // ==========================================
     // TRANSLATION DICTIONARY (EN & AR)
@@ -613,9 +619,9 @@
         "visitor_contractor_portal": "Visitor & Contractor Portal", "submit_new_request": "Submit New Request", "type": "Type",
         "visitor": "Visitor", "contractor": "Contractor", "req_email_ph": "Email Address (For Pass Tracking)", "req_vname_ph": "Visitor / Contractor Full Name",
         "visit_date": "Visit Date", "slp_ticket": "SLP Ticket No.", "contact_no": "Contact No.", "invited_by": "Invited by Whom",
-        "vehicle_plate": "Vehicle Plate / Picture (Optional)", "live_camera": "📷 Live Camera", "contract_exp": "Contract Expiration (From - To)",
+        "vehicle_plate": "Vehicle Plate No. / Picture details", "live_camera": "📷 Live Camera", "contract_exp": "Contract Expiration (From - To)",
         "project_name": "Project Name", "company_name": "Company / Contractor Name", "project_manager": "Project Manager", "fm_poc": "FM POC",
-        "upload_iqama": "Upload Iqama/ID Copy", "upload_selfie": "Upload Selfie Photo", "submit_approval": "Submit for Approval",
+        "upload_iqama": "Upload Iqama/ID Copy", "upload_selfie": "Upload Selfie Photo", "upload_fmpoc": "Upload FM POC", "submit_approval": "Submit for Approval",
         "my_passes": "My Passes", "refresh": "Refresh", "fetching": "Fetching your passes...", "start_camera": "START CAMERA SCANNER",
         "name_label": "Name:", "type_label": "Type:", "location_label": "Location:", "confirm_action": "CONFIRM ACTION",
         "access_approvals": "📋 Access Approvals", "history": "🕰️ History", "guard_approvals": "🛡️ Guard Approvals", "analytics": "📊 Analytics",
@@ -643,9 +649,9 @@
         "visitor_contractor_portal": "بوابة الزوار والمقاولين", "submit_new_request": "تقديم طلب جديد", "type": "النوع",
         "visitor": "زائر", "contractor": "مقاول", "req_email_ph": "البريد الإلكتروني (لتتبع التصريح)", "req_vname_ph": "الاسم الكامل للزائر/المقاول",
         "visit_date": "تاريخ الزيارة", "slp_ticket": "رقم تذكرة SLP", "contact_no": "رقم الاتصال", "invited_by": "بدعوة من",
-        "vehicle_plate": "صورة / لوحة السيارة (اختياري)", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
+        "vehicle_plate": "رقم لوحة السيارة / تفاصيل أخرى", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
         "project_name": "اسم المشروع", "company_name": "اسم الشركة / المقاول", "project_manager": "مدير المشروع", "fm_poc": "مسؤول المرافق (FM POC)",
-        "upload_iqama": "رفع صورة الهوية/الإقامة", "upload_selfie": "رفع صورة شخصية", "submit_approval": "إرسال للموافقة",
+        "upload_iqama": "رفع صورة الهوية/الإقامة", "upload_selfie": "رفع صورة شخصية", "upload_fmpoc": "رفع مسؤول المرافق (FM POC)", "submit_approval": "إرسال للموافقة",
         "my_passes": "تصاريحي", "refresh": "تحديث", "fetching": "جاري جلب التصاريح...", "start_camera": "تشغيل ماسح الكاميرا",
         "name_label": "الاسم:", "type_label": "النوع:", "location_label": "الموقع:", "confirm_action": "تأكيد الإجراء",
         "access_approvals": "📋 موافقات الدخول", "history": "🕰️ السجل", "guard_approvals": "🛡️ عمليات البوابة", "analytics": "📊 الإحصائيات",
@@ -1044,11 +1050,13 @@
       const type = document.getElementById('req-type').value;
       const iqamaInput = document.getElementById('req-iqama');
       const selfieInput = document.getElementById('req-selfie');
+      const fmpocInput = document.getElementById('req-fmpoc');
       const vehicleInput = document.getElementById('req-vehicle');
       const btn = document.getElementById('btn-submit-req');
       
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
+      let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg';
       let finalVehicleB64 = ''; let finalVehicleMime = 'image/jpeg';
 
       if (capturedImages.iqama) {
@@ -1067,12 +1075,25 @@
           finalSelfieMime = selfieInput.files[0].type;
       } else { return alert("Please provide the Selfie photo (Camera or Upload)."); }
 
-      if (capturedImages.vehicle) {
-          finalVehicleB64 = capturedImages.vehicle.split(',')[1];
-      } else if (vehicleInput && vehicleInput.files.length > 0) {
-          const vFull = await getBase64(vehicleInput.files[0]);
-          finalVehicleB64 = vFull.split(',')[1];
-          finalVehicleMime = vehicleInput.files[0].type;
+      // Contractor FM POC Image processing
+      if (type === 'Contractor') {
+          if (capturedImages.fmpoc) {
+              finalFmpocB64 = capturedImages.fmpoc.split(',')[1];
+          } else if (fmpocInput && fmpocInput.files.length > 0) {
+              const fFull = await getBase64(fmpocInput.files[0]);
+              finalFmpocB64 = fFull.split(',')[1];
+              finalFmpocMime = fmpocInput.files[0].type;
+          } else { 
+              return alert("Please provide the FM POC photo (Camera or Upload)."); 
+          }
+      }
+
+      // Legacy vehicle text fallback logic is replaced entirely by text input now for visitor
+      // But keeping this structure intact if they want image vehicle back later.
+      // Currently using a text input for visitor vehicle, let's pass it safely.
+      let vehicleTextVal = '';
+      if(type === 'Visitor') {
+         vehicleTextVal = document.getElementById('req-vehicle-text').value;
       }
 
       let hostNameVal = '';
@@ -1104,8 +1125,9 @@
           iqamaMimeType: finalIqamaMime,
           selfieBase64: finalSelfieB64,
           selfieMimeType: finalSelfieMime,
-          vehicleBase64: finalVehicleB64,
-          vehicleMimeType: finalVehicleMime,
+          fmpocBase64: finalFmpocB64,
+          fmpocMimeType: finalFmpocMime,
+          vehiclePlateNo: vehicleTextVal,
           
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
@@ -1113,7 +1135,7 @@
           projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
           companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '',
           projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : '',
-          fmPoc: type === 'Contractor' ? document.getElementById('req-con-fmpoc').value : ''
+          fmPoc: '' // No longer a text input!
         };
         
         if(!payload.startDate) {
@@ -1127,8 +1149,11 @@
         
         if(currentUser.role === 'admin') document.getElementById('req-vname').value = ""; 
         
-        iqamaInput.value = ""; selfieInput.value = ""; if(vehicleInput) vehicleInput.value = "";
-        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('vehicle');
+        iqamaInput.value = ""; selfieInput.value = ""; 
+        if(fmpocInput) fmpocInput.value = ""; 
+        document.getElementById('req-vehicle-text').value = "";
+
+        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc');
         loadMyPasses(true, false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
@@ -1543,7 +1568,6 @@
                 <div><strong>${t('project_name')}</strong>${r.ProjectName || '-'}</div>
                 <div><strong>${t('company_name')}</strong>${r.CompanyName || '-'}</div>
                 <div><strong>${t('project_manager')}</strong>${r.ProjectManager || '-'}</div>
-                <div><strong>${t('fm_poc')}</strong>${r.FmPoc || '-'}</div>
             `;
         }
 
@@ -1553,11 +1577,11 @@
                 <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')}</strong><img src="${r.SelfieURL || ''}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>
         `;
 
-        if (r.VehiclePlateNo) {
-             if (r.VehiclePlateNo.startsWith('http') || r.VehiclePlateNo.startsWith('data:image')) {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
+        if (r.Type === 'Contractor') {
+             if (r.FmPoc && (r.FmPoc.startsWith('http') || r.FmPoc.startsWith('data:image'))) {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
              } else {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.FmPoc || '-'}</div></div>`;
              }
         }
 
