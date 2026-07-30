@@ -743,7 +743,7 @@
         }
     }
 
-    // --- Full Screen Toggle ---
+    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
       const doc = window.document;
       const docEl = doc.documentElement;
@@ -1090,6 +1090,16 @@
                 loadMyPasses(false, true); 
             }
         }, 15000); 
+    }
+    
+    // ==========================================
+    // MISSING FUNCTION RESTORED HERE:
+    // ==========================================
+    function switchLoginTab(role) {
+      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
+      document.getElementById(`tab-${role}`).classList.add('active');
+      document.getElementById(`login-${role}`).classList.remove('hidden');
     }
 
     function login(role) {
@@ -2127,7 +2137,6 @@
             guardRosterIndex = 0;
             renderGuardCarousel();
         } else {
-            // Standard Single Profile Picture
             if(data.SelfieBase64 || data.SelfieURL) {
                 selfieImg.src = data.SelfieBase64 || data.SelfieURL;
                 selfieImg.style.display = 'block';
