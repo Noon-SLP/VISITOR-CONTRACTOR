@@ -46,7 +46,7 @@
     body[dir="rtl"] .ops-card { text-align: right; }
     body[dir="rtl"] .pass-item { text-align: right; }
 
-    /* Login Top Controls (Fullscreen & Lang) */
+    /* Login Top Controls */
     .login-top-controls { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000; }
     body[dir="rtl"] .login-top-controls { right: auto; left: 20px; }
 
@@ -97,18 +97,15 @@
     
     #main-content { flex: 1; height: 100vh; overflow-y: auto; position: relative; background-image: radial-gradient(circle at center, rgba(20, 22, 28, 0.4) 0%, rgba(5, 5, 7, 0.95) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E"); }
     
-    /* Dashboards General Formatting */
     .dashboard { width: 100%; padding: 20px; margin: 0 auto; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 15px;}
     .header h2 { color: var(--noon-yellow); font-size: 22px; margin: 0; display: flex; align-items: center; gap: 15px;}
     .header-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-    /* EXACT WIDTH RESTRICTIONS */
     #dashboard-ops { max-width: 950px; margin-top: 20px; } 
     #dashboard-guard { max-width: 600px; margin-top: 20px; }
     #dashboard-admin { max-width: 100%; padding: 30px 2.5vw; padding-top: 0; }
 
-    /* OPS Portal Layout */
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
     .ops-card { background: var(--card-bg); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
@@ -116,7 +113,6 @@
     .pass-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 10px;}
     .qr-box { background: white; padding: 10px; border-radius: 6px; display: inline-block; margin-top: 10px; }
     
-    /* GUARD SCANNER UI */
     #reader { width: 100%; border: none; border-radius: 12px; overflow: hidden; background: var(--card-bg); padding: 30px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
     #reader a { color: var(--noon-yellow) !important; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; margin: 15px 5px; padding: 14px 24px; border: 2px solid var(--noon-yellow); border-radius: 8px; transition: 0.2s; background: rgba(255,199,0,0.05); }
     #reader button { background: var(--noon-yellow) !important; color: #000 !important; border: none; padding: 14px 28px; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer; margin: 15px 5px; text-transform: uppercase; transition: 0.2s; }
@@ -129,10 +125,16 @@
     .bg-blue { background-color: #3b82f6; }
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
-    /* TEAM ROSTER UI */
-    .team-roster { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+    .team-roster { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .team-member-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+    .team-member-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;}
+    .team-member-img:hover { border-color: var(--noon-yellow); }
 
-    /* ADMIN DASHBOARD UI */
+    /* Carousel Buttons */
+    .carousel-btn { background: var(--noon-yellow); border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: 0.2s; }
+    .carousel-btn:hover { transform: scale(1.1); }
+    .carousel-btn:active { transform: scale(0.9); }
+
     .admin-header-top { display: flex; align-items: center; padding: 0 2.5vw; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; flex-wrap: wrap; gap: 15px;}
     .admin-brand-horizontal { display: flex; flex-direction: column; }
     .admin-brand-horizontal h1 { font-size: 18px; font-weight: 700; color: var(--noon-yellow); letter-spacing: 0.5px; margin:0; }
@@ -161,7 +163,6 @@
     .btn-filter { background: transparent; color: var(--text-muted); border: none; font-size: 12px; font-weight: 600; cursor: pointer; padding: 8px 12px; text-transform: uppercase; border-radius: 6px; transition: 0.2s;}
     .btn-filter.active { color: var(--noon-yellow); background: rgba(255, 199, 0, 0.1); }
 
-    /* MODALS */
     .popup-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px; }
     .record-modal-box { background: var(--card-bg); width: 100%; max-width: 650px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 15px 40px rgba(0,0,0,0.7); }
     .record-modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
@@ -177,7 +178,6 @@
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
 
-    /* ================= RESPONSIVE (MOBILE & TABLET) FIXES ================= */
     @media (max-width: 1024px) {
         .ops-grid { grid-template-columns: 1fr; }
     }
@@ -203,13 +203,11 @@
 </head>
 <body class="sidebar-minimized" dir="ltr"> 
 
-  <!-- ================= FULL SCREEN IMAGE MODAL ================= -->
   <div id="fullscreen-image-modal" class="popup-modal hidden" onclick="this.classList.add('hidden')" style="z-index: 9999999; cursor: zoom-out;">
       <img id="fullscreen-img" src="" style="max-width: 95vw; max-height: 95vh; border-radius: 8px; object-fit: contain;">
       <div style="position: absolute; bottom: 20px; color: white; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px;" data-i18n="click_to_close">Click anywhere to close</div>
   </div>
 
-  <!-- ================= VIEW RECORD MODAL ================= -->
   <div id="view-record-modal" class="popup-modal hidden">
     <div class="record-modal-box">
         <div class="record-modal-header">
@@ -220,7 +218,6 @@
     </div>
   </div>
 
-  <!-- ================= EXTEND PASS MODAL ================= -->
   <div id="extend-pass-modal" class="popup-modal hidden">
     <div class="record-modal-box" style="max-width: 400px;">
         <div class="record-modal-header">
@@ -243,7 +240,6 @@
     </div>
   </div>
 
-  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="popup-modal hidden">
     <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
         <video id="camera-video-stream" autoplay playsinline></video>
@@ -256,8 +252,6 @@
     </div>
   </div>
 
-
-  <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
   <div id="login-view">
     <div class="login-top-controls">
         <button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button>
@@ -302,9 +296,7 @@
     </div>
   </div>
 
-  <!-- ================= MAIN APP LAYOUT ================= -->
   <div id="app-layout" class="hidden">
-      <!-- SIDEBAR (ONLY FOR ADMINS) -->
       <aside id="sidebar" class="sidebar">
            <div class="sidebar-header">
                <div class="sidebar-brand">
@@ -329,10 +321,7 @@
            </div>
       </aside>
 
-      <!-- MAIN CONTENT AREA -->
       <main id="main-content">
-          
-          <!-- 1. OPS PORTAL -->
           <div id="dashboard-ops" class="dashboard hidden">
             <div class="header">
               <h2 data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</h2>
@@ -408,13 +397,38 @@
                     <img id="preview-fmpoc" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
                   </div>
 
-                  <!-- NEW DYNAMIC TEAM MEMBERS UI -->
                   <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                       <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;">TEAM MEMBERS (OPTIONAL)</label>
-                      <button type="button" class="btn-primary btn-outline" style="font-size: 12px;" onclick="addTeamMemberBlock()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
                       
-                      <div id="team-roster-display" class="team-roster hidden">
-                          <!-- Dynamic Team blocks injected here -->
+                      <div id="team-roster-display" class="team-roster hidden"></div>
+
+                      <button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
+                      
+                      <div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;">
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                              <strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong>
+                              <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button>
+                          </div>
+                          
+                          <div class="input-group">
+                              <label style="font-size: 11px;">Upload Iqama/ID Copy</label>
+                              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')">📷 Live Camera</button>
+                                <input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')">
+                              </div>
+                              <img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+                          </div>
+
+                          <div class="input-group" style="margin-bottom: 15px;">
+                              <label style="font-size: 11px;">Upload Selfie Photo</label>
+                              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')">📷 Live Camera</button>
+                                <input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')">
+                              </div>
+                              <img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+                          </div>
+
+                          <button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button>
                       </div>
                   </div>
                 </div>
@@ -483,17 +497,18 @@
                 
                 <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
 
+                <!-- NEW: GUARD TEAM CAROUSEL UI -->
+                <div id="guard-team-section" class="hidden" style="margin-bottom: 20px;">
+                    <div id="guard-team-roster"></div>
+                </div>
+
                 <div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: start; font-size: 16px; line-height: 1.6;">
                     <p><strong data-i18n="name_label">Name:</strong> <span id="r-name" style="color: var(--noon-yellow);">-</span></p>
                     <p><strong data-i18n="type_label">Type:</strong> <span id="r-type">-</span></p>
                     <p><strong data-i18n="location_label">Location:</strong> <span id="r-location">-</span></p>
                 </div>
 
-                <!-- GUARD TEAM ROSTER & HEADCOUNT INPUT -->
-                <div id="guard-team-section" class="hidden" style="margin-top: 20px; text-align: left;">
-                    <h3 style="color: var(--noon-yellow); font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">TEAM ROSTER (<span id="guard-team-count">0</span>)</h3>
-                    <div id="guard-team-roster" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;"></div>
-                    
+                <div id="guard-headcount-section" class="hidden" style="margin-top: 20px; text-align: left;">
                     <div class="input-group" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
                         <label style="color: white; font-weight: bold;">Number of Workers Present Today:</label>
                         <input type="number" id="guard-headcount" class="input-field" placeholder="E.g., 8" style="font-size: 18px; font-weight: bold; text-align: center;">
@@ -623,11 +638,15 @@
     let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
     // --- Team Loop Variables ---
-    let teamMemberCount = 0;
-    let activeTeamMembers = [];
+    let teamList = []; 
+    let currentTeamCounter = 1;
+
+    // --- Guard Carousel Variables ---
+    let guardRoster = [];
+    let guardRosterIndex = 0;
 
     // ==========================================
-    // TRANSLATION DICTIONARY (EN & AR)
+    // TRANSLATION DICTIONARY
     // ==========================================
     const dict = {
       en: {
@@ -702,9 +721,7 @@
         updateUI();
     }
 
-    function t(key) {
-        return dict[currentLang][key] || key;
-    }
+    function t(key) { return dict[currentLang][key] || key; }
 
     function updateUI() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -715,35 +732,22 @@
             const key = el.getAttribute('data-i18n');
             if(dict[currentLang][key]) { el.placeholder = dict[currentLang][key]; }
         });
-
         if (currentUser && currentUser.role === 'admin') renderAdminData(globalAdminData);
         if (currentUser && currentUser.role !== 'guard') loadMyPasses(false, true); 
     }
 
-    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
-      const doc = window.document;
-      const docEl = doc.documentElement;
-
+      const doc = window.document; const docEl = doc.documentElement;
       const reqFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
       const exitFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
       if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-        if (reqFullScreen) {
-          reqFullScreen.call(docEl).catch(err => {
-            console.log("Fullscreen API Error / Mobile Block:", err);
-          });
-        } else {
-          alert("Fullscreen mode is not supported on this browser/device.");
-        }
+        if (reqFullScreen) reqFullScreen.call(docEl).catch(err => { console.log(err); });
+        else alert("Fullscreen mode is not supported on this browser.");
       } else {
-        if (exitFullScreen) {
-          exitFullScreen.call(doc).catch(err => console.log(err));
-        }
+        if (exitFullScreen) exitFullScreen.call(doc).catch(err => console.log(err));
       }
     }
 
-    // --- Core Navigation ---
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('minimized');
         document.body.classList.toggle('sidebar-minimized');
@@ -759,80 +763,98 @@
         if(activeNav) activeNav.classList.add('active');
 
         if(window.innerWidth <= 900 && !document.getElementById('sidebar').classList.contains('minimized')) { toggleSidebar(); } 
-
-        if (viewId === 'ops' && currentUser && currentUser.role === 'admin') {
-            loadMyPasses(false, false);
-        }
+        if (viewId === 'ops' && currentUser && currentUser.role === 'admin') loadMyPasses(false, false);
     }
 
-    // --- Admin Guard Loc Updater ---
     function updateAdminGuardLoc() {
-        if(currentUser && currentUser.role === 'admin') {
-            currentUser.location = document.getElementById('admin-guard-loc').value || '';
-        }
+        if(currentUser && currentUser.role === 'admin') currentUser.location = document.getElementById('admin-guard-loc').value || '';
     }
 
-    // --- Full Screen Image Utility ---
     function openFullscreenImage(src) {
         if(!src || src === '') return;
         document.getElementById('fullscreen-img').src = src;
         document.getElementById('fullscreen-image-modal').classList.remove('hidden');
     }
 
-    // --- Dynamic Team Member Blocks ---
-    function addTeamMemberBlock() {
-        teamMemberCount++;
-        const id = teamMemberCount;
-        activeTeamMembers.push(id);
-
-        const container = document.getElementById('team-roster-display');
-        container.classList.remove('hidden');
-
-        const block = document.createElement('div');
-        block.id = `team-member-block-${id}`;
-        block.style.cssText = "border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; background: rgba(255,255,255,0.02);";
-        
-        block.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <strong style="color: white; font-size: 13px;">Team Member ${id}</strong>
-                <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="removeTeamMemberBlock(${id})">❌</button>
-            </div>
-            
-            <div class="input-group">
-              <label style="font-size: 11px;">Upload Iqama/ID Copy</label>
-              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama_${id}')">📷 Live Camera</button>
-                <input type="file" id="req-team_iqama_${id}" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama_${id}')">
-              </div>
-              <img id="preview-team_iqama_${id}" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
-            </div>
-
-            <div class="input-group" style="margin-bottom: 0;">
-              <label style="font-size: 11px;">Upload Selfie Photo</label>
-              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie_${id}')">📷 Live Camera</button>
-                <input type="file" id="req-team_selfie_${id}" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie_${id}')">
-              </div>
-              <img id="preview-team_selfie_${id}" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
-            </div>
-        `;
-        container.appendChild(block);
+    // --- SINGLE-SPOT TEAM MEMBER LOGIC ---
+    function showTeamEntry() {
+        document.getElementById('team-entry-box').classList.remove('hidden');
+        document.getElementById('btn-show-team-entry').classList.add('hidden');
+        document.getElementById('team-entry-title').innerText = `Team Member ${currentTeamCounter}`;
     }
 
-    function removeTeamMemberBlock(id) {
-        const block = document.getElementById(`team-member-block-${id}`);
-        if (block) block.remove();
-        activeTeamMembers = activeTeamMembers.filter(memberId => memberId !== id);
-        
-        delete capturedImages[`team_iqama_${id}`];
-        delete capturedImages[`team_selfie_${id}`];
+    function hideTeamEntry() {
+        document.getElementById('team-entry-box').classList.add('hidden');
+        document.getElementById('btn-show-team-entry').classList.remove('hidden');
+        document.getElementById('req-team-iqama').value = "";
+        document.getElementById('req-team-selfie').value = "";
+        clearCapturedData('team_iqama'); clearCapturedData('team_selfie');
+    }
 
-        if (activeTeamMembers.length === 0) {
-            document.getElementById('team-roster-display').classList.add('hidden');
+    async function saveCurrentTeamMember() {
+        let iqamaB64 = ''; let selfieB64 = '';
+        const iInput = document.getElementById('req-team-iqama');
+        const sInput = document.getElementById('req-team-selfie');
+
+        if (capturedImages.team_iqama) {
+            iqamaB64 = capturedImages.team_iqama.split(',')[1];
+        } else if (iInput && iInput.files.length > 0) {
+            let full = await getBase64(iInput.files[0]);
+            iqamaB64 = full.split(',')[1];
+        } else { return alert("Please provide the Iqama/ID photo for this team member."); }
+
+        if (capturedImages.team_selfie) {
+            selfieB64 = capturedImages.team_selfie.split(',')[1];
+        } else if (sInput && sInput.files.length > 0) {
+            let full = await getBase64(sInput.files[0]);
+            selfieB64 = full.split(',')[1];
+        } else { return alert("Please provide the Selfie photo for this team member."); }
+
+        teamList.push({
+            iqama: "data:image/jpeg;base64," + iqamaB64, 
+            selfie: "data:image/jpeg;base64," + selfieB64,
+            rawIqama: iqamaB64, 
+            rawSelfie: selfieB64
+        });
+
+        currentTeamCounter++;
+        renderTeamRoster();
+        
+        iInput.value = ""; sInput.value = "";
+        clearCapturedData('team_iqama'); clearCapturedData('team_selfie');
+        document.getElementById('team-entry-title').innerText = `Team Member ${currentTeamCounter}`;
+    }
+
+    function renderTeamRoster() {
+        const div = document.getElementById('team-roster-display');
+        if(teamList.length > 0) {
+            div.classList.remove('hidden');
+            let html = '';
+            teamList.forEach((mem, idx) => {
+                html += `
+                <div class="team-member-row">
+                    <span style="color:white; font-size:13px; font-weight:bold;">Person ${idx+1}</span>
+                    <div style="display:flex; gap:10px;">
+                        <img src="${mem.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Iqama">
+                        <img src="${mem.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Selfie">
+                        <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="removeTeamMember(${idx})">❌</button>
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } else {
+            div.classList.add('hidden');
         }
     }
 
-    // --- Camera Logic ---
+    function removeTeamMember(idx) {
+        teamList.splice(idx, 1);
+        currentTeamCounter = teamList.length + 1;
+        renderTeamRoster();
+        document.getElementById('team-entry-title').innerText = `Team Member ${currentTeamCounter}`;
+    }
+
+    // --- CAMERA LOGIC ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -847,19 +869,19 @@
     function captureLivePhoto() {
         const video = document.getElementById('camera-video-stream');
         const canvas = document.getElementById('camera-hidden-canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         canvas.getContext('2d').drawImage(video, 0, 0);
         
         const b64 = canvas.toDataURL('image/jpeg', 0.8);
         capturedImages[targetPhotoType] = b64;
         
         const preview = document.getElementById(`preview-${targetPhotoType}`);
-        preview.src = b64;
-        preview.classList.remove('hidden');
-        preview.onclick = () => openFullscreenImage(b64); 
+        if(preview) { preview.src = b64; preview.classList.remove('hidden'); preview.onclick = () => openFullscreenImage(b64); }
         
-        const fileInput = document.getElementById(`req-${targetPhotoType}`);
+        let idStr = `req-${targetPhotoType}`;
+        if(targetPhotoType === 'team_iqama') idStr = 'req-team-iqama';
+        if(targetPhotoType === 'team_selfie') idStr = 'req-team-selfie';
+        const fileInput = document.getElementById(idStr);
         if(fileInput) fileInput.value = "";
         
         closeLiveCamera();
@@ -873,43 +895,26 @@
     function clearCapturedData(type) {
         capturedImages[type] = null;
         const preview = document.getElementById(`preview-${type}`);
-        if (preview) {
-            preview.classList.add('hidden');
-            preview.src = "";
-        }
+        if (preview) { preview.classList.add('hidden'); preview.src = ""; }
     }
 
     async function startStream(videoId) {
         if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); }
-        try {
-            liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
-            document.getElementById(videoId).srcObject = liveStream;
-        } catch (err) {
-            alert("Camera access denied or not available on this device.");
-            closeLiveCamera();
-        }
+        try { liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } }); document.getElementById(videoId).srcObject = liveStream; } 
+        catch (err) { alert("Camera access denied or not available on this device."); closeLiveCamera(); }
     }
 
-    // --- Formatting Helpers & Robust Date Parsing ---
+    // --- Utilities & Date Parsing ---
     function parseFlexibleDate(dateStr) {
         if (!dateStr) return null;
         if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
-        
-        let d = new Date(dateStr);
-        if (!isNaN(d.getTime())) return d;
-
+        let d = new Date(dateStr); if (!isNaN(d.getTime())) return d;
         if (typeof dateStr === 'string') {
-            const cleanStr = dateStr.trim();
-            const parts = cleanStr.split(/[\/\-\s]/);
+            const parts = dateStr.trim().split(/[\/\-\s]/);
             if (parts.length >= 3) {
-                let p0 = parseInt(parts[0], 10);
-                let p1 = parseInt(parts[1], 10);
-                let p2 = parseInt(parts[2], 10);
+                let p0 = parseInt(parts[0], 10); let p1 = parseInt(parts[1], 10); let p2 = parseInt(parts[2], 10);
                 if (p2 < 100) p2 += 2000;
-
-                if (p0 > 12) { d = new Date(p2, p1 - 1, p0); } 
-                else if (p1 > 12) { d = new Date(p2, p0 - 1, p1); } 
-                else { d = new Date(p2, p1 - 1, p0); }
+                if (p0 > 12) d = new Date(p2, p1 - 1, p0); else if (p1 > 12) d = new Date(p2, p0 - 1, p1); else d = new Date(p2, p1 - 1, p0);
                 if (!isNaN(d.getTime())) return d;
             }
         }
@@ -917,493 +922,172 @@
     }
 
     function formatToDDMMYYYY(dateString) {
-        if (!dateString) return '-';
-        const d = parseFlexibleDate(dateString);
-        if (!d) return '-';
+        if (!dateString) return '-'; const d = parseFlexibleDate(dateString); if (!d) return '-';
         return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
     }
     
     function formatTime(dateString) {
-        if (!dateString) return '-';
-        const d = parseFlexibleDate(dateString);
-        if (!d) return '-';
+        if (!dateString) return '-'; const d = parseFlexibleDate(dateString); if (!d) return '-';
         return d.toLocaleString();
     }
 
     function getBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
+      return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); });
     }
 
     function isDateInRange(dateStr, filterType, startStr, endStr) {
         if (filterType === 'all') return true;
-        
-        const d = parseFlexibleDate(dateStr);
-        if (!d) return true; 
-        
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
-        if (filterType === 'today') {
-            return d >= todayStart && d <= todayEnd;
-        } else if (filterType === 'weekly') {
-            const weekAgo = new Date(todayStart);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return d >= weekAgo && d <= todayEnd;
-        } else if (filterType === 'monthly') {
-            const monthAgo = new Date(todayStart);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return d >= monthAgo && d <= todayEnd;
-        } else if (filterType === '6months') {
-            const sixAgo = new Date(todayStart);
-            sixAgo.setMonth(sixAgo.getMonth() - 6);
-            return d >= sixAgo && d <= todayEnd;
-        } else if (filterType === 'year') {
-            const yearAgo = new Date(todayStart);
-            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-            return d >= yearAgo && d <= todayEnd;
-        } else if (filterType === 'custom') {
+        const d = parseFlexibleDate(dateStr); if (!d) return true; 
+        const now = new Date(); const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0); const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        if (filterType === 'today') return d >= todayStart && d <= todayEnd;
+        else if (filterType === 'weekly') { const w = new Date(todayStart); w.setDate(w.getDate() - 7); return d >= w && d <= todayEnd; }
+        else if (filterType === 'monthly') { const m = new Date(todayStart); m.setMonth(m.getMonth() - 1); return d >= m && d <= todayEnd; }
+        else if (filterType === '6months') { const m6 = new Date(todayStart); m6.setMonth(m6.getMonth() - 6); return d >= m6 && d <= todayEnd; }
+        else if (filterType === 'year') { const y = new Date(todayStart); y.setFullYear(y.getFullYear() - 1); return d >= y && d <= todayEnd; }
+        else if (filterType === 'custom') {
             if(!startStr || !endStr) return true;
-            const start = parseFlexibleDate(startStr);
-            const end = parseFlexibleDate(endStr);
-            if (start) start.setHours(0,0,0,0);
-            if (end) end.setHours(23,59,59,999);
+            const start = parseFlexibleDate(startStr); const end = parseFlexibleDate(endStr);
+            if (start) start.setHours(0,0,0,0); if (end) end.setHours(23,59,59,999);
             if (start && end) return d >= start && d <= end;
         }
         return true;
     }
 
-    // --- Sessions & Auth ---
     function saveSession() { localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() })); }
 
     function startAutoRefresh(role) {
         if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-        autoRefreshTimer = setInterval(() => {
-            if (role === 'ops') loadMyPasses(false, true);
-            else if (role === 'admin') {
-                loadAdminData(true);
-                loadMyPasses(false, true); 
-            }
-        }, 15000); 
-    }
-
-    window.onload = function() {
-        updateUI(); // Default lang
-        const session = localStorage.getItem('noon_session');
-        if (session) {
-            const parsed = JSON.parse(session);
-            const hoursElapsed = (Date.now() - parsed.time) / (1000 * 60 * 60);
-            if (hoursElapsed < 12) {
-                currentUser = parsed.user;
-                initApp();
-            } else { localStorage.removeItem('noon_session'); }
-        }
-    };
-
-    function switchLoginTab(role) {
-      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(f => f.classList.add('hidden'));
-      document.getElementById(`tab-${role}`).classList.add('active');
-      document.getElementById(`login-${role}`).classList.remove('hidden');
+        autoRefreshTimer = setInterval(() => { if (role === 'ops') loadMyPasses(false, true); else if (role === 'admin') { loadAdminData(true); loadMyPasses(false, true); } }, 15000); 
     }
 
     function login(role) {
       if (role === 'guard') {
-        const name = document.getElementById('lg-name').value;
-        const id = document.getElementById('lg-id').value;
-        const loc = document.getElementById('lg-location').value;
+        const name = document.getElementById('lg-name').value; const id = document.getElementById('lg-id').value; const loc = document.getElementById('lg-location').value;
         if(!name || !id || !loc) return alert("Fill all Guard details");
         currentUser = { role: 'guard', name: name, id: id, location: loc };
       } else if (role === 'ops') {
-        const name = document.getElementById('lo-name').value;
-        const mail = document.getElementById('lo-mail').value.toLowerCase().trim();
+        const name = document.getElementById('lo-name').value; const mail = document.getElementById('lo-mail').value.toLowerCase().trim();
         if(!name || !mail) return alert("Enter Name and Gmail");
         currentUser = { role: 'ops', name: name, email: mail };
       } else if (role === 'admin') {
-        const name = document.getElementById('la-name').value;
-        const mail = document.getElementById('la-mail').value.toLowerCase().trim();
-        const pass = document.getElementById('la-pass').value;
+        const name = document.getElementById('la-name').value; const mail = document.getElementById('la-mail').value.toLowerCase().trim(); const pass = document.getElementById('la-pass').value;
         if(!name || !mail || !pass) return alert("Enter all Admin details");
-        if(pass === 'admin123') { 
-            currentUser = { role: 'admin', name: name, email: mail };
-        } else { return alert("Incorrect Password"); }
+        if(pass === 'admin123') { currentUser = { role: 'admin', name: name, email: mail }; } else { return alert("Incorrect Password"); }
       }
-      saveSession();
-      initApp();
+      saveSession(); initApp();
     }
 
     function initApp() {
-        const loginView = document.getElementById('login-view');
-        if (loginView) loginView.classList.add('hidden');
-        
-        const appLayout = document.getElementById('app-layout');
-        if (appLayout) appLayout.classList.remove('hidden');
+        const loginView = document.getElementById('login-view'); if (loginView) loginView.classList.add('hidden');
+        const appLayout = document.getElementById('app-layout'); if (appLayout) appLayout.classList.remove('hidden');
 
         if (currentUser.role === 'admin') {
-            const vName = document.getElementById('req-vname');
-            if (vName) vName.value = '';
-            
-            const adminEmail = document.getElementById('req-admin-email');
-            if (adminEmail) adminEmail.value = '';
-            
-            const adminGroup = document.getElementById('admin-email-group');
-            if (adminGroup) adminGroup.classList.remove('hidden');
-            
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) sidebar.style.display = 'flex';
-            
-            const headerAdminName = document.getElementById('header-admin-name');
-            if (headerAdminName) headerAdminName.innerText = currentUser.name;
-            
-            const sidebarUserName = document.getElementById('sidebar-user-name');
-            if (sidebarUserName) sidebarUserName.innerText = currentUser.name;
-            
-            const navAdmin = document.getElementById('nav-sidebar-admin');
-            if (navAdmin) navAdmin.classList.remove('hidden');
+            const vName = document.getElementById('req-vname'); if (vName) vName.value = '';
+            const adminEmail = document.getElementById('req-admin-email'); if (adminEmail) adminEmail.value = '';
+            const adminGroup = document.getElementById('admin-email-group'); if (adminGroup) adminGroup.classList.remove('hidden');
+            const sidebar = document.getElementById('sidebar'); if (sidebar) sidebar.style.display = 'flex';
+            const headerAdminName = document.getElementById('header-admin-name'); if (headerAdminName) headerAdminName.innerText = currentUser.name;
+            const sidebarUserName = document.getElementById('sidebar-user-name'); if (sidebarUserName) sidebarUserName.innerText = currentUser.name;
+            const navAdmin = document.getElementById('nav-sidebar-admin'); if (navAdmin) navAdmin.classList.remove('hidden');
 
-            document.getElementById('guard-loc-text').classList.add('hidden');
-            document.getElementById('admin-guard-loc').classList.remove('hidden');
+            document.getElementById('guard-loc-text').classList.add('hidden'); document.getElementById('admin-guard-loc').classList.remove('hidden');
             currentUser.location = document.getElementById('admin-guard-loc').value || '';
-            
-            loadAdminData(false);
-            switchMainView('admin');
+            loadAdminData(false); switchMainView('admin');
         } else {
-            const vName = document.getElementById('req-vname');
-            if (vName && currentUser.name) vName.value = currentUser.name;
-            
-            const adminGroup = document.getElementById('admin-email-group');
-            if (adminGroup) adminGroup.classList.add('hidden');
-
-            const sidebar = document.getElementById('sidebar');
-            if (sidebar) sidebar.style.display = 'none';
+            const vName = document.getElementById('req-vname'); if (vName && currentUser.name) vName.value = currentUser.name;
+            const adminGroup = document.getElementById('admin-email-group'); if (adminGroup) adminGroup.classList.add('hidden');
+            const sidebar = document.getElementById('sidebar'); if (sidebar) sidebar.style.display = 'none';
             document.body.classList.add('sidebar-minimized');
+            const mainContent = document.getElementById('main-content'); if (mainContent) mainContent.style.margin = '0';
             
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) mainContent.style.margin = '0';
-            
-            if (currentUser.role === 'ops') {
-                switchMainView('ops');
-                loadMyPasses(false, false);
-            } else if (currentUser.role === 'guard') {
-                // Setup Normal Guard UI
-                document.getElementById('guard-loc-text').classList.remove('hidden');
-                document.getElementById('admin-guard-loc').classList.add('hidden');
-
-                const locDisplay = document.getElementById('guard-loc-display');
-                if (locDisplay) locDisplay.innerText = currentUser.location || '';
-                
+            if (currentUser.role === 'ops') { switchMainView('ops'); loadMyPasses(false, false); } 
+            else if (currentUser.role === 'guard') {
+                document.getElementById('guard-loc-text').classList.remove('hidden'); document.getElementById('admin-guard-loc').classList.add('hidden');
+                const locDisplay = document.getElementById('guard-loc-display'); if (locDisplay) locDisplay.innerText = currentUser.location || '';
                 document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => e.classList.add('hidden'));
-                const dashGuard = document.getElementById('dashboard-guard');
-                if (dashGuard) dashGuard.classList.remove('hidden');
+                const dashGuard = document.getElementById('dashboard-guard'); if (dashGuard) dashGuard.classList.remove('hidden');
             }
         }
         startAutoRefresh(currentUser.role);
     }
 
-    function logout() {
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      localStorage.removeItem('noon_session');
-      if(html5QrcodeScanner) html5QrcodeScanner.clear();
-      location.reload(); 
-    }
-
-    // --- Ops Portal Logic ---
-    function toggleDateFields() {
-      const type = document.getElementById('req-type').value;
-      document.getElementById('req-visitor-fields').classList.toggle('hidden', type === 'Contractor');
-      document.getElementById('req-contractor-fields').classList.toggle('hidden', type === 'Visitor');
-    }
-
     async function submitRequest() {
-      const type = document.getElementById('req-type').value;
-      const iqamaInput = document.getElementById('req-iqama');
-      const selfieInput = document.getElementById('req-selfie');
-      const btn = document.getElementById('btn-submit-req');
-      
-      let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
-      let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
+      const type = document.getElementById('req-type').value; const iqamaInput = document.getElementById('req-iqama'); const selfieInput = document.getElementById('req-selfie'); const btn = document.getElementById('btn-submit-req');
+      let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg'; let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
 
-      // Primary Iqama processing
-      if (capturedImages.iqama) {
-          finalIqamaB64 = capturedImages.iqama.split(',')[1];
-      } else if (iqamaInput.files.length > 0) {
-          const iFull = await getBase64(iqamaInput.files[0]);
-          finalIqamaB64 = iFull.split(',')[1];
-          finalIqamaMime = iqamaInput.files[0].type;
-      } else { return alert("Please provide the Lead Iqama/ID photo (Camera or Upload)."); }
+      if (capturedImages.iqama) { finalIqamaB64 = capturedImages.iqama.split(',')[1]; } 
+      else if (iqamaInput.files.length > 0) { const iFull = await getBase64(iqamaInput.files[0]); finalIqamaB64 = iFull.split(',')[1]; finalIqamaMime = iqamaInput.files[0].type; } 
+      else { return alert("Please provide the Lead Iqama/ID photo."); }
 
-      // Primary Selfie processing
-      if (capturedImages.selfie) {
-          finalSelfieB64 = capturedImages.selfie.split(',')[1];
-      } else if (selfieInput.files.length > 0) {
-          const sFull = await getBase64(selfieInput.files[0]);
-          finalSelfieB64 = sFull.split(',')[1];
-          finalSelfieMime = selfieInput.files[0].type;
-      } else { return alert("Please provide the Lead Selfie photo (Camera or Upload)."); }
+      if (capturedImages.selfie) { finalSelfieB64 = capturedImages.selfie.split(',')[1]; } 
+      else if (selfieInput.files.length > 0) { const sFull = await getBase64(selfieInput.files[0]); finalSelfieB64 = sFull.split(',')[1]; finalSelfieMime = selfieInput.files[0].type; } 
+      else { return alert("Please provide the Lead Selfie photo."); }
 
-      let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg';
-      let finalVehicleVal = ''; let finalVehicleMime = '';
-
-      let cleanTeamList = [];
+      let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg'; let finalVehicleVal = ''; let cleanTeamList = [];
 
       if (type === 'Contractor') {
           const fmpocInput = document.getElementById('req-fmpoc');
-          if (capturedImages.fmpoc) {
-              finalFmpocB64 = capturedImages.fmpoc.split(',')[1];
-          } else if (fmpocInput && fmpocInput.files.length > 0) {
-              const fFull = await getBase64(fmpocInput.files[0]);
-              finalFmpocB64 = fFull.split(',')[1];
-              finalFmpocMime = fmpocInput.files[0].type;
-          } else { return alert("Please provide the FM POC photo (Camera or Upload)."); }
+          if (capturedImages.fmpoc) { finalFmpocB64 = capturedImages.fmpoc.split(',')[1]; } 
+          else if (fmpocInput && fmpocInput.files.length > 0) { const fFull = await getBase64(fmpocInput.files[0]); finalFmpocB64 = fFull.split(',')[1]; finalFmpocMime = fmpocInput.files[0].type; } 
+          else { return alert("Please provide the FM POC photo."); }
+          teamList.forEach(m => { cleanTeamList.push({ iqama: m.rawIqama, selfie: m.rawSelfie }); });
+      } else { finalVehicleVal = document.getElementById('req-vehicle-text').value; }
 
-          // Process Dynamic Team Member Arrays
-          for (let i = 0; i < activeTeamMembers.length; i++) {
-              let mId = activeTeamMembers[i];
-              let mIqamaB64 = ''; let mSelfieB64 = '';
-              
-              let mIqamaInput = document.getElementById(`req-team_iqama_${mId}`);
-              if (capturedImages[`team_iqama_${mId}`]) {
-                  mIqamaB64 = capturedImages[`team_iqama_${mId}`].split(',')[1];
-              } else if (mIqamaInput && mIqamaInput.files.length > 0) {
-                  let full = await getBase64(mIqamaInput.files[0]);
-                  mIqamaB64 = full.split(',')[1];
-              } else {
-                  return alert(`Please provide the Iqama/ID photo for Team Member ${mId}.`);
-              }
-
-              let mSelfieInput = document.getElementById(`req-team_selfie_${mId}`);
-              if (capturedImages[`team_selfie_${mId}`]) {
-                  mSelfieB64 = capturedImages[`team_selfie_${mId}`].split(',')[1];
-              } else if (mSelfieInput && mSelfieInput.files.length > 0) {
-                  let full = await getBase64(mSelfieInput.files[0]);
-                  mSelfieB64 = full.split(',')[1];
-              } else {
-                  return alert(`Please provide the Selfie photo for Team Member ${mId}.`);
-              }
-
-              cleanTeamList.push({ iqama: mIqamaB64, selfie: mSelfieB64 });
-          }
-      } else {
-          finalVehicleVal = document.getElementById('req-vehicle-text').value;
-      }
-
-      let hostNameVal = '';
-      let hostEmailVal = currentUser.email;
-
+      let hostNameVal = ''; let hostEmailVal = currentUser.email;
       if (currentUser.role === 'admin') {
-          hostNameVal = currentUser.name; 
-          hostEmailVal = document.getElementById('req-admin-email').value.toLowerCase().trim();
+          hostNameVal = currentUser.name; hostEmailVal = document.getElementById('req-admin-email').value.toLowerCase().trim();
           if(!hostEmailVal) return alert("Please enter the Email Address for this pass.");
       }
 
-      const visitorNameVal = document.getElementById('req-vname').value.trim();
-      if(!visitorNameVal) return alert("Full Name is a required field.");
-
-      btn.innerText = t("fetching");
-      btn.disabled = true;
+      const visitorNameVal = document.getElementById('req-vname').value.trim(); if(!visitorNameVal) return alert("Full Name is a required field.");
+      btn.innerText = t("fetching"); btn.disabled = true;
 
       try {
         const payload = {
-          action: 'create',
-          hostName: hostNameVal,
-          hostEmail: hostEmailVal, 
-          visitorName: visitorNameVal,
-          type: type,
-          location: document.getElementById('req-location').value,
+          action: 'create', hostName: hostNameVal, hostEmail: hostEmailVal, visitorName: visitorNameVal, type: type, location: document.getElementById('req-location').value,
           startDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-start').value,
           endDate: type === 'Visitor' ? document.getElementById('req-date-single').value : document.getElementById('req-date-end').value,
-          iqamaBase64: finalIqamaB64, iqamaMimeType: finalIqamaMime,
-          selfieBase64: finalSelfieB64, selfieMimeType: finalSelfieMime,
-          fmpocBase64: finalFmpocB64, fmpocMimeType: finalFmpocMime,
-          vehiclePlateNo: finalVehicleVal,
-          team: cleanTeamList, 
-          
+          iqamaBase64: finalIqamaB64, iqamaMimeType: finalIqamaMime, selfieBase64: finalSelfieB64, selfieMimeType: finalSelfieMime,
+          fmpocBase64: finalFmpocB64, fmpocMimeType: finalFmpocMime, vehiclePlateNo: finalVehicleVal, team: cleanTeamList, 
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
-          invitedBy: type === 'Visitor' ? document.getElementById('req-vis-invitedby').value : '',
-          projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
-          companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '',
-          projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : '',
-          fmPoc: '' 
+          invitedBy: type === 'Visitor' ? document.getElementById('req-vis-invitedby').value : '', projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
+          companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '', projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : ''
         };
         
-        if(!payload.startDate) {
-            btn.innerText = t("submit_approval"); btn.disabled = false;
-            return alert("Visit dates are required fields.");
-        }
-
+        if(!payload.startDate) { btn.innerText = t("submit_approval"); btn.disabled = false; return alert("Visit dates are required fields."); }
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
 
         btn.innerText = t("submit_approval"); btn.disabled = false;
-        
         if(currentUser.role === 'admin') document.getElementById('req-vname').value = ""; 
-        
         iqamaInput.value = ""; selfieInput.value = ""; document.getElementById('req-vehicle-text').value = "";
         const fmpocI = document.getElementById('req-fmpoc'); if(fmpocI) fmpocI.value = "";
 
-        // WIPE MEMORY
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc');
-        document.getElementById('team-roster-display').innerHTML = "";
-        document.getElementById('team-roster-display').classList.add('hidden');
-        activeTeamMembers = [];
-        teamMemberCount = 0;
-        
-        loadMyPasses(true, false); 
-      } catch (err) { 
-        alert("Network Error: Could not reach the database."); 
-        btn.innerText = t("submit_approval"); btn.disabled = false;
-      }
-    }
-
-    function renderMyPasses(data) {
-        const listDiv = document.getElementById('my-passes-list');
-        let newHtml = '';
-        if(data.length === 0) newHtml = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_no_history")}</p>`;
-        
-        data.reverse().forEach((pass) => {
-            const todayNum = new Date().setHours(0,0,0,0);
-            let endObj = parseFlexibleDate(pass.EndDate) || parseFlexibleDate(pass.StartDate);
-            let endNum = endObj ? endObj.setHours(0,0,0,0) : todayNum;
-            
-            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
-            const isExpired = todayNum > endNum;
-            const isCompleted = isVisitorDone || isExpired;
-            
-            let statusText = t(pass.Status === 'Approved' ? 'status_approved' : pass.Status === 'Rejected' ? 'status_rejected' : 'status_pending');
-            let statusColor = (pass.Status === 'Approved' ? 'var(--success)' : pass.Status === 'Rejected' ? 'var(--danger)' : 'var(--noon-yellow)');
-
-            if (isCompleted) {
-                statusText = t(isExpired ? 'status_expired' : 'status_completed');
-                statusColor = 'var(--text-muted)';
-            }
-            
-            const validityText = pass.Type === 'Visitor' ? `(${formatToDDMMYYYY(pass.StartDate)})` : `(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate)})`;
-
-            let cardHtml = `
-            <div class="pass-item">
-                <div class="pass-header">
-                    <div>
-                        <strong style="color: white; font-size: 14px;">${pass.VisitorName}</strong><br>
-                        <span style="font-size: 11px; color: var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br>
-                        <span style="font-size: 10px; color: var(--noon-yellow);">${validityText}</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 11px; font-weight: bold; color: ${statusColor}; text-transform: uppercase;">${statusText}</span><br>
-                        <span style="font-size: 10px; color: var(--text-muted);">${pass.UniqueID}</span>
-                    </div>
-                </div>
-            `;
-            
-            if (pass.Status === 'Approved' && !isCompleted) {
-                cardHtml += `
-                    <div style="text-align: center;">
-                        <div class="qr-box" id="qr-${pass.UniqueID}"></div>
-                    </div>
-                `;
-            } else if (isCompleted) {
-                let textStr = isExpired ? t("status_expired") : `${t("check_out_time")}: ${formatTime(pass.CheckOutTime)}`;
-                cardHtml += `<div style="text-align: center; margin-top: 15px; font-size: 12px; color: var(--text-muted);"><em>${textStr}</em></div>`;
-            }
-            cardHtml += `</div>`;
-            newHtml += cardHtml;
-        });
-
-        listDiv.innerHTML = newHtml;
-
-        data.forEach((pass) => {
-            const todayNum = new Date().setHours(0,0,0,0);
-            let endObj = parseFlexibleDate(pass.EndDate) || parseFlexibleDate(pass.StartDate);
-            let endNum = endObj ? endObj.setHours(0,0,0,0) : todayNum;
-
-            const isVisitorDone = pass.Type === 'Visitor' && !!pass.CheckOutTime;
-            const isExpired = todayNum > endNum;
-            const isCompleted = isVisitorDone || isExpired;
-            
-            if (pass.Status === 'Approved' && !isCompleted) {
-                const qrElement = document.getElementById(`qr-${pass.UniqueID}`);
-                if(qrElement) new QRCode(qrElement, { text: pass.UniqueID, width: 120, height: 120, colorDark: "#000", colorLight: "#fff" });
-            }
-        });
-    }
-
-    async function loadMyPasses(forceRefresh = false, isSilent = false) {
-      const listDiv = document.getElementById('my-passes-list');
-      let targetEmail = currentUser.email;
-      if (currentUser.role === 'admin') {
-          const inputEmail = document.getElementById('req-admin-email').value.toLowerCase().trim();
-          if (inputEmail) { targetEmail = inputEmail; } 
-          else { if (!isSilent) listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("msg_enter_email")}</p>`; return; }
-      }
-      const cachedKey = 'cached_passes_' + targetEmail;
-      const cached = localStorage.getItem(cachedKey);
-      
-      if (!forceRefresh && cached && !isSilent) { renderMyPasses(JSON.parse(cached)); } 
-      else if (!isSilent || forceRefresh) { listDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t("fetching")}</p>`; }
-
-      try {
-        const res = await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
-        const data = await res.json();
-        localStorage.setItem(cachedKey, JSON.stringify(data));
-        renderMyPasses(data);
-      } catch (err) { if(!isSilent && !cached) listDiv.innerHTML = '<p style="color: var(--danger); font-size: 13px;">Error loading passes.</p>'; }
-    }
-
-    // --- Admin Portal Logic ---
-    function switchAdminTab(tabName) {
-      document.querySelectorAll('.admin-nav-horizontal li').forEach(t => t.classList.remove('active'));
-      document.getElementById(`nav-${tabName}`).classList.add('active');
-      document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
-      document.getElementById(`admin-sec-${tabName}`).classList.remove('hidden');
-    }
-
-    function setAdminFilter(range, btnElement) {
-        document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
-        if(btnElement) btnElement.classList.add('active');
-        currentAdminFilter = range;
-        
-        if (range === 'custom') { document.getElementById('custom-date-picker').classList.remove('hidden'); } 
-        else { document.getElementById('custom-date-picker').classList.add('hidden'); renderAdminData(globalAdminData); }
+        teamList = []; currentTeamCounter = 1; renderTeamRoster(); hideTeamEntry(); loadMyPasses(true, false); 
+      } catch (err) { alert("Network Error."); btn.innerText = t("submit_approval"); btn.disabled = false; }
     }
 
     function renderAdminData(data) {
         globalAdminData = data; 
-        const tPending = document.getElementById('admin-table-pending');
-        const tActive = document.getElementById('admin-table-active');
-        const tHistory = document.getElementById('admin-table-history');
-        const tGuard = document.getElementById('admin-table-guard-approvals');
-
+        const tPending = document.getElementById('admin-table-pending'); const tActive = document.getElementById('admin-table-active');
+        const tHistory = document.getElementById('admin-table-history'); const tGuard = document.getElementById('admin-table-guard-approvals');
         let htmlPending = ''; let htmlActive = ''; let htmlHistory = ''; let htmlGuard = '';
         const today = new Date(); today.setHours(0,0,0,0);
-        const fStart = document.getElementById('filter-start').value;
-        const fEnd = document.getElementById('filter-end').value;
-
+        const fStart = document.getElementById('filter-start').value; const fEnd = document.getElementById('filter-end').value;
         let pendingCount = 0, activeCount = 0, historyCount = 0, guardCount = 0;
         let aDate = {}, aType = {}, aFacility = {}, aStatus = {};
 
         data.forEach(row => {
           if(!row.UniqueID) return;
-          
-          let endDateObj = parseFlexibleDate(row.EndDate) || parseFlexibleDate(row.StartDate) || new Date();
-          endDateObj.setHours(23,59,59,999); 
-          
-          const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime;
-          const isExpired = endDateObj < today;
-          const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
-          
+          let endDateObj = parseFlexibleDate(row.EndDate) || parseFlexibleDate(row.StartDate) || new Date(); endDateObj.setHours(23,59,59,999); 
+          const isVisitorDone = row.Type === 'Visitor' && !!row.CheckOutTime; const isExpired = endDateObj < today; const isHistory = (isExpired && row.Status !== 'Pending') || row.Status === 'Rejected' || isVisitorDone; 
           const inRange = isDateInRange(row.StartDate, currentAdminFilter, fStart, fEnd);
           const dateStr = row.Type === 'Visitor' ? formatToDDMMYYYY(row.StartDate) : `${formatToDDMMYYYY(row.StartDate)} - ${formatToDDMMYYYY(row.EndDate || row.StartDate)}`;
 
           if (inRange) {
-              aType[row.Type] = (aType[row.Type] || 0) + 1;
-              aFacility[row.Location] = (aFacility[row.Location] || 0) + 1;
-              aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
-              let dClean = formatToDDMMYYYY(row.StartDate);
-              if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
+              aType[row.Type] = (aType[row.Type] || 0) + 1; aFacility[row.Location] = (aFacility[row.Location] || 0) + 1; aStatus[row.Status] = (aStatus[row.Status] || 0) + 1;
+              let dClean = formatToDDMMYYYY(row.StartDate); if (dClean !== '-') aDate[dClean] = (aDate[dClean] || 0) + 1;
           }
 
           if (isHistory) {
@@ -1414,95 +1098,54 @@
                 else if (isVisitorDone) { finalStatus = t('status_completed'); sColor = 'var(--success)'; }
                 else { finalStatus = t('status_approved'); sColor = 'var(--success)'; }
 
-                let historyActionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
-                    <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
-                </div>`;
-
-                htmlHistory += `<tr>
-                  <td style="color: var(--text-muted);">${dateStr}</td>
-                  <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                  <td>${t(row.Type.toLowerCase())}</td>
-                  <td>${row.Location}</td>
-                  <td style="font-weight: 600; color: ${sColor}">${finalStatus}</td>
-                  <td style="color: var(--text-muted); font-size: 11px;">${row.CheckInTime ? formatTime(row.CheckInTime) : '-'}</td>
-                  <td style="color: var(--text-muted); font-size: 11px;">${row.CheckOutTime ? formatTime(row.CheckOutTime) : '-'}</td>
-                  <td style="color: var(--noon-yellow); font-size: 11px;">${row.ScannedByGuard || '-'}</td>
-                  <td>${historyActionBtns}</td>
-                </tr>`;
+                let historyActionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;"><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button></div>`;
+                htmlHistory += `<tr><td style="color: var(--text-muted);">${dateStr}</td><td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td style="font-weight: 600; color: ${sColor}">${finalStatus}</td><td style="color: var(--text-muted); font-size: 11px;">${row.CheckInTime ? formatTime(row.CheckInTime) : '-'}</td><td style="color: var(--text-muted); font-size: 11px;">${row.CheckOutTime ? formatTime(row.CheckOutTime) : '-'}</td><td style="color: var(--noon-yellow); font-size: 11px;">${row.ScannedByGuard || '-'}</td><td>${historyActionBtns}</td></tr>`;
                 historyCount++;
             }
           } else {
-            const isPending = row.Status === 'Pending';
             if (inRange) {
-                if (isPending) {
-                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                      <button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">${t('btn_approve')}</button>
-                      <button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">${t('btn_reject')}</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
-                    </div>`;
-
-                    htmlPending += `<tr>
-                      <td style="color: var(--text-muted);">${dateStr}</td>
-                      <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                      <td>${t(row.Type.toLowerCase())}</td>
-                      <td>${row.Location}</td>
-                      <td>${actionBtns}</td>
-                    </tr>`;
+                if (row.Status === 'Pending') {
+                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;"><button class="btn-primary btn-success btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Approved')">${t('btn_approve')}</button><button class="btn-primary btn-danger btn-sm" style="width: auto; white-space: nowrap;" onclick="updateStatus('${row.UniqueID}', 'Rejected')">${t('btn_reject')}</button><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button></div>`;
+                    htmlPending += `<tr><td style="color: var(--text-muted);">${dateStr}</td><td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${actionBtns}</td></tr>`;
                     pendingCount++;
                 } else if (row.Status === 'Approved') {
                     const isChecked = checkedPrintIds.has(row.UniqueID) ? 'checked' : '';
                     let cbHtml = `<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${row.VisitorName}" data-type="${row.Type}" data-location="${row.Location}" data-status="${row.Status}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
-                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;">
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">${t('btn_print')}</button>
-                      <button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">${t('btn_checkout')}</button>
-                      <button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button>
-                    </div>`;
-
-                    htmlActive += `<tr>
-                      <td>${cbHtml}</td>
-                      <td style="color: var(--text-muted);">${dateStr}</td>
-                      <td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td>
-                      <td>${t(row.Type.toLowerCase())}</td>
-                      <td>${row.Location}</td>
-                      <td>${actionBtns}</td>
-                    </tr>`;
+                    let actionBtns = `<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; max-width: 250px;"><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="printQR('${row.VisitorName}', '${row.Type}', '${row.Location}', '${row.UniqueID}', '${row.Status}', '${dateStr}')">${t('btn_print')}</button><button class="btn-primary btn-warning btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap; color: #000;" onclick="adminCheckOut('${row.UniqueID}')">${t('btn_checkout')}</button><button class="btn-primary btn-outline btn-sm" style="padding: 6px 10px; font-size: 10px; width: auto; white-space: nowrap;" onclick="openExtendPass('${row.UniqueID}', '${row.Type}')">${t('btn_extend')}</button></div>`;
+                    htmlActive += `<tr><td>${cbHtml}</td><td style="color: var(--text-muted);">${dateStr}</td><td><strong>${row.VisitorName}</strong><br><span style="font-size: 10px; color: var(--text-muted);">Email: ${row.HostEmail}</span></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${actionBtns}</td></tr>`;
                     activeCount++;
                 }
             }
           }
 
-          // GUARD LOG PARSING (Daily History)
-          if (row.GateLogs && inRange) {
+          // GUARD READABLE LOG PARSING 
+          if (row.GateLogs && row.GateLogs.trim() !== "" && inRange) {
               let logs = [];
-              try { logs = JSON.parse(row.GateLogs); } catch(e){}
-              logs.forEach(log => {
-                 let hc = log.count ? `<strong style="color:var(--noon-yellow)">${log.count} Present</strong>` : '-';
-                 let aColor = log.action === 'IN' ? 'var(--success)' : 'var(--danger)';
-                 htmlGuard += `<tr>
-                    <td style="color: var(--text-muted);">${formatTime(log.time)}</td>
-                    <td style="color: ${aColor}; font-weight:bold;">${log.action}</td>
-                    <td><strong>${row.VisitorName}</strong></td>
-                    <td>${t(row.Type.toLowerCase())}</td>
-                    <td>${row.Location}</td>
-                    <td>${hc}</td>
-                    <td style="color: var(--noon-yellow); font-weight: 600;">${log.guard || '-'}</td>
-                 </tr>`;
-                 guardCount++;
-              });
+              if (row.GateLogs.startsWith("[")) {
+                  try { logs = JSON.parse(row.GateLogs); } catch(e){}
+                  logs.forEach(log => {
+                     let hc = log.count ? `<strong style="color:var(--noon-yellow)">${log.count} Present</strong>` : '-';
+                     let aColor = log.action === 'IN' ? 'var(--success)' : 'var(--danger)';
+                     htmlGuard += `<tr><td style="color: var(--text-muted);">${formatTime(log.time)}</td><td style="color: ${aColor}; font-weight:bold;">${log.action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color: var(--noon-yellow); font-weight: 600;">${log.guard || '-'}</td></tr>`;
+                     guardCount++;
+                  });
+              } else {
+                  // Parse New Clean String format
+                  let lines = row.GateLogs.split("\n");
+                  lines.forEach(line => {
+                      let match = line.match(/(IN|OUT)\s*\((\d+)\)\s*at\s*(.+?)\s*by\s*(.*)/);
+                      if(match) {
+                          let action = match[1]; let count = match[2]; let time = new Date(match[3]); let guard = match[4];
+                          let hc = `<strong style="color:var(--noon-yellow)">${count} Present</strong>`;
+                          let aColor = action === 'IN' ? 'var(--success)' : 'var(--danger)';
+                          htmlGuard += `<tr><td style="color: var(--text-muted);">${formatTime(time)}</td><td style="color: ${aColor}; font-weight:bold;">${action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color: var(--noon-yellow); font-weight: 600;">${guard || '-'}</td></tr>`;
+                          guardCount++;
+                      }
+                  });
+              }
               
-              if(logs.length === 0 && row.CheckInTime) {
-                  htmlGuard += `<tr>
-                    <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
-                    <td style="color: var(--success); font-weight:bold;">IN</td>
-                    <td><strong>${row.VisitorName}</strong></td>
-                    <td>${t(row.Type.toLowerCase())}</td>
-                    <td>${row.Location}</td>
-                    <td>-</td>
-                    <td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || '-'}</td>
-                 </tr>`;
+              if(logs.length === 0 && !row.GateLogs.includes("at") && row.CheckInTime) {
+                  htmlGuard += `<tr><td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td><td style="color: var(--success); font-weight:bold;">IN</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>-</td><td style="color: var(--noon-yellow); font-weight: 600;">${row.ScannedByGuard || '-'}</td></tr>`;
                  guardCount++;
               }
           }
@@ -1513,161 +1156,63 @@
         if (historyCount === 0) htmlHistory = `<tr><td colspan="9" class="text-center" style="padding: 30px;">${t("msg_no_history")}</td></tr>`;
         if (guardCount === 0) htmlGuard = `<tr><td colspan="7" class="text-center" style="padding: 30px;">${t("msg_no_gate")}</td></tr>`;
 
-        tPending.innerHTML = htmlPending; tActive.innerHTML = htmlActive;
-        tHistory.innerHTML = htmlHistory; tGuard.innerHTML = htmlGuard;
-
+        tPending.innerHTML = htmlPending; tActive.innerHTML = htmlActive; tHistory.innerHTML = htmlHistory; tGuard.innerHTML = htmlGuard;
         document.getElementById('stat-type').innerHTML = Object.keys(aType).map(k => `<div class="stat-row"><span>${t(k.toLowerCase())}</span> <span class="stat-val">${aType[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
         document.getElementById('stat-facility').innerHTML = Object.keys(aFacility).map(k => `<div class="stat-row"><span>${k}</span> <span class="stat-val">${aFacility[k]}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
-        
         let statusHtml = '';
         if(aStatus['Approved']) statusHtml += `<div class="stat-row"><span style="color:var(--success)">${t('status_approved')}</span> <span class="stat-val">${aStatus['Approved']}</span></div>`;
         if(aStatus['Pending']) statusHtml += `<div class="stat-row"><span style="color:var(--noon-yellow)">${t('status_pending')}</span> <span class="stat-val">${aStatus['Pending']}</span></div>`;
         if(aStatus['Rejected']) statusHtml += `<div class="stat-row"><span style="color:var(--danger)">${t('status_rejected')}</span> <span class="stat-val">${aStatus['Rejected']}</span></div>`;
         document.getElementById('stat-status').innerHTML = statusHtml || '<div class="stat-row"><span>-</span></div>';
-
-        let topDates = Object.entries(aDate).sort((a,b) => b[1]-a[1]).slice(0, 5);
-        document.getElementById('stat-date').innerHTML = topDates.map(([k,v]) => `<div class="stat-row"><span>${k}</span> <span class="stat-val" style="color: var(--noon-yellow);">${v}</span></div>`).join('') || '<div class="stat-row"><span>-</span></div>';
-    }
-
-    function handlePrintCheckbox(cb) {
-        if(cb.checked) checkedPrintIds.add(cb.value);
-        else checkedPrintIds.delete(cb.value);
-    }
-    function toggleSelectAll(source) {
-        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox');
-        checkboxes.forEach(cb => { cb.checked = source.checked; handlePrintCheckbox(cb); });
-    }
-
-    async function loadAdminData(isSilent = false) {
-      const cached = localStorage.getItem('cached_admin_data');
-      if (cached && !isSilent) { renderAdminData(JSON.parse(cached).reverse()); } 
-      
-      try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        localStorage.setItem('cached_admin_data', JSON.stringify(data));
-        renderAdminData(data.reverse()); 
-      } catch (err) { if (!isSilent && !cached) console.log(err); }
-    }
-
-    async function updateStatus(id, newStatus) {
-      if(!confirm(`Mark ${id} as ${newStatus}?`)) return;
-      try {
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'update_status', id: id, newStatus: newStatus }) });
-        loadAdminData(false); 
-      } catch (err) { alert("Failed to update status"); }
-    }
-
-    async function adminCheckOut(id) {
-      if(!confirm(`Force check-out for pass ${id}?`)) return;
-      try {
-        const adminInfo = `Admin: ${currentUser.name} (${currentUser.email})`;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'check_out', id: id, guardInfo: adminInfo, headCount: 1 }) });
-        loadAdminData(false); 
-      } catch (err) { alert("Failed to check out."); }
-    }
-
-    function openExtendPass(id, type) {
-        document.getElementById('extend-id').value = id;
-        document.getElementById('extend-type').value = type;
-        if (type === 'Visitor') document.getElementById('extend-end-group').classList.add('hidden');
-        else document.getElementById('extend-end-group').classList.remove('hidden');
-        document.getElementById('extend-pass-modal').classList.remove('hidden');
-    }
-    function closeExtendPass() {
-        document.getElementById('extend-pass-modal').classList.add('hidden');
-    }
-
-    async function submitExtendPass() {
-        const id = document.getElementById('extend-id').value;
-        const type = document.getElementById('extend-type').value;
-        const newStart = document.getElementById('extend-start').value;
-        const newEnd = type === 'Visitor' ? newStart : document.getElementById('extend-end').value;
-        const btn = document.getElementById('btn-submit-extend');
-
-        if (!newStart || (type === 'Contractor' && !newEnd)) return alert('Please select the new dates.');
-        if (!confirm(`Are you sure you want to extend pass ${id} and set it back to Approved status?`)) return;
-
-        btn.innerText = 'SAVING...'; btn.disabled = true;
-
-        try {
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'extend_pass', id: id, newStartDate: newStart, newEndDate: newEnd }) });
-            closeExtendPass(); loadAdminData(false); 
-        } catch (err) { alert('Error.'); } finally { btn.innerText = t("save_extension"); btn.disabled = false; }
     }
 
     function openViewRecord(id) {
-        const r = globalAdminData.find(x => String(x.UniqueID) === String(id));
-        if (!r) return;
-
+        const r = globalAdminData.find(x => String(x.UniqueID) === String(id)); if (!r) return;
         let contentHtml = `
-            <div><strong>${t('lbl_host_name')}</strong>${r.HostName || '-'}</div>
-            <div><strong>${t('lbl_host_email')}</strong>${r.HostEmail || '-'}</div>
-            <div><strong>${t('visitor_name')}</strong>${r.VisitorName || '-'}</div>
-            <div><strong>${t('type_header')}</strong>${t(r.Type.toLowerCase()) || '-'}</div>
-            <div><strong>${t('location_label')}</strong>${r.Location || '-'}</div>
-            <div><strong>${t('lbl_validity')}</strong>${r.Type === 'Visitor' ? formatToDDMMYYYY(r.StartDate) : formatToDDMMYYYY(r.StartDate) + ' - ' + formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
-            <div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo || '-'}</div>
-            <div><strong>${t('contact_no')}</strong>${r.ContactNo || '-'}</div>
+            <div><strong>${t('lbl_host_name')}</strong>${r.HostName || '-'}</div><div><strong>${t('lbl_host_email')}</strong>${r.HostEmail || '-'}</div>
+            <div><strong>${t('visitor_name')}</strong>${r.VisitorName || '-'}</div><div><strong>${t('type_header')}</strong>${t(r.Type.toLowerCase()) || '-'}</div>
+            <div><strong>${t('location_label')}</strong>${r.Location || '-'}</div><div><strong>${t('lbl_validity')}</strong>${r.Type === 'Visitor' ? formatToDDMMYYYY(r.StartDate) : formatToDDMMYYYY(r.StartDate) + ' - ' + formatToDDMMYYYY(r.EndDate || r.StartDate)}</div>
+            <div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo || '-'}</div><div><strong>${t('contact_no')}</strong>${r.ContactNo || '-'}</div>
         `;
+        if (r.Type === 'Visitor') { contentHtml += `<div><strong>${t('invited_by')}</strong>${r.InvitedBy || '-'}</div>`; } 
+        else { contentHtml += `<div><strong>${t('project_name')}</strong>${r.ProjectName || '-'}</div><div><strong>${t('company_name')}</strong>${r.CompanyName || '-'}</div><div><strong>${t('project_manager')}</strong>${r.ProjectManager || '-'}</div>`; }
 
-        if (r.Type === 'Visitor') {
-            contentHtml += `<div><strong>${t('invited_by')}</strong>${r.InvitedBy || '-'}</div>`;
-        } else {
-            contentHtml += `
-                <div><strong>${t('project_name')}</strong>${r.ProjectName || '-'}</div>
-                <div><strong>${t('company_name')}</strong>${r.CompanyName || '-'}</div>
-                <div><strong>${t('project_manager')}</strong>${r.ProjectManager || '-'}</div>
-            `;
-        }
-
-        contentHtml += `
-            <div class="record-img-box" style="margin-top: 15px;">
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_iqama')} (Lead)</strong><img src="${r.IqamaURL || ''}" onclick="openFullscreenImage(this.src)"></div>
-                <div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')} (Lead)</strong><img src="${r.SelfieURL || ''}" onclick="openFullscreenImage(this.src)"></div>
-        `;
+        contentHtml += `<div class="record-img-box" style="margin-top: 15px;"><div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_iqama')} (Lead)</strong><img src="${r.IqamaURL || ''}" onclick="openFullscreenImage(this.src)"></div><div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_selfie')} (Lead)</strong><img src="${r.SelfieURL || ''}" onclick="openFullscreenImage(this.src)"></div>`;
 
         if (r.Type === 'Contractor') {
-             if (r.FmPoc && (r.FmPoc.startsWith('http') || r.FmPoc.startsWith('data:image'))) {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" onclick="openFullscreenImage(this.src)"></div>`;
-             } else {
-                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.FmPoc || '-'}</div></div>`;
-             }
+             if (r.FmPoc && (r.FmPoc.startsWith('http') || r.FmPoc.startsWith('data:image'))) { contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" onclick="openFullscreenImage(this.src)"></div>`; } 
+             else { contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.FmPoc || '-'}</div></div>`; }
         }
-
         if (r.VehiclePlateNo) {
-             contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
+             if (r.VehiclePlateNo.startsWith('http') || r.VehiclePlateNo.startsWith('data:image')) { contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" onclick="openFullscreenImage(this.src)"></div>`; } 
+             else { contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`; }
         }
         contentHtml += `</div>`;
 
-        // INJECT TEAM ROSTER INTO VIEW DATA
-        if (r.TeamMembers && r.TeamMembers !== "[]") {
+        // READ CLEAN TEAM MEMBER STRING FROM GOOGLE SHEET
+        if (r.TeamMembers && r.TeamMembers.trim() !== "") {
             let teamData = [];
-            try { teamData = JSON.parse(r.TeamMembers); } catch(e){}
+            if (r.TeamMembers.startsWith("[")) {
+                try { teamData = JSON.parse(r.TeamMembers); } catch(e){} // legacy
+            } else {
+                let lines = r.TeamMembers.split('\n');
+                lines.forEach((line, index) => {
+                    let urls = line.split(' | ');
+                    if(urls.length >= 2) { teamData.push({person: index + 1, iqama: urls[0].trim(), selfie: urls[1].trim()}); }
+                });
+            }
+
             if (teamData.length > 0) {
-               contentHtml += `<div style="grid-column: span 2; background: transparent; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 10px;">
-                   <strong style="font-size: 14px; margin-bottom: 15px;">TEAM MEMBERS (${teamData.length})</strong>
-                   <div style="display: flex; flex-direction: column; gap: 10px;">
-               `;
+               contentHtml += `<div style="grid-column: span 2; background: transparent; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 10px;"><strong style="font-size: 14px; margin-bottom: 15px;">TEAM MEMBERS (${teamData.length})</strong><div style="display: flex; flex-direction: column; gap: 10px;">`;
                teamData.forEach(m => {
-                   contentHtml += `
-                   <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-                       <span style="color:var(--noon-yellow); font-weight:bold;">Person ${m.person}</span>
-                       <div style="display:flex; gap:10px;">
-                           <img src="${m.iqama}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama">
-                           <img src="${m.selfie}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie">
-                       </div>
-                   </div>`;
+                   contentHtml += `<div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;"><span style="color:var(--noon-yellow); font-weight:bold;">Person ${m.person}</span><div style="display:flex; gap:10px;"><img src="${m.iqama}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" style="width: 50px; height: 50px; border-radius: 6px; object-fit: cover; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie"></div></div>`;
                });
                contentHtml += `</div></div>`;
             }
         }
-
         document.getElementById('view-record-content').innerHTML = contentHtml;
         document.getElementById('view-record-modal').classList.remove('hidden');
     }
-
-    function closeViewRecord() { document.getElementById('view-record-modal').classList.add('hidden'); }
 
     // --- GUARD SCANNER LOGIC ---
     function startScanner() {
@@ -1681,10 +1226,30 @@
         document.getElementById('r-decision').innerText = decision;
         document.getElementById('r-reason').innerHTML = reasonHtml; 
         document.getElementById('scan-result').className = `scan-result-card ${colorClass}`;
-        if (decision === "DENIED") {
-            setTimeout(() => { document.getElementById('scan-result').classList.add('hidden'); html5QrcodeScanner.resume(); }, 3500);
-        }
+        if (decision === "DENIED") { setTimeout(() => { document.getElementById('scan-result').classList.add('hidden'); html5QrcodeScanner.resume(); }, 3500); }
     }
+
+    // CAROUSEL LOGIC
+    function renderGuardCarousel() {
+        const item = guardRoster[guardRosterIndex];
+        let html = `
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <button class="carousel-btn" onclick="prevGuardPhoto()">❮</button>
+                <div style="text-align:center;">
+                    <p style="color:var(--noon-yellow); font-weight:bold; font-size:14px; margin-bottom:10px; text-transform: uppercase;">${item.title} <span style="color: white; font-size: 11px;">(${guardRosterIndex + 1}/${guardRoster.length})</span></p>
+                    <div style="display:flex; gap:15px; justify-content:center;">
+                        <img src="${item.iqama}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:2px solid var(--border-color); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Iqama">
+                        <img src="${item.selfie}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:2px solid var(--border-color); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Selfie">
+                    </div>
+                </div>
+                <button class="carousel-btn" onclick="nextGuardPhoto()">❯</button>
+            </div>
+        `;
+        document.getElementById('guard-team-roster').innerHTML = html;
+    }
+
+    window.prevGuardPhoto = function() { if(guardRosterIndex > 0) { guardRosterIndex--; renderGuardCarousel(); } }
+    window.nextGuardPhoto = function() { if(guardRosterIndex < guardRoster.length - 1) { guardRosterIndex++; renderGuardCarousel(); } }
 
     async function onScanSuccess(decodedText) {
       html5QrcodeScanner.pause();
@@ -1693,32 +1258,22 @@
       const confirmBtn = document.getElementById('btn-confirm-action');
       const teamSec = document.getElementById('guard-team-section');
       
-      resultCard.classList.remove('hidden');
-      confirmBtn.classList.add('hidden'); teamSec.classList.add('hidden');
+      resultCard.classList.remove('hidden'); confirmBtn.classList.add('hidden'); teamSec.classList.add('hidden');
       document.getElementById('r-decision').innerText = "VERIFYING..."; document.getElementById('r-reason').innerHTML = "";
-      selfieImg.style.display = 'none'; selfieImg.src = ""; 
-      currentScannedID = decodedText;
+      selfieImg.style.display = 'none'; selfieImg.src = ""; currentScannedID = decodedText;
 
       try {
         const res = await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
         const data = await res.json();
         if (data.error) return showScanResult("DENIED", "Invalid QR Code", "bg-red");
 
-        document.getElementById('r-name').innerText = data.VisitorName;
-        document.getElementById('r-type').innerText = t(data.Type.toLowerCase());
-        document.getElementById('r-location').innerText = data.Location;
+        document.getElementById('r-name').innerText = data.VisitorName; document.getElementById('r-type').innerText = t(data.Type.toLowerCase()); document.getElementById('r-location').innerText = data.Location;
 
-        if(data.SelfieBase64) { selfieImg.src = data.SelfieBase64; selfieImg.style.display = 'block'; }
-
-        const todayStr = formatToDDMMYYYY(new Date());
-        const startStr = formatToDDMMYYYY(data.StartDate);
-        const todayNum = new Date().setHours(0,0,0,0);
-        
+        const todayStr = formatToDDMMYYYY(new Date()); const startStr = formatToDDMMYYYY(data.StartDate); const todayNum = new Date().setHours(0,0,0,0);
         let startObj = parseFlexibleDate(data.StartDate); let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
         let endObj = parseFlexibleDate(data.EndDate); let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
 
-        const isCheckedOut = !!data.CheckOutTime;
-        const isInside = !!data.CheckInTime && !data.CheckOutTime;
+        const isCheckedOut = !!data.CheckOutTime; const isInside = !!data.CheckInTime && !data.CheckOutTime;
 
         if (currentUser.role === 'admin' && !currentUser.location) return showScanResult("DENIED", t('msg_admin_select_loc') || "Admin: Please select a facility first.", "bg-red");
         if (data.Status !== 'Approved') return showScanResult("DENIED", "Pass not approved by Admin", "bg-red");
@@ -1726,64 +1281,59 @@
         if (data.Type === 'Visitor' && startStr !== todayStr) return showScanResult("DENIED", "Pass is not valid for today", "bg-red");
         if (data.Type === 'Contractor' && (todayNum < startNum || todayNum > endNum)) return showScanResult("DENIED", "Contractor Pass Expired", "bg-red");
         
-        // CHECK IF IT HAS A TEAM
-        let teamData = [];
-        let maxWorkers = 1;
-        if(data.TeamMembers && data.TeamMembers !== "[]") {
-            try { teamData = JSON.parse(data.TeamMembers); maxWorkers = teamData.length + 1; } catch(e){}
+        let teamData = []; let maxWorkers = 1;
+        if(data.TeamMembers && data.TeamMembers.trim() !== "") {
+            if (data.TeamMembers.startsWith("[")) {
+                try { teamData = JSON.parse(data.TeamMembers); maxWorkers = teamData.length + 1; } catch(e){}
+            } else {
+                let lines = data.TeamMembers.split('\n');
+                lines.forEach((line, index) => {
+                    let urls = line.split(' | ');
+                    if(urls.length >= 2) { teamData.push({person: index + 1, iqama: urls[0].trim(), selfie: urls[1].trim()}); }
+                });
+                maxWorkers = teamData.length + 1;
+            }
         }
 
+        // --- NEW CAROUSEL LAUNCHER ---
         if (teamData.length > 0) {
-            teamSec.classList.remove('hidden');
-            document.getElementById('guard-team-count').innerText = maxWorkers;
+            teamSec.classList.remove('hidden'); 
+            document.getElementById('guard-team-count').innerText = maxWorkers; 
             document.getElementById('guard-headcount').value = maxWorkers; 
             
-            let rosterHtml = `
-               <img src="${data.SelfieBase64 || data.SelfieURL}" style="width: 45px; height: 45px; border-radius: 5px; object-fit: cover; border: 2px solid var(--noon-yellow); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Lead">
-            `;
-            teamData.forEach(m => {
-               rosterHtml += `<img src="${m.selfie}" style="width: 45px; height: 45px; border-radius: 5px; object-fit: cover; border: 1px solid var(--text-muted); cursor:zoom-in;" onclick="openFullscreenImage(this.src)" title="Person ${m.person}">`;
-            });
-            document.getElementById('guard-team-roster').innerHTML = rosterHtml;
+            guardRoster = [];
+            guardRoster.push({ title: 'Lead (' + data.VisitorName + ')', selfie: data.SelfieBase64 || data.SelfieURL, iqama: data.IqamaURL });
+            teamData.forEach(m => guardRoster.push({ title: 'Team Member ' + m.person, selfie: m.selfie, iqama: m.iqama }));
+            
+            guardRosterIndex = 0;
+            renderGuardCarousel();
+        } else {
+            // Standard Single Profile Picture
+            if(data.SelfieBase64 || data.SelfieURL) { selfieImg.src = data.SelfieBase64 || data.SelfieURL; selfieImg.style.display = 'block'; }
         }
 
         if (isInside) {
             currentScanAction = 'check_out';
             showScanResult("CHECK OUT", "Scanning Out.<br><span style='color:#ffc700; font-size:14px;'>⚠️ TAKE ID CARD FROM LEAD.</span>", "bg-blue");
-            confirmBtn.innerText = t("btn_checkout");
-            confirmBtn.className = "btn-primary btn-warning hidden"; 
-            confirmBtn.classList.remove('hidden');
+            confirmBtn.innerText = t("btn_checkout"); confirmBtn.className = "btn-primary btn-warning hidden"; confirmBtn.classList.remove('hidden');
         } else {
             currentScanAction = 'check_in';
             showScanResult("ALLOWED", "Pass Validated", "bg-green");
-            confirmBtn.innerText = t("confirm_action");
-            confirmBtn.className = "btn-primary btn-success hidden"; 
-            confirmBtn.classList.remove('hidden');
+            confirmBtn.innerText = t("confirm_action"); confirmBtn.className = "btn-primary btn-success hidden"; confirmBtn.classList.remove('hidden');
         }
       } catch (err) { showScanResult("ERROR", "Network failure", "bg-red"); }
     }
 
     async function confirmAction() {
-      const btn = document.getElementById('btn-confirm-action');
-      const hcInput = document.getElementById('guard-headcount');
-      const teamSec = document.getElementById('guard-team-section');
-      
+      const btn = document.getElementById('btn-confirm-action'); const hcInput = document.getElementById('guard-headcount'); const teamSec = document.getElementById('guard-team-section');
       let hcVal = 1;
-      if (!teamSec.classList.contains('hidden')) {
-          hcVal = hcInput.value;
-          if(!hcVal || hcVal < 1) return alert("Please enter the number of workers present.");
-      }
-
+      if (!teamSec.classList.contains('hidden')) { hcVal = hcInput.value; if(!hcVal || hcVal < 1) return alert("Please enter the number of workers present."); }
       btn.innerText = "SAVING...";
       try {
         const gInfo = `${currentUser.name} (${currentUser.location})`;
         await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo, headCount: hcVal }) });
-        document.getElementById('scan-result').classList.add('hidden');
-        html5QrcodeScanner.resume();
-      } catch (err) { 
-        alert("Failed to log entry/exit."); 
-        btn.innerText = t("confirm_action");
-      }
+        document.getElementById('scan-result').classList.add('hidden'); html5QrcodeScanner.resume();
+      } catch (err) { alert("Failed to log entry/exit."); btn.innerText = t("confirm_action"); }
     }
   </script>
 </body>
