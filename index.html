@@ -376,8 +376,15 @@
                   <div class="input-group"><input type="text" id="req-vis-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
                   <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
                   <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
+                  
+                  <!-- RESTORED: Vehicle Image Upload UI -->
                   <div class="input-group">
-                    <input type="text" id="req-vehicle-text" class="input-field t-ph" data-i18n="vehicle_plate" placeholder="Vehicle Plate No. / Picture details">
+                    <label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')" data-i18n="live_camera">📷 Live Camera</button>
+                      <input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')">
+                    </div>
+                    <img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
                   </div>
                 </div>
 
@@ -395,7 +402,6 @@
                   <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
                   <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
                   
-                  <!-- NEW: FM POC IMAGE UPLOAD -->
                   <div class="input-group">
                     <label data-i18n="upload_fmpoc">Upload FM POC</label>
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -603,7 +609,6 @@
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
     
-    // NEW: Added fmpoc to the payload storage
     let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
     // ==========================================
@@ -649,7 +654,7 @@
         "visitor_contractor_portal": "بوابة الزوار والمقاولين", "submit_new_request": "تقديم طلب جديد", "type": "النوع",
         "visitor": "زائر", "contractor": "مقاول", "req_email_ph": "البريد الإلكتروني (لتتبع التصريح)", "req_vname_ph": "الاسم الكامل للزائر/المقاول",
         "visit_date": "تاريخ الزيارة", "slp_ticket": "رقم تذكرة SLP", "contact_no": "رقم الاتصال", "invited_by": "بدعوة من",
-        "vehicle_plate": "رقم لوحة السيارة / تفاصيل أخرى", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
+        "vehicle_plate": "صورة / لوحة السيارة (اختياري)", "live_camera": "📷 كاميرا مباشرة", "contract_exp": "صلاحية العقد (من - إلى)",
         "project_name": "اسم المشروع", "company_name": "اسم الشركة / المقاول", "project_manager": "مدير المشروع", "fm_poc": "مسؤول المرافق (FM POC)",
         "upload_iqama": "رفع صورة الهوية/الإقامة", "upload_selfie": "رفع صورة شخصية", "upload_fmpoc": "رفع مسؤول المرافق (FM POC)", "submit_approval": "إرسال للموافقة",
         "my_passes": "تصاريحي", "refresh": "تحديث", "fetching": "جاري جلب التصاريح...", "start_camera": "تشغيل ماسح الكاميرا",
@@ -1088,12 +1093,13 @@
           }
       }
 
-      // Legacy vehicle text fallback logic is replaced entirely by text input now for visitor
-      // But keeping this structure intact if they want image vehicle back later.
-      // Currently using a text input for visitor vehicle, let's pass it safely.
-      let vehicleTextVal = '';
-      if(type === 'Visitor') {
-         vehicleTextVal = document.getElementById('req-vehicle-text').value;
+      // Restored Vehicle Upload processing
+      if (capturedImages.vehicle) {
+          finalVehicleB64 = capturedImages.vehicle.split(',')[1];
+      } else if (vehicleInput && vehicleInput.files.length > 0) {
+          const vFull = await getBase64(vehicleInput.files[0]);
+          finalVehicleB64 = vFull.split(',')[1];
+          finalVehicleMime = vehicleInput.files[0].type;
       }
 
       let hostNameVal = '';
@@ -1127,7 +1133,8 @@
           selfieMimeType: finalSelfieMime,
           fmpocBase64: finalFmpocB64,
           fmpocMimeType: finalFmpocMime,
-          vehiclePlateNo: vehicleTextVal,
+          vehicleBase64: finalVehicleB64,      // Back to sending base64 vehicle image!
+          vehicleMimeType: finalVehicleMime, // Back to sending mime!
           
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
@@ -1135,7 +1142,7 @@
           projectName: type === 'Contractor' ? document.getElementById('req-con-project').value : '',
           companyName: type === 'Contractor' ? document.getElementById('req-con-company').value : '',
           projectManager: type === 'Contractor' ? document.getElementById('req-con-pm').value : '',
-          fmPoc: '' // No longer a text input!
+          fmPoc: '' 
         };
         
         if(!payload.startDate) {
@@ -1151,9 +1158,9 @@
         
         iqamaInput.value = ""; selfieInput.value = ""; 
         if(fmpocInput) fmpocInput.value = ""; 
-        document.getElementById('req-vehicle-text').value = "";
+        if(vehicleInput) vehicleInput.value = "";
 
-        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc');
+        clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc'); clearCapturedData('vehicle');
         loadMyPasses(true, false); 
       } catch (err) { 
         alert("Network Error: Could not reach the database."); 
@@ -1582,6 +1589,14 @@
                  contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
              } else {
                  contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.FmPoc || '-'}</div></div>`;
+             }
+        }
+
+        if (r.VehiclePlateNo) {
+             if (r.VehiclePlateNo.startsWith('http') || r.VehiclePlateNo.startsWith('data:image')) {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" alt="No Image" onclick="openFullscreenImage(this.src)"></div>`;
+             } else {
+                 contentHtml += `<div style="flex:1; background:transparent; border:none; padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px; color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
              }
         }
 
