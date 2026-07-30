@@ -130,10 +130,7 @@
     .visitor-photo { width: 160px; height: 160px; border-radius: 12px; object-fit: cover; border: 3px solid white; margin: 0 auto 20px auto; display: none; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
     
     /* TEAM ROSTER UI */
-    .team-roster { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    .team-member-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-    .team-member-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer;}
-    .team-member-img:hover { border-color: var(--noon-yellow); }
+    .team-roster { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
 
     /* ADMIN DASHBOARD UI */
     .admin-header-top { display: flex; align-items: center; padding: 0 2.5vw; height: 75px; background-color: var(--sidebar-bg); border-bottom: 1px solid var(--border-color); justify-content: space-between; flex-wrap: wrap; gap: 15px;}
@@ -176,7 +173,7 @@
     .record-img-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-top: 5px; cursor: pointer; transition: 0.2s;}
     .record-img-box img:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(255,199,0,0.3); }
     
-    #camera-video-stream, #team-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
+    #camera-video-stream { width: 100%; max-width: 500px; max-height: 70vh; background: #000; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover; }
     .cam-controls { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
     .print-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--noon-yellow); }
 
@@ -246,7 +243,7 @@
     </div>
   </div>
 
-  <!-- ================= NORMAL CAMERA MODAL ================= -->
+  <!-- ================= CAMERA MODAL ================= -->
   <div id="custom-camera-modal" class="popup-modal hidden">
     <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
         <video id="camera-video-stream" autoplay playsinline></video>
@@ -259,33 +256,6 @@
     </div>
   </div>
 
-  <!-- ================= TEAM CONTINUOUS CAMERA MODAL ================= -->
-  <div id="team-camera-modal" class="popup-modal hidden">
-    <div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); width:100%; max-width: 500px;">
-        
-        <h3 id="team-cam-title" style="color: var(--noon-yellow); margin-bottom: 15px; font-size: 18px; text-transform: uppercase;">Person 1: Capture Iqama</h3>
-        
-        <video id="team-video-stream" autoplay playsinline></video>
-        <img id="team-preview" class="hidden" style="width: 100%; max-width: 500px; max-height: 70vh; border-radius: 12px; border: 2px solid var(--noon-yellow); object-fit: cover;">
-        <canvas id="team-hidden-canvas" class="hidden"></canvas>
-        
-        <div id="team-capture-actions" class="cam-controls">
-            <button class="btn-primary btn-success" style="width: auto;" onclick="captureTeamPhoto()">📸 CAPTURE</button>
-            <button class="btn-primary btn-outline" style="width: auto;" onclick="switchTeamCamera()">🔄 FLIP CAM</button>
-            <button class="btn-primary btn-danger" style="width: auto;" onclick="closeTeamCamera()">❌ CANCEL</button>
-        </div>
-
-        <div id="team-preview-actions" class="cam-controls hidden">
-            <button class="btn-primary btn-success" style="width: auto;" onclick="confirmTeamPhoto()">✅ CONFIRM & NEXT</button>
-            <button class="btn-primary btn-outline" style="width: auto;" onclick="retakeTeamPhoto()">🔁 RETAKE</button>
-        </div>
-        
-        <div style="margin-top: 20px; width: 100%; border-top: 1px solid #333; padding-top: 15px;">
-            <button class="btn-primary btn-warning" style="width: 100%;" onclick="finishTeamCapture()">✅ DONE (FINISH TEAM ROSTER)</button>
-            <p style="color: var(--text-muted); font-size: 11px; text-align: center; margin-top: 10px;">Click this when you have finished adding all team members.</p>
-        </div>
-    </div>
-  </div>
 
   <!-- ================= SINGLE UNIFIED LOGIN VIEW ================= -->
   <div id="login-view">
@@ -438,13 +408,13 @@
                     <img id="preview-fmpoc" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
                   </div>
 
-                  <!-- NEW TEAM MEMBERS UI -->
+                  <!-- NEW DYNAMIC TEAM MEMBERS UI -->
                   <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
                       <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;">TEAM MEMBERS (OPTIONAL)</label>
-                      <button type="button" class="btn-primary btn-outline" style="font-size: 12px;" onclick="openTeamCamera()">➕ ADD TEAM MEMBER (LIVE CAPTURE)</button>
+                      <button type="button" class="btn-primary btn-outline" style="font-size: 12px;" onclick="addTeamMemberBlock()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
                       
                       <div id="team-roster-display" class="team-roster hidden">
-                          <!-- Team members injected here dynamically -->
+                          <!-- Dynamic Team blocks injected here -->
                       </div>
                   </div>
                 </div>
@@ -653,13 +623,11 @@
     let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
     // --- Team Loop Variables ---
-    let teamList = []; 
-    let currentTeamIndex = 1;
-    let currentTeamStep = 'iqama'; // 'iqama' -> 'selfie' -> loop
-    let tempTeamData = { iqama: null, selfie: null };
+    let teamMemberCount = 0;
+    let activeTeamMembers = [];
 
     // ==========================================
-    // TRANSLATION DICTIONARY
+    // TRANSLATION DICTIONARY (EN & AR)
     // ==========================================
     const dict = {
       en: {
@@ -690,7 +658,8 @@
         "status_approved": "Approved", "status_pending": "Pending", "status_rejected": "Rejected", "status_expired": "EXPIRED", "status_completed": "COMPLETED",
         "msg_no_pending": "No pending requests found in this timeframe.", "msg_no_active": "No active requests found in this timeframe.", "msg_no_history": "No history found in this timeframe.", "msg_no_gate": "No gate operations found in this timeframe.",
         "msg_enter_email": "Enter an Email Address on the left to view passes.", "msg_loading": "Loading requests...", "msg_inside": "Inside Facility",
-        "msg_admin_select_loc": "Admin: Please select a facility first."
+        "msg_admin_select_loc": "Admin: Please select a facility first.",
+        "btn_add_team": "➕ ADD TEAM MEMBER"
       },
       ar: {
         "guard": "🛡️ الحارس", "visitor_ops": "📋 الزوار/العمليات", "admin": "⚙️ الإدارة",
@@ -720,7 +689,8 @@
         "status_approved": "مقبول", "status_pending": "قيد الانتظار", "status_rejected": "مرفوض", "status_expired": "منتهي", "status_completed": "مكتمل",
         "msg_no_pending": "لا توجد طلبات معلقة في هذه الفترة.", "msg_no_active": "لا توجد طلبات نشطة في هذه الفترة.", "msg_no_history": "لا يوجد سجل في هذه الفترة.", "msg_no_gate": "لا توجد عمليات بوابة في هذه الفترة.",
         "msg_enter_email": "أدخل بريداً إلكترونياً لعرض التصاريح.", "msg_loading": "جاري التحميل...", "msg_inside": "داخل المنشأة",
-        "msg_admin_select_loc": "المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية."
+        "msg_admin_select_loc": "المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية.",
+        "btn_add_team": "➕ إضافة عضو للفريق"
       }
     };
 
@@ -750,6 +720,7 @@
         if (currentUser && currentUser.role !== 'guard') loadMyPasses(false, true); 
     }
 
+    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
       const doc = window.document;
       const docEl = doc.documentElement;
@@ -759,7 +730,9 @@
 
       if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
         if (reqFullScreen) {
-          reqFullScreen.call(docEl).catch(err => { console.log("Fullscreen API Error / Mobile Block:", err); });
+          reqFullScreen.call(docEl).catch(err => {
+            console.log("Fullscreen API Error / Mobile Block:", err);
+          });
         } else {
           alert("Fullscreen mode is not supported on this browser/device.");
         }
@@ -770,6 +743,7 @@
       }
     }
 
+    // --- Core Navigation ---
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('minimized');
         document.body.classList.toggle('sidebar-minimized');
@@ -791,21 +765,74 @@
         }
     }
 
+    // --- Admin Guard Loc Updater ---
     function updateAdminGuardLoc() {
         if(currentUser && currentUser.role === 'admin') {
             currentUser.location = document.getElementById('admin-guard-loc').value || '';
         }
     }
 
+    // --- Full Screen Image Utility ---
     function openFullscreenImage(src) {
         if(!src || src === '') return;
         document.getElementById('fullscreen-img').src = src;
         document.getElementById('fullscreen-image-modal').classList.remove('hidden');
     }
 
-    // ==========================================
-    // STANDARD SINGLE-CAPTURE CAMERA
-    // ==========================================
+    // --- Dynamic Team Member Blocks ---
+    function addTeamMemberBlock() {
+        teamMemberCount++;
+        const id = teamMemberCount;
+        activeTeamMembers.push(id);
+
+        const container = document.getElementById('team-roster-display');
+        container.classList.remove('hidden');
+
+        const block = document.createElement('div');
+        block.id = `team-member-block-${id}`;
+        block.style.cssText = "border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-bottom: 15px; background: rgba(255,255,255,0.02);";
+        
+        block.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <strong style="color: white; font-size: 13px;">Team Member ${id}</strong>
+                <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="removeTeamMemberBlock(${id})">❌</button>
+            </div>
+            
+            <div class="input-group">
+              <label style="font-size: 11px;">Upload Iqama/ID Copy</label>
+              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama_${id}')">📷 Live Camera</button>
+                <input type="file" id="req-team_iqama_${id}" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama_${id}')">
+              </div>
+              <img id="preview-team_iqama_${id}" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 0;">
+              <label style="font-size: 11px;">Upload Selfie Photo</label>
+              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie_${id}')">📷 Live Camera</button>
+                <input type="file" id="req-team_selfie_${id}" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie_${id}')">
+              </div>
+              <img id="preview-team_selfie_${id}" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
+            </div>
+        `;
+        container.appendChild(block);
+    }
+
+    function removeTeamMemberBlock(id) {
+        const block = document.getElementById(`team-member-block-${id}`);
+        if (block) block.remove();
+        activeTeamMembers = activeTeamMembers.filter(memberId => memberId !== id);
+        
+        delete capturedImages[`team_iqama_${id}`];
+        delete capturedImages[`team_selfie_${id}`];
+
+        if (activeTeamMembers.length === 0) {
+            document.getElementById('team-roster-display').classList.add('hidden');
+        }
+    }
+
+    // --- Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         document.getElementById('custom-camera-modal').classList.remove('hidden');
@@ -832,7 +859,9 @@
         preview.classList.remove('hidden');
         preview.onclick = () => openFullscreenImage(b64); 
         
-        document.getElementById(`req-${targetPhotoType}`).value = "";
+        const fileInput = document.getElementById(`req-${targetPhotoType}`);
+        if(fileInput) fileInput.value = "";
+        
         closeLiveCamera();
     }
 
@@ -843,8 +872,11 @@
 
     function clearCapturedData(type) {
         capturedImages[type] = null;
-        document.getElementById(`preview-${type}`).classList.add('hidden');
-        document.getElementById(`preview-${type}`).src = "";
+        const preview = document.getElementById(`preview-${type}`);
+        if (preview) {
+            preview.classList.add('hidden');
+            preview.src = "";
+        }
     }
 
     async function startStream(videoId) {
@@ -854,137 +886,30 @@
             document.getElementById(videoId).srcObject = liveStream;
         } catch (err) {
             alert("Camera access denied or not available on this device.");
-            if(videoId === 'camera-video-stream') closeLiveCamera();
-            else closeTeamCamera();
+            closeLiveCamera();
         }
     }
 
-    // ==========================================
-    // NEW: CONTINUOUS TEAM CAPTURE LOOP
-    // ==========================================
-    function updateTeamTitle() {
-        const t = document.getElementById('team-cam-title');
-        t.innerText = `PERSON ${currentTeamIndex}: CAPTURE ${currentTeamStep.toUpperCase()}`;
-    }
-
-    async function openTeamCamera() {
-        currentTeamStep = 'iqama';
-        tempTeamData = { iqama: null, selfie: null };
-        document.getElementById('team-camera-modal').classList.remove('hidden');
-        document.getElementById('team-preview').classList.add('hidden');
-        document.getElementById('team-video-stream').classList.remove('hidden');
-        document.getElementById('team-capture-actions').classList.remove('hidden');
-        document.getElementById('team-preview-actions').classList.add('hidden');
-        updateTeamTitle();
-        await startStream('team-video-stream');
-    }
-
-    function switchTeamCamera() {
-        currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
-        startStream('team-video-stream');
-    }
-
-    function captureTeamPhoto() {
-        const video = document.getElementById('team-video-stream');
-        const canvas = document.getElementById('team-hidden-canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        
-        const b64 = canvas.toDataURL('image/jpeg', 0.8);
-        if (currentTeamStep === 'iqama') { tempTeamData.iqama = b64; } 
-        else { tempTeamData.selfie = b64; }
-        
-        const preview = document.getElementById('team-preview');
-        preview.src = b64;
-        
-        video.classList.add('hidden');
-        preview.classList.remove('hidden');
-        document.getElementById('team-capture-actions').classList.add('hidden');
-        document.getElementById('team-preview-actions').classList.remove('hidden');
-    }
-
-    function retakeTeamPhoto() {
-        document.getElementById('team-video-stream').classList.remove('hidden');
-        document.getElementById('team-preview').classList.add('hidden');
-        document.getElementById('team-capture-actions').classList.remove('hidden');
-        document.getElementById('team-preview-actions').classList.add('hidden');
-    }
-
-    function confirmTeamPhoto() {
-        if (currentTeamStep === 'iqama') {
-            currentTeamStep = 'selfie';
-            retakeTeamPhoto(); // Resets view for selfie
-            updateTeamTitle();
-        } else {
-            // Push to team array!
-            teamList.push({ iqama: tempTeamData.iqama, selfie: tempTeamData.selfie });
-            renderTeamRoster();
-            
-            // Loop for next person
-            currentTeamIndex++;
-            currentTeamStep = 'iqama';
-            tempTeamData = { iqama: null, selfie: null };
-            retakeTeamPhoto();
-            updateTeamTitle();
-        }
-    }
-
-    function closeTeamCamera() {
-        if (liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
-        document.getElementById('team-camera-modal').classList.add('hidden');
-    }
-
-    function finishTeamCapture() {
-        closeTeamCamera();
-    }
-
-    function renderTeamRoster() {
-        const div = document.getElementById('team-roster-display');
-        if(teamList.length > 0) {
-            div.classList.remove('hidden');
-            let html = '';
-            teamList.forEach((mem, idx) => {
-                html += `
-                <div class="team-member-row">
-                    <span style="color:white; font-size:13px; font-weight:bold;">Person ${idx+1}</span>
-                    <div style="display:flex; gap:10px;">
-                        <img src="${mem.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Iqama">
-                        <img src="${mem.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Selfie">
-                        <button style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="removeTeamMember(${idx})">🗑️</button>
-                    </div>
-                </div>`;
-            });
-            div.innerHTML = html;
-        } else {
-            div.classList.add('hidden');
-        }
-    }
-
-    function removeTeamMember(idx) {
-        teamList.splice(idx, 1);
-        currentTeamIndex = teamList.length + 1;
-        renderTeamRoster();
-    }
-
-    // ==========================================
-    // UTILITIES
-    // ==========================================
+    // --- Formatting Helpers & Robust Date Parsing ---
     function parseFlexibleDate(dateStr) {
         if (!dateStr) return null;
         if (dateStr instanceof Date) return isNaN(dateStr.getTime()) ? null : dateStr;
+        
         let d = new Date(dateStr);
         if (!isNaN(d.getTime())) return d;
+
         if (typeof dateStr === 'string') {
-            const parts = dateStr.trim().split(/[\/\-\s]/);
+            const cleanStr = dateStr.trim();
+            const parts = cleanStr.split(/[\/\-\s]/);
             if (parts.length >= 3) {
                 let p0 = parseInt(parts[0], 10);
                 let p1 = parseInt(parts[1], 10);
                 let p2 = parseInt(parts[2], 10);
                 if (p2 < 100) p2 += 2000;
-                if (p0 > 12) d = new Date(p2, p1 - 1, p0);
-                else if (p1 > 12) d = new Date(p2, p0 - 1, p1);
-                else d = new Date(p2, p1 - 1, p0);
+
+                if (p0 > 12) { d = new Date(p2, p1 - 1, p0); } 
+                else if (p1 > 12) { d = new Date(p2, p0 - 1, p1); } 
+                else { d = new Date(p2, p1 - 1, p0); }
                 if (!isNaN(d.getTime())) return d;
             }
         }
@@ -1024,15 +949,30 @@
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        if (filterType === 'today') return d >= todayStart && d <= todayEnd;
-        else if (filterType === 'weekly') { const w = new Date(todayStart); w.setDate(w.getDate() - 7); return d >= w && d <= todayEnd; }
-        else if (filterType === 'monthly') { const m = new Date(todayStart); m.setMonth(m.getMonth() - 1); return d >= m && d <= todayEnd; }
-        else if (filterType === '6months') { const m6 = new Date(todayStart); m6.setMonth(m6.getMonth() - 6); return d >= m6 && d <= todayEnd; }
-        else if (filterType === 'year') { const y = new Date(todayStart); y.setFullYear(y.getFullYear() - 1); return d >= y && d <= todayEnd; }
-        else if (filterType === 'custom') {
+        if (filterType === 'today') {
+            return d >= todayStart && d <= todayEnd;
+        } else if (filterType === 'weekly') {
+            const weekAgo = new Date(todayStart);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return d >= weekAgo && d <= todayEnd;
+        } else if (filterType === 'monthly') {
+            const monthAgo = new Date(todayStart);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return d >= monthAgo && d <= todayEnd;
+        } else if (filterType === '6months') {
+            const sixAgo = new Date(todayStart);
+            sixAgo.setMonth(sixAgo.getMonth() - 6);
+            return d >= sixAgo && d <= todayEnd;
+        } else if (filterType === 'year') {
+            const yearAgo = new Date(todayStart);
+            yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+            return d >= yearAgo && d <= todayEnd;
+        } else if (filterType === 'custom') {
             if(!startStr || !endStr) return true;
-            const start = parseFlexibleDate(startStr); const end = parseFlexibleDate(endStr);
-            if (start) start.setHours(0,0,0,0); if (end) end.setHours(23,59,59,999);
+            const start = parseFlexibleDate(startStr);
+            const end = parseFlexibleDate(endStr);
+            if (start) start.setHours(0,0,0,0);
+            if (end) end.setHours(23,59,59,999);
             if (start && end) return d >= start && d <= end;
         }
         return true;
@@ -1150,8 +1090,10 @@
                 switchMainView('ops');
                 loadMyPasses(false, false);
             } else if (currentUser.role === 'guard') {
+                // Setup Normal Guard UI
                 document.getElementById('guard-loc-text').classList.remove('hidden');
                 document.getElementById('admin-guard-loc').classList.add('hidden');
+
                 const locDisplay = document.getElementById('guard-loc-display');
                 if (locDisplay) locDisplay.innerText = currentUser.location || '';
                 
@@ -1186,25 +1128,28 @@
       let finalIqamaB64 = ''; let finalIqamaMime = 'image/jpeg';
       let finalSelfieB64 = ''; let finalSelfieMime = 'image/jpeg';
 
+      // Primary Iqama processing
       if (capturedImages.iqama) {
           finalIqamaB64 = capturedImages.iqama.split(',')[1];
       } else if (iqamaInput.files.length > 0) {
           const iFull = await getBase64(iqamaInput.files[0]);
           finalIqamaB64 = iFull.split(',')[1];
           finalIqamaMime = iqamaInput.files[0].type;
-      } else { return alert("Please provide the Lead Iqama/ID photo."); }
+      } else { return alert("Please provide the Lead Iqama/ID photo (Camera or Upload)."); }
 
+      // Primary Selfie processing
       if (capturedImages.selfie) {
           finalSelfieB64 = capturedImages.selfie.split(',')[1];
       } else if (selfieInput.files.length > 0) {
           const sFull = await getBase64(selfieInput.files[0]);
           finalSelfieB64 = sFull.split(',')[1];
           finalSelfieMime = selfieInput.files[0].type;
-      } else { return alert("Please provide the Lead Selfie photo."); }
+      } else { return alert("Please provide the Lead Selfie photo (Camera or Upload)."); }
 
-      // Package everything based on Type
       let finalFmpocB64 = ''; let finalFmpocMime = 'image/jpeg';
       let finalVehicleVal = ''; let finalVehicleMime = '';
+
+      let cleanTeamList = [];
 
       if (type === 'Contractor') {
           const fmpocInput = document.getElementById('req-fmpoc');
@@ -1214,19 +1159,38 @@
               const fFull = await getBase64(fmpocInput.files[0]);
               finalFmpocB64 = fFull.split(',')[1];
               finalFmpocMime = fmpocInput.files[0].type;
-          } else { return alert("Please provide the FM POC photo."); }
+          } else { return alert("Please provide the FM POC photo (Camera or Upload)."); }
+
+          // Process Dynamic Team Member Arrays
+          for (let i = 0; i < activeTeamMembers.length; i++) {
+              let mId = activeTeamMembers[i];
+              let mIqamaB64 = ''; let mSelfieB64 = '';
+              
+              let mIqamaInput = document.getElementById(`req-team_iqama_${mId}`);
+              if (capturedImages[`team_iqama_${mId}`]) {
+                  mIqamaB64 = capturedImages[`team_iqama_${mId}`].split(',')[1];
+              } else if (mIqamaInput && mIqamaInput.files.length > 0) {
+                  let full = await getBase64(mIqamaInput.files[0]);
+                  mIqamaB64 = full.split(',')[1];
+              } else {
+                  return alert(`Please provide the Iqama/ID photo for Team Member ${mId}.`);
+              }
+
+              let mSelfieInput = document.getElementById(`req-team_selfie_${mId}`);
+              if (capturedImages[`team_selfie_${mId}`]) {
+                  mSelfieB64 = capturedImages[`team_selfie_${mId}`].split(',')[1];
+              } else if (mSelfieInput && mSelfieInput.files.length > 0) {
+                  let full = await getBase64(mSelfieInput.files[0]);
+                  mSelfieB64 = full.split(',')[1];
+              } else {
+                  return alert(`Please provide the Selfie photo for Team Member ${mId}.`);
+              }
+
+              cleanTeamList.push({ iqama: mIqamaB64, selfie: mSelfieB64 });
+          }
       } else {
           finalVehicleVal = document.getElementById('req-vehicle-text').value;
       }
-
-      // Format Team Members Array (Strip headers)
-      let cleanTeamList = [];
-      teamList.forEach(m => {
-          cleanTeamList.push({
-              iqama: m.iqama ? m.iqama.split(',')[1] : null,
-              selfie: m.selfie ? m.selfie.split(',')[1] : null
-          });
-      });
 
       let hostNameVal = '';
       let hostEmailVal = currentUser.email;
@@ -1257,7 +1221,7 @@
           selfieBase64: finalSelfieB64, selfieMimeType: finalSelfieMime,
           fmpocBase64: finalFmpocB64, fmpocMimeType: finalFmpocMime,
           vehiclePlateNo: finalVehicleVal,
-          team: cleanTeamList, // SENT TO BACKEND!
+          team: cleanTeamList, 
           
           slpTicketNo: type === 'Visitor' ? document.getElementById('req-vis-slp').value : document.getElementById('req-con-slp').value,
           contactNo: type === 'Visitor' ? document.getElementById('req-vis-contact').value : document.getElementById('req-con-contact').value,
@@ -1282,8 +1246,12 @@
         iqamaInput.value = ""; selfieInput.value = ""; document.getElementById('req-vehicle-text').value = "";
         const fmpocI = document.getElementById('req-fmpoc'); if(fmpocI) fmpocI.value = "";
 
+        // WIPE MEMORY
         clearCapturedData('iqama'); clearCapturedData('selfie'); clearCapturedData('fmpoc');
-        teamList = []; currentTeamIndex = 1; renderTeamRoster(); // clear roster
+        document.getElementById('team-roster-display').innerHTML = "";
+        document.getElementById('team-roster-display').classList.add('hidden');
+        activeTeamMembers = [];
+        teamMemberCount = 0;
         
         loadMyPasses(true, false); 
       } catch (err) { 
@@ -1525,7 +1493,6 @@
                  guardCount++;
               });
               
-              // Fallback for old single checkins without JSON logs
               if(logs.length === 0 && row.CheckInTime) {
                   htmlGuard += `<tr>
                     <td style="color: var(--text-muted);">${formatTime(row.CheckInTime)}</td>
