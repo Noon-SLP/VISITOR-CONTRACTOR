@@ -380,17 +380,10 @@
                     <label data-i18n="visit_date">Visit Date</label>
                     <input type="date" id="req-date-single" class="input-field">
                   </div>
-                  <div class="input-group">
-                      <input type="text" id="req-vis-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No.">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No.">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom">
-                  </div>
+                  <div class="input-group"><input type="text" id="req-vis-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
                   
-                  <!-- RESTORED IMAGE UPLOAD FOR VEHICLE -->
                   <div class="input-group">
                     <label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label>
                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -409,21 +402,11 @@
                       <input type="date" id="req-date-end" class="input-field">
                     </div>
                   </div>
-                  <div class="input-group">
-                      <input type="text" id="req-con-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No.">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-con-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No.">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-con-project" class="input-field t-ph" data-i18n="project_name" placeholder="Project Name">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name">
-                  </div>
-                  <div class="input-group">
-                      <input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager">
-                  </div>
+                  <div class="input-group"><input type="text" id="req-con-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
+                  <div class="input-group"><input type="text" id="req-con-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
+                  <div class="input-group"><input type="text" id="req-con-project" class="input-field t-ph" data-i18n="project_name" placeholder="Project Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
+                  <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
                   
                   <div class="input-group">
                     <label data-i18n="upload_fmpoc">Upload FM POC</label>
@@ -534,6 +517,7 @@
                 
                 <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
 
+                <!-- GUARD TEAM CAROUSEL -->
                 <div id="guard-team-section" class="hidden" style="margin-bottom: 20px;">
                     <div id="guard-team-roster"></div>
                 </div>
@@ -667,23 +651,17 @@
     let globalAdminData = []; 
     let checkedPrintIds = new Set(); 
 
-    // --- Media Variables ---
     let liveStream = null;
     let currentFacingMode = 'environment';
     let targetPhotoType = '';
     let capturedImages = { iqama: null, selfie: null, vehicle: null, fmpoc: null };
 
-    // --- Single Spot Team Variables ---
     let teamList = []; 
     let currentTeamCounter = 1;
 
-    // --- Guard Carousel Variables ---
     let guardRoster = [];
     let guardRosterIndex = 0;
 
-    // ==========================================
-    // TRANSLATION DICTIONARY
-    // ==========================================
     const dict = {
       en: {
         "guard": "🛡️ Guard", "visitor_ops": "📋 Visitor/Ops", "admin": "⚙️ Admin",
@@ -785,7 +763,6 @@
         }
     }
 
-    // --- Robust Cross-Browser & Mobile Fullscreen Toggle ---
     function toggleFullScreen() {
       const doc = window.document;
       const docEl = doc.documentElement;
@@ -808,7 +785,6 @@
       }
     }
 
-    // --- Core Navigation ---
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         if (sidebar) {
@@ -894,7 +870,6 @@
         }
     }
 
-    // --- Full Screen Image Utility ---
     function openFullscreenImage(src) {
         if(!src || src === '') return;
         const fsImg = document.getElementById('fullscreen-img');
@@ -905,7 +880,6 @@
         }
     }
 
-    // --- Dynamic Team Member Blocks ---
     function showTeamEntry() {
         const teamEntryBox = document.getElementById('team-entry-box');
         const btnShowTeamEntry = document.getElementById('btn-show-team-entry');
@@ -1008,7 +982,6 @@
         if (teamEntryTitle) teamEntryTitle.innerText = `Team Member ${currentTeamCounter}`;
     }
 
-    // --- Camera Logic ---
     async function openLiveCamera(type) {
         targetPhotoType = type;
         const customCameraModal = document.getElementById('custom-camera-modal');
@@ -1089,7 +1062,6 @@
         }
     }
 
-    // --- Formatting Helpers & Robust Date Parsing ---
     function parseFlexibleDate(dateStr) {
         if (!dateStr) return null;
         if (dateStr instanceof Date) {
@@ -1185,7 +1157,6 @@
         return true;
     }
 
-    // --- Sessions & Auth ---
     function saveSession() {
         try {
             localStorage.setItem('noon_session', JSON.stringify({ user: currentUser, time: Date.now() }));
@@ -1206,134 +1177,20 @@
         }, 15000); 
     }
 
-    function login(role) {
-      if (role === 'guard') {
-        const nameInput = document.getElementById('lg-name');
-        const idInput = document.getElementById('lg-id');
-        const locInput = document.getElementById('lg-location');
-        
-        const name = nameInput ? nameInput.value : '';
-        const id = idInput ? idInput.value : '';
-        const loc = locInput ? locInput.value : '';
-        
-        if(!name || !id || !loc) return alert("Fill all Guard details");
-        currentUser = { role: 'guard', name: name, id: id, location: loc };
-        
-      } else if (role === 'ops') {
-        const nameInput = document.getElementById('lo-name');
-        const mailInput = document.getElementById('lo-mail');
-        
-        const name = nameInput ? nameInput.value : '';
-        const mail = mailInput ? mailInput.value.toLowerCase().trim() : '';
-        
-        if(!name || !mail) return alert("Enter Name and Gmail");
-        currentUser = { role: 'ops', name: name, email: mail };
-        
-      } else if (role === 'admin') {
-        const nameInput = document.getElementById('la-name');
-        const mailInput = document.getElementById('la-mail');
-        const passInput = document.getElementById('la-pass');
-        
-        const name = nameInput ? nameInput.value : '';
-        const mail = mailInput ? mailInput.value.toLowerCase().trim() : '';
-        const pass = passInput ? passInput.value : '';
-        
-        if(!name || !mail || !pass) return alert("Enter all Admin details");
-        if(pass === 'admin123') { 
-            currentUser = { role: 'admin', name: name, email: mail };
-        } else { 
-            return alert("Incorrect Password");
-        }
-      }
-      
-      saveSession();
-      initApp();
-    }
-
-    function initApp() {
-        try {
-            const loginView = document.getElementById('login-view');
-            if (loginView) loginView.classList.add('hidden');
-            
-            const appLayout = document.getElementById('app-layout');
-            if (appLayout) appLayout.classList.remove('hidden');
-
-            if (currentUser && currentUser.role === 'admin') {
-                const vName = document.getElementById('req-vname');
-                if (vName) vName.value = '';
-                
-                const adminEmail = document.getElementById('req-admin-email');
-                if (adminEmail) adminEmail.value = '';
-                
-                const adminGroup = document.getElementById('admin-email-group');
-                if (adminGroup) adminGroup.classList.remove('hidden');
-                
-                const sidebar = document.getElementById('sidebar');
-                if (sidebar) sidebar.style.display = 'flex';
-                
-                const headerAdminName = document.getElementById('header-admin-name');
-                if (headerAdminName) headerAdminName.innerText = currentUser.name;
-                
-                const sidebarUserName = document.getElementById('sidebar-user-name');
-                if (sidebarUserName) sidebarUserName.innerText = currentUser.name;
-                
-                const navAdmin = document.getElementById('nav-sidebar-admin');
-                if (navAdmin) navAdmin.classList.remove('hidden');
-
-                const guardLocText = document.getElementById('guard-loc-text');
-                if (guardLocText) guardLocText.classList.add('hidden');
-                
-                const adminGuardLoc = document.getElementById('admin-guard-loc');
-                if (adminGuardLoc) {
-                    adminGuardLoc.classList.remove('hidden');
-                    currentUser.location = adminGuardLoc.value || '';
-                }
-                
-                loadAdminData(false);
-                switchMainView('admin');
-            } else if (currentUser) {
-                const vName = document.getElementById('req-vname');
-                if (vName && currentUser.name) vName.value = currentUser.name;
-                
-                const adminGroup = document.getElementById('admin-email-group');
-                if (adminGroup) adminGroup.classList.add('hidden');
-
-                const sidebar = document.getElementById('sidebar');
-                if (sidebar) sidebar.style.display = 'none';
-                
-                document.body.classList.add('sidebar-minimized');
-                
-                const mainContent = document.getElementById('main-content');
-                if (mainContent) mainContent.style.margin = '0';
-                
-                if (currentUser.role === 'ops') {
-                    switchMainView('ops');
-                    loadMyPasses(false, false);
-                } else if (currentUser.role === 'guard') {
-                    const guardLocText = document.getElementById('guard-loc-text');
-                    if (guardLocText) guardLocText.classList.remove('hidden');
-                    
-                    const adminGuardLoc = document.getElementById('admin-guard-loc');
-                    if (adminGuardLoc) adminGuardLoc.classList.add('hidden');
-                    
-                    const locDisplay = document.getElementById('guard-loc-display');
-                    if (locDisplay) locDisplay.innerText = currentUser.location || '';
-                    
-                    document.querySelectorAll('#dashboard-ops, #dashboard-guard, #dashboard-admin').forEach(e => {
-                        e.classList.add('hidden');
-                    });
-                    
-                    const dashGuard = document.getElementById('dashboard-guard');
-                    if (dashGuard) dashGuard.classList.remove('hidden');
-                }
+    window.onload = function() {
+        updateUI(); // Default lang
+        const session = localStorage.getItem('noon_session');
+        if (session) {
+            const parsed = JSON.parse(session);
+            const hoursElapsed = (Date.now() - parsed.time) / (1000 * 60 * 60);
+            if (hoursElapsed < 12) {
+                currentUser = parsed.user;
+                initApp();
+            } else { 
+                localStorage.removeItem('noon_session'); 
             }
-            if (currentUser) {
-                startAutoRefresh(currentUser.role);
-            }
-        } catch (e) {
-            console.error("InitApp Error: ", e);
         }
-    }
+    };
 
     async function submitRequest() {
       const typeInput = document.getElementById('req-type');
@@ -1616,20 +1473,6 @@
       }
     }
 
-    function switchAdminTab(tabName) {
-      document.querySelectorAll('.admin-nav-horizontal li').forEach(t => {
-          t.classList.remove('active');
-      });
-      const navItem = document.getElementById(`nav-${tabName}`);
-      if (navItem) navItem.classList.add('active');
-      
-      document.querySelectorAll('.admin-section').forEach(s => {
-          s.classList.add('hidden');
-      });
-      const secItem = document.getElementById(`admin-sec-${tabName}`);
-      if (secItem) secItem.classList.remove('hidden');
-    }
-
     function setAdminFilter(range, btnElement) {
         document.querySelectorAll('.btn-filter').forEach(b => {
             b.classList.remove('active');
@@ -1801,7 +1644,6 @@
                           });
                       } catch(e){}
                   } else {
-                      // Parse Clean String format from Google Sheet
                       let lines = row.GateLogs.split("\n");
                       lines.forEach(line => {
                           let match = line.match(/(IN|OUT)\s*\((\d+)\)\s*at\s*(.+?)\s*by\s*(.*)/);
@@ -2002,6 +1844,163 @@
         }
     }
 
+    function closeViewRecord() {
+        const modal = document.getElementById('view-record-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function printSelected() {
+        const checkboxes = document.querySelectorAll('.print-checkbox.row-checkbox:checked');
+        if (checkboxes.length === 0) return alert("Please select at least one approved pass to print using the checkboxes.");
+
+        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = MULTIPLE passes per page (Standard A4/Letter)\n[Cancel] = SINGLE pass per page (ID Card Printer)");
+
+        const printWindow = window.open('', '', 'width=800,height=600');
+        let cardsHtml = '';
+        let scripts = '';
+
+        checkboxes.forEach((cb, index) => {
+            const id = cb.value;
+            const name = cb.getAttribute('data-name');
+            const type = cb.getAttribute('data-type');
+            const location = cb.getAttribute('data-location');
+            const status = cb.getAttribute('data-status');
+            const date = cb.getAttribute('data-date'); 
+
+            cardsHtml += `
+                <div class="card">
+                    <div class="top-row">
+                        <div>
+                            <p class="name">${name}</p>
+                            <p class="sub">${type} &bull; ${location}</p>
+                            <p class="date">Valid: ${date}</p>
+                        </div>
+                        <div>
+                            <p class="status">${status}</p>
+                            <p class="id">${id}</p>
+                        </div>
+                    </div>
+                    <div class="qr-box" id="qr-code-batch-${index}"></div>
+                </div>
+            `;
+            scripts += `new QRCode(printWindow.document.getElementById("qr-code-batch-${index}"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });\n`;
+        });
+
+        let printStyles = printModeMultiple ? `
+            @media print {
+                @page { margin: 10mm; }
+                body { display: flex; flex-wrap: wrap; gap: 5mm; align-content: flex-start; justify-content: flex-start; }
+                .card { page-break-inside: avoid; border: 1px solid #ccc !important; }
+            }
+        ` : `
+            @media print {
+                @page { size: 85.6mm 54mm; margin: 0; }
+                body { display: block; margin: 0; padding: 0; background: #fff;}
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-after: always; box-sizing: border-box; }
+                .card:last-child { page-break-after: auto; }
+            }
+        `;
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Batch Print Passes</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+                <style>
+                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; flex-wrap: wrap; gap: 15px; }
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
+                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
+                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
+                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
+                    ${printStyles}
+                </style>
+            </head>
+            <body>
+                ${cardsHtml}
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    setTimeout(() => { 
+                        ${scripts}
+                        setTimeout(() => { window.print(); window.close(); }, 500);
+                    }, 500);
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    function printQR(name, type, location, id, status, date) {
+        const printModeMultiple = confirm("Print Layout Selection:\n\n[OK] = Standard Printer (A4/Letter, prints top-left)\n[Cancel] = ID Card Printer (85.6x54mm format)");
+        
+        const printWindow = window.open('', '', 'width=800,height=600');
+        
+        let printStyles = printModeMultiple ? `
+            @media print {
+                @page { margin: 10mm; }
+                body { display: flex; align-items: flex-start; justify-content: flex-start; }
+                .card { border: 1px solid #ccc !important; }
+            }
+        ` : `
+            @media print {
+                @page { size: 85.6mm 54mm; margin: 0; }
+                body { display: block; margin: 0; padding: 0; background: #fff;}
+                .card { border: none !important; border-radius: 0; margin: 0; padding: 4mm; width: 85.6mm; height: 54mm; page-break-inside: avoid; box-sizing: border-box; }
+            }
+        `;
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print QR Pass</title>
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
+                <style>
+                    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    body { margin: 0; padding: 20px; background: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; }
+                    .card { width: 85.6mm; height: 54mm; background: white; border-radius: 2mm; padding: 4mm; border: 1px solid #ccc; position: relative; overflow: hidden; }
+                    .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+                    .name { font-size: 10pt; font-weight: 700; margin: 0; color: black; line-height: 1.1; max-width: 48mm; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+                    .sub { font-size: 7pt; color: #555; margin: 2px 0 0 0; }
+                    .date { font-size: 6pt; font-weight: 600; color: #444; margin: 2px 0 0 0; }
+                    .status { font-size: 8pt; font-weight: 700; color: #10b981; margin: 0; text-align: right; text-transform: uppercase; }
+                    .id { font-size: 6pt; color: #555; margin: 2px 0 0 0; text-align: right; }
+                    .qr-box { display: flex; justify-content: center; align-items: center; margin-top: 2mm; }
+                    ${printStyles}
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <div class="top-row">
+                        <div>
+                            <p class="name">${name}</p>
+                            <p class="sub">${type} &bull; ${location}</p>
+                            <p class="date">Valid: ${date}</p>
+                        </div>
+                        <div>
+                            <p class="status">${status}</p>
+                            <p class="id">${id}</p>
+                        </div>
+                    </div>
+                    <div class="qr-box" id="qr-code"></div>
+                </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    setTimeout(() => {
+                        new QRCode(printWindow.document.getElementById("qr-code"), { text: "${id}", width: 110, height: 110, colorDark: "#000", colorLight: "#fff" });
+                        setTimeout(() => { window.print(); window.close(); }, 500);
+                    }, 500);
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
     function openViewRecord(id) {
         const r = globalAdminData.find(x => String(x.UniqueID) === String(id));
         if (!r) return;
@@ -2072,13 +2071,12 @@
         }
         contentHtml += `</div>`;
 
-        // READ CLEAN TEAM MEMBER STRING FROM GOOGLE SHEET
         if (r.TeamMembers && r.TeamMembers.trim() !== "") {
             let teamData = [];
             if (r.TeamMembers.startsWith("[")) {
                 try {
                     teamData = JSON.parse(r.TeamMembers);
-                } catch(e){} // legacy
+                } catch(e){}
             } else {
                 let lines = r.TeamMembers.split('\n');
                 lines.forEach((line, index) => {
@@ -2121,11 +2119,6 @@
         if (modal) modal.classList.remove('hidden');
     }
 
-    function closeViewRecord() {
-        const modal = document.getElementById('view-record-modal');
-        if (modal) modal.classList.add('hidden');
-    }
-
     // --- GUARD SCANNER LOGIC ---
     function startScanner() {
       const btn = document.getElementById('btn-start-scan');
@@ -2155,7 +2148,6 @@
         }
     }
 
-    // CAROUSEL LOGIC
     function renderGuardCarousel() {
         const item = guardRoster[guardRosterIndex];
         let html = `
@@ -2288,7 +2280,6 @@
             }
         }
 
-        // --- NEW CAROUSEL LAUNCHER ---
         if (teamData.length > 0) {
             if (teamSec) teamSec.classList.remove('hidden'); 
             
@@ -2316,7 +2307,6 @@
             guardRosterIndex = 0;
             renderGuardCarousel();
         } else {
-            // Standard Single Profile Picture
             if(data.SelfieBase64 || data.SelfieURL) {
                 if (selfieImg) {
                     selfieImg.src = data.SelfieBase64 || data.SelfieURL;
