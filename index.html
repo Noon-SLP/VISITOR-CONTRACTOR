@@ -168,7 +168,6 @@ function updateUI(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.innerHTML=dict[currentLang][k]});
     document.querySelectorAll('.t-ph').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.placeholder=dict[currentLang][k]});
     if(currentUser&&currentUser.role==='admin')renderAdminData(globalAdminData);
-    if(currentUser&&currentUser.role!=='guard')loadMyPasses(false,true);
 }
 
 function toggleFullScreen(){
@@ -344,7 +343,12 @@ function saveSession(){try{localStorage.setItem('noon_session',JSON.stringify({u
 
 function startAutoRefresh(r){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
-    autoRefreshTimer=setInterval(()=>{if(r==='ops')loadMyPasses(false,true);else if(r==='admin'){loadAdminData(true);loadMyPasses(false,true)}},30000);
+    autoRefreshTimer=setInterval(async ()=>{
+        if(r==='ops') await loadMyPasses(false,true);
+        else if(r==='admin'){
+            await loadAdminData(true);
+        }
+    },30000);
 }
 
 function login(role){
@@ -504,7 +508,7 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
         else{if(!isSilent)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_enter_email")}</p>`;return}
     }
     const cachedKey='cached_passes_'+targetEmail,cached=localStorage.getItem(cachedKey);
-    if(cached)renderMyPasses(JSON.parse(cached));
+    if(!forceRefresh&&cached&&!isSilent)renderMyPasses(JSON.parse(cached));
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
         const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
@@ -654,7 +658,7 @@ async function loadAdminData(isSilent=false){
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
-    }catch(e){if(!isSilent&&!cached)console.log(e)}
+    }catch(e){if(!isSilent&&!cached)console.error(e)}
 }
 
 async function updateStatus(id,newStatus){
