@@ -16,7 +16,7 @@ body[dir="rtl"]{font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 #main-content{flex:1;height:100vh;overflow-y:auto;position:relative;background-image:radial-gradient(circle at center,rgba(20,22,28,0.4) 0%,rgba(5,5,7,0.95) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E")}
 .dashboard{width:100%;padding:20px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;gap:15px}.header h2{color:var(--noon-yellow);font-size:22px;margin:0;display:flex;align-items:center;gap:15px}.header-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}#dashboard-ops{max-width:950px;margin-top:20px}#dashboard-guard{max-width:600px;margin-top:20px}#dashboard-admin{max-width:100%;padding:30px 2.5vw;padding-top:0}
 .ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
-#reader{width:100%;border:none;border-radius:12px;overflow:hidden;background:var(--card-bg);padding:30px 15px;box-shadow:0 10px 40px rgba(0,0,0,0.6)}#reader a{color:var(--noon-yellow) !important;text-decoration:none;font-weight:700;font-size:16px;display:inline-block;margin:15px 5px;padding:14px 24px;border:2px solid var(--noon-yellow);border-radius:8px;transition:0.2s;background:rgba(255,199,0,0.05)}#reader button{background:var(--noon-yellow) !important;color:#000 !important;border:none;padding:14px 28px;border-radius:8px;font-weight:800;font-size:16px;cursor:pointer;margin:15px 5px;text-transform:uppercase;transition:0.2s}#reader select{padding:12px;border-radius:8px;background:var(--input-bg);color:white;border:1px solid var(--border-color);font-size:15px;margin:15px 0;width:100%;max-width:300px;outline:none}#reader span{font-size:16px !important;color:var(--text-main);line-height:1.5}
+#reader{width:100%;border:none;border-radius:12px;overflow:hidden;background:var(--card-bg);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 .scan-result-card{padding:30px;border-radius:12px;text-align:center;margin-top:25px;color:white;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}.bg-green{background-color:var(--success)}.bg-red{background-color:var(--danger)}.bg-blue{background-color:#3b82f6}.visitor-photo{width:160px;height:160px;border-radius:12px;object-fit:cover;border:3px solid white;margin:0 auto 20px auto;display:none;box-shadow:0 8px 25px rgba(0,0,0,0.5)}
 .fullscreen-scan{position:fixed !important;top:0;left:0;width:100vw !important;height:100vh !important;z-index:999999;overflow-y:auto;border-radius:0 !important;margin:0 !important;display:flex;flex-direction:column;justify-content:flex-start}
 .team-roster{display:flex;flex-direction:column;gap:10px;margin-bottom:15px}.team-member-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1)}.team-member-img{width:50px;height:50px;border-radius:6px;object-fit:cover;border:2px solid var(--border-color);cursor:pointer}.team-member-img:hover{border-color:var(--noon-yellow)}
@@ -93,7 +93,15 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
       </div>
       <div style="max-width: 450px; margin: 0 auto;">
         <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;" data-i18n="start_camera">START CAMERA SCANNER</button>
-        <div id="reader" class="hidden"></div>
+        
+        <div id="reader-container" class="hidden">
+            <div id="reader" style="width:100%; border:none; border-radius:12px; overflow:hidden; background:var(--card-bg); box-shadow:0 10px 40px rgba(0,0,0,0.6);"></div>
+            <div style="display:flex;gap:10px;margin-top:15px;justify-content:center;flex-wrap:wrap;">
+                <button class="btn-primary btn-outline" style="width:auto;" onclick="switchScannerCamera()">🔄 FLIP CAM</button>
+                <button class="btn-primary btn-danger" style="width:auto;" onclick="stopScanner()">❌ CANCEL</button>
+            </div>
+        </div>
+
         <div id="scan-result" class="scan-result-card hidden" style="position:relative;"><button onclick="closeScanResult()" style="position:absolute;top:10px;right:15px;background:transparent;border:none;color:white;font-size:26px;cursor:pointer;z-index:10;">&times;</button>
           <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
           <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
@@ -145,15 +153,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
-let html5QrcodeScanner=null; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
-
-document.addEventListener('click', function(e) {
-    if (e.target && (e.target.id === 'html5-qrcode-button-camera-stop' || (e.target.innerText && e.target.innerText.includes('Stop Scanning')))) {
-        const scanResult = document.getElementById('scan-result'); if (scanResult) scanResult.classList.add('hidden');
-        const startBtn = document.getElementById('btn-start-scan'); if (startBtn) startBtn.classList.remove('hidden');
-        const reader = document.getElementById('reader'); if (reader) reader.classList.add('hidden');
-    }
-});
+let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
 
 const dict={
     en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture (Optional)","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","upload_fmpoc":"Upload FM POC","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"🕰️ History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER"},
@@ -168,7 +168,6 @@ function updateUI(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.innerHTML=dict[currentLang][k]});
     document.querySelectorAll('.t-ph').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.placeholder=dict[currentLang][k]});
     if(currentUser&&currentUser.role==='admin')renderAdminData(globalAdminData);
-    if(currentUser&&currentUser.role!=='guard')loadMyPasses(false,true);
 }
 
 function toggleFullScreen(){
@@ -187,7 +186,7 @@ function toggleSidebar(){
 function logout(){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
     localStorage.removeItem('noon_session');
-    if(html5QrcodeScanner)html5QrcodeScanner.clear();
+    try{if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop();}catch(e){}
     location.reload();
 }
 
@@ -765,11 +764,60 @@ function printQR(name,type,location,id,status,date){
     pw.document.close();
 }
 
-function startScanner(){
-    const btn=document.getElementById('btn-start-scan'),reader=document.getElementById('reader');
-    if(btn)btn.classList.add('hidden');if(reader)reader.classList.remove('hidden');
-    html5QrcodeScanner=new Html5QrcodeScanner("reader",{fps:10,qrbox:250});
-    html5QrcodeScanner.render(onScanSuccess,e=>{});
+function startScanner() {
+    const btn = document.getElementById('btn-start-scan');
+    const readerCont = document.getElementById('reader-container');
+    const scanResult = document.getElementById('scan-result');
+    if(btn) btn.classList.add('hidden');
+    if(scanResult) scanResult.classList.add('hidden');
+    if(readerCont) readerCont.classList.remove('hidden');
+
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+    startQrCodeStream();
+}
+
+function startQrCodeStream() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            playQrCodeStream();
+        }).catch(e => { playQrCodeStream(); });
+    } else {
+        playQrCodeStream();
+    }
+}
+
+function playQrCodeStream() {
+    html5QrCode.start(
+        { facingMode: scannerFacingMode },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        onScanSuccess,
+        (errorMessage) => { }
+    ).catch((err) => {
+        alert("Camera access error. Please check permissions.");
+        hideScannerUI();
+    });
+}
+
+function switchScannerCamera() {
+    scannerFacingMode = scannerFacingMode === "environment" ? "user" : "environment";
+    startQrCodeStream();
+}
+
+function stopScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            hideScannerUI();
+        }).catch(e => { hideScannerUI(); });
+    } else {
+        hideScannerUI();
+    }
+}
+
+function hideScannerUI() {
+    document.getElementById('reader-container').classList.add('hidden');
+    document.getElementById('btn-start-scan').classList.remove('hidden');
 }
 
 function showScanResult(d,rHtml,cClass,isContractor=false){
@@ -777,17 +825,17 @@ function showScanResult(d,rHtml,cClass,isContractor=false){
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
-    if(d==="DENIED"){setTimeout(()=>{sr.classList.add('hidden');try{if(html5QrcodeScanner)html5QrcodeScanner.resume();}catch(e){}},3500)}
+    if(d==="DENIED"){setTimeout(()=>{sr.classList.add('hidden');try{if(html5QrCode)html5QrCode.resume();}catch(e){}},3500)}
 }
 
 window.closeScanResult = function() {
     const sr = document.getElementById('scan-result');
     if(sr) sr.classList.add('hidden');
-    try{if(html5QrcodeScanner) html5QrcodeScanner.resume();}catch(e){}
+    try{if(html5QrCode) html5QrCode.resume();}catch(e){}
 }
 
 async function onScanSuccess(decodedText){
-    try{if(html5QrcodeScanner)html5QrcodeScanner.pause();}catch(e){}
+    try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section');
     if(resultCard)resultCard.classList.remove('hidden');if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
     const rDecision=document.getElementById('r-decision'),rReason=document.getElementById('r-reason');
@@ -886,7 +934,7 @@ async function confirmAction(){
         const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
         if(!res.ok)throw new Error("HTTP error");
         const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
-        try{if(html5QrcodeScanner)html5QrcodeScanner.resume();}catch(e){}
+        try{if(html5QrCode)html5QrCode.resume();}catch(e){}
     }catch(e){alert("Failed to log entry/exit.");if(btn)btn.innerText=t("confirm_action")}
 }
 </script>
