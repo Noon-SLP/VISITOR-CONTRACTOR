@@ -33,7 +33,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 <div id="custom-camera-modal" class="popup-modal hidden"><div style="display: flex; flex-direction: column; align-items: center; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);"><video id="camera-video-stream" autoplay playsinline></video><canvas id="camera-hidden-canvas" class="hidden"></canvas><div class="cam-controls"><button class="btn-primary btn-success" style="width: auto;" onclick="captureLivePhoto()" data-i18n="capture">📸 CAPTURE</button><button class="btn-primary btn-outline" style="width: auto;" onclick="switchLiveCamera()" data-i18n="flip_cam">🔄 FLIP CAM</button><button class="btn-primary btn-danger" style="width: auto;" onclick="closeLiveCamera()" data-i18n="cancel">❌ CANCEL</button></div></div></div>
 
 <div id="login-view"><div class="login-top-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button></div><div class="login-container"><div class="logo-box"></div>
-<!-- HIDDEN BY DEFAULT FOR OPTION 1 -->
 <div class="role-tabs" id="role-tabs" style="display:none;"><div class="role-tab active" id="tab-guard" onclick="switchLoginTab('guard')" data-i18n="guard">🛡️ Guard</div><div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')" data-i18n="admin">⚙️ Admin</div></div>
 <div id="login-guard" class="hidden"><div class="input-group"><input type="text" id="lg-name" class="input-field t-ph" data-i18n="name" placeholder="Name"></div><div class="input-group"><input type="text" id="lg-id" class="input-field t-ph" data-i18n="noon_id" placeholder="Noon ID"></div><div class="input-group"><select id="lg-location" class="input-field"><option value="" data-i18n="select_guard_loc">Select Guard Location...</option><option value="RUH01">RUH01</option><option value="JED01">JED01</option><option value="DXB01">DXB01</option></select></div><button class="btn-primary" onclick="login('guard')" data-i18n="login_gate">LOGIN TO GATE</button></div><div id="login-ops"><div class="input-group"><input type="text" id="lo-name" class="input-field t-ph" data-i18n="your_full_name" placeholder="Your Full Name"></div><div class="input-group"><input type="email" id="lo-mail" class="input-field t-ph" data-i18n="your_email" placeholder="Your Gmail / Email"></div><button class="btn-primary" onclick="login('ops')" data-i18n="login_portal">LOGIN TO PORTAL</button></div><div id="login-admin" class="hidden"><div class="input-group"><input type="text" id="la-name" class="input-field t-ph" data-i18n="admin_name" placeholder="Admin Name"></div><div class="input-group"><input type="email" id="la-mail" class="input-field t-ph" data-i18n="admin_email" placeholder="Admin Gmail"></div><div class="input-group"><input type="password" id="la-pass" class="input-field t-ph" data-i18n="admin_password" placeholder="Admin Password"></div><button class="btn-primary" onclick="login('admin')" data-i18n="login_admin">LOGIN AS ADMIN</button></div></div></div>
 
@@ -342,7 +341,7 @@ function saveSession(){try{localStorage.setItem('noon_session',JSON.stringify({u
 
 function startAutoRefresh(r){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
-    autoRefreshTimer=setInterval(()=>{if(r==='ops')loadMyPasses(false,true);else if(r==='admin'){loadAdminData(true);loadMyPasses(false,true)}},15000);
+    autoRefreshTimer=setInterval(()=>{if(r==='ops')loadMyPasses(false,true);else if(r==='admin'){loadAdminData(true);loadMyPasses(false,true)}},30000);
 }
 
 function login(role){
@@ -505,6 +504,7 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
         const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
+        if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();localStorage.setItem(cachedKey,JSON.stringify(data));renderMyPasses(data);
     }catch(e){if(!isSilent&&!cached)listDiv.innerHTML='<p style="color:var(--danger);font-size:13px;">Error.</p>'}
 }
@@ -646,22 +646,28 @@ function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkb
 async function loadAdminData(isSilent=false){
     const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
     try{
-        const res=await fetch(SCRIPT_URL);const data=await res.json();
+        const res=await fetch(SCRIPT_URL);
+        if(!res.ok)throw new Error("HTTP error");
+        const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
     }catch(e){if(!isSilent&&!cached)console.log(e)}
 }
 
 async function updateStatus(id,newStatus){
     if(!confirm(`Mark ${id} as ${newStatus}?`))return;
-    try{await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});loadAdminData(false)}
-    catch(e){alert("Failed to update status")}
+    try{
+        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});
+        if(!res.ok)throw new Error("HTTP error");
+        loadAdminData(false);
+    }catch(e){alert("Failed to update status")}
 }
 
 async function adminCheckOut(id){
     if(!confirm(`Force check-out for pass ${id}?`))return;
     try{
         const adminInfo=`Admin: ${currentUser.name} (${currentUser.email})`;
-        await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'})});
+        if(!res.ok)throw new Error("HTTP error");
         localStorage.removeItem('cached_admin_data');
         setTimeout(()=>{loadAdminData(true)},1000);
     }catch(e){alert("Failed to check out.")}
@@ -682,7 +688,8 @@ async function submitExtendPass(){
     if(!confirm(`Extend pass ${id}?`))return;
     btn.innerText='SAVING...';btn.disabled=true;
     try{
-        await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'extend_pass',id:id,newStartDate:ns,newEndDate:ne})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'extend_pass',id:id,newStartDate:ns,newEndDate:ne})});
+        if(!res.ok)throw new Error("HTTP error");
         closeExtendPass();loadAdminData(false);
     }catch(e){alert('Error.')}finally{btn.innerText=t("save_extension");btn.disabled=false}
 }
@@ -734,7 +741,7 @@ function printSelected(){
     cbs.forEach((cb,idx)=>{
         const id=cb.value,name=cb.getAttribute('data-name'),type=cb.getAttribute('data-type'),loc=cb.getAttribute('data-location'),st=cb.getAttribute('data-status'),date=cb.getAttribute('data-date');
         cardsHtml+=`<div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${loc}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${st}</p><p class="id">${id}</p></div></div><div class="qr-box" id="qr-code-batch-${idx}"></div></div>`;
-        scripts+=`new QRCode(pw.document.getElementById("qr-code-batch-${idx}"),{text:"${id}",width:110,height:110,colorDark:"#000",colorLight:"#fff"});\n`;
+        scripts+=`new QRCode(document.getElementById("qr-code-batch-${idx}"),{text:"${id}",width:110,height:110,colorDark:"#000",colorLight:"#fff"});\n`;
     });
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}`;
     pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{${scripts}setTimeout(()=>{window.print();window.close()},500)},500);<\/script></body></html>`);
@@ -745,7 +752,7 @@ function printQR(name,type,location,id,status,date){
     const pm=confirm("Print Layout Selection:\n\n[OK] = Standard Printer\n[Cancel] = ID Card Printer");
     const pw=window.open('','','width=800,height=600');
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;align-items:flex-start;justify-content:flex-start}.card{border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-inside:avoid;box-sizing:border-box}}`;
-    pw.document.write(`<html><head><title>Print QR Pass</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;justify-content:center}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body><div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${location}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${status}</p><p class="id">${id}</p></div></div><div class="qr-box" id="qr-code"></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{new QRCode(pw.document.getElementById("qr-code"),{text:"${id}",width:110,height:110,colorDark:"#000",colorLight:"#fff"});setTimeout(()=>{window.print();window.close()},500)},500);<\/script></body></html>`);
+    pw.document.write(`<html><head><title>Print QR Pass</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;justify-content:center}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body><div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${location}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${status}</p><p class="id">${id}</p></div></div><div class="qr-box" id="qr-code"></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script><script>setTimeout(()=>{new QRCode(document.getElementById("qr-code"),{text:"${id}",width:110,height:110,colorDark:"#000",colorLight:"#fff"});setTimeout(()=>{window.print();window.close()},500)},500);<\/script></body></html>`);
     pw.document.close();
 }
 
@@ -781,6 +788,7 @@ async function onScanSuccess(decodedText){
 
     try{
         const res=await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
+        if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         if(data.error)return showScanResult("DENIED","Invalid QR Code","bg-red");
 
@@ -845,7 +853,8 @@ async function confirmAction(){
     if(btn)btn.innerText="SAVING...";
     try{
         const gInfo=`${currentUser.name} (${currentUser.location})`;
-        await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
+        if(!res.ok)throw new Error("HTTP error");
         const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
         if(html5QrcodeScanner)html5QrcodeScanner.resume();
     }catch(e){alert("Failed to log entry/exit.");if(btn)btn.innerText=t("confirm_action")}
