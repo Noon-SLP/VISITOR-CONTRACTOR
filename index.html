@@ -168,6 +168,7 @@ function updateUI(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.innerHTML=dict[currentLang][k]});
     document.querySelectorAll('.t-ph').forEach(el=>{const k=el.getAttribute('data-i18n');if(dict[currentLang][k])el.placeholder=dict[currentLang][k]});
     if(currentUser&&currentUser.role==='admin')renderAdminData(globalAdminData);
+    if(currentUser&&currentUser.role!=='guard')loadMyPasses(false,true);
 }
 
 function toggleFullScreen(){
@@ -658,7 +659,7 @@ async function loadAdminData(isSilent=false){
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
-    }catch(e){if(!isSilent&&!cached)console.error(e)}
+    }catch(e){if(!isSilent&&!cached)console.log(e)}
 }
 
 async function updateStatus(id,newStatus){
@@ -776,17 +777,17 @@ function showScanResult(d,rHtml,cClass,isContractor=false){
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
-    if(d==="DENIED"){setTimeout(()=>{sr.classList.add('hidden');if(html5QrcodeScanner)html5QrcodeScanner.resume()},3500)}
+    if(d==="DENIED"){setTimeout(()=>{sr.classList.add('hidden');try{if(html5QrcodeScanner)html5QrcodeScanner.resume();}catch(e){}},3500)}
 }
 
 window.closeScanResult = function() {
     const sr = document.getElementById('scan-result');
     if(sr) sr.classList.add('hidden');
-    if(html5QrcodeScanner) html5QrcodeScanner.resume();
+    try{if(html5QrcodeScanner) html5QrcodeScanner.resume();}catch(e){}
 }
 
 async function onScanSuccess(decodedText){
-    if(html5QrcodeScanner)html5QrcodeScanner.pause();
+    try{if(html5QrcodeScanner)html5QrcodeScanner.pause();}catch(e){}
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section');
     if(resultCard)resultCard.classList.remove('hidden');if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
     const rDecision=document.getElementById('r-decision'),rReason=document.getElementById('r-reason');
@@ -885,7 +886,7 @@ async function confirmAction(){
         const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
         if(!res.ok)throw new Error("HTTP error");
         const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
-        if(html5QrcodeScanner)html5QrcodeScanner.resume();
+        try{if(html5QrcodeScanner)html5QrcodeScanner.resume();}catch(e){}
     }catch(e){alert("Failed to log entry/exit.");if(btn)btn.innerText=t("confirm_action")}
 }
 </script>
