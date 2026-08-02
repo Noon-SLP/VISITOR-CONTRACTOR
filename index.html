@@ -375,7 +375,7 @@ function initApp(){
         if(lv)lv.classList.add('hidden');if(al)al.classList.remove('hidden');
         if(currentUser&&currentUser.role==='admin'){
             const vn=document.getElementById('req-vname'),ae=document.getElementById('req-admin-email'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),han=document.getElementById('header-admin-name'),sun=document.getElementById('sidebar-user-name'),na=document.getElementById('nav-sidebar-admin'),glt=document.getElementById('guard-loc-text'),agl=document.getElementById('admin-guard-loc');
-            if(vn)vn.value='';if(ae)ae.value='';if(ag)ag.classList.remove('hidden');if(sb)sb.style.display='flex';
+            if(vn)vn.value='';if(ae)ae.value='';if(ag)ag.classList.remove('hidden');if(sb)style.display='flex';
             if(han)han.innerText=currentUser.name;if(sun)sun.innerText=currentUser.name;if(na)na.classList.remove('hidden');
             if(glt)glt.classList.add('hidden');if(agl){agl.classList.remove('hidden');currentUser.location=agl.value||''}
             loadAdminData(false);switchMainView('admin');
@@ -511,7 +511,10 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     if(!forceRefresh&&cached&&!isSilent)renderMyPasses(JSON.parse(cached));
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
-        const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'get_by_email', email: targetEmail })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();localStorage.setItem(cachedKey,JSON.stringify(data));renderMyPasses(data);
     }catch(e){if(!isSilent&&!cached)listDiv.innerHTML='<p style="color:var(--danger);font-size:13px;">Error.</p>'}
@@ -654,7 +657,10 @@ function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkb
 async function loadAdminData(isSilent=false){
     const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
     try{
-        const res=await fetch(SCRIPT_URL);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'get_all' })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
@@ -854,7 +860,10 @@ async function onScanSuccess(decodedText){
     currentScannedID=decodedText;
 
     try{
-        const res=await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'get_single', id: decodedText })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         if(data.error)return showScanResult("DENIED","Invalid QR Code","bg-red");
