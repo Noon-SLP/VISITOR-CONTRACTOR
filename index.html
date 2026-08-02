@@ -192,7 +192,7 @@ function toggleSidebar(){
 
 function logout(){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
-    localStorage.removeItem('noon_session');
+    sessionStorage.removeItem('noon_session');
     try{if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop();}catch(e){}
     location.reload();
 }
@@ -346,7 +346,7 @@ function isDateInRange(s,ft,stStr,enStr){
     return true;
 }
 
-function saveSession(){try{localStorage.setItem('noon_session',JSON.stringify({user:currentUser,time:Date.now()}))}catch(e){}}
+function saveSession(){try{sessionStorage.setItem('noon_session',JSON.stringify({user:currentUser,time:Date.now()}))}catch(e){}}
 
 function startAutoRefresh(r){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
@@ -411,10 +411,10 @@ window.onload=function(){
         const rt=document.getElementById('role-tabs');if(rt)rt.style.display='flex';
         switchLoginTab(r==='admin'?'admin':'guard');
     }
-    const session=localStorage.getItem('noon_session');
+    const session=sessionStorage.getItem('noon_session');
     if(session){
         const p=JSON.parse(session),h=(Date.now()-p.time)/(1000*60*60);
-        if(h<12){currentUser=p.user;initApp()}else localStorage.removeItem('noon_session');
+        if(h<12){currentUser=p.user;initApp()}else sessionStorage.removeItem('noon_session');
     }
 };
 
@@ -661,7 +661,7 @@ function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkb
 async function loadAdminData(isSilent=false){
     const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
     try{
-        const res=await fetch(SCRIPT_URL, { cache: 'no-store' });
+        const res=await fetch(`${SCRIPT_URL}?action=get_all`, { cache: 'no-store' });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
