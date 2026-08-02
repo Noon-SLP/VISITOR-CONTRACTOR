@@ -721,13 +721,11 @@ function openViewRecord(id){
 
     if(r.TeamMembers&&r.TeamMembers.trim()!==""){
         let td=[];
-        if(r.TeamMembers.startsWith("[")){try{td=JSON.parse(r.TeamMembers)}catch(e){}}
-        else{
-            let lines=r.TeamMembers.split('\n');
-            lines.forEach((l,idx)=>{
-                let cl=l.replace(/Member \d+:\s*/,''),urls=cl.split(' | ');
-                if(urls.length>=2)td.push({person:idx+1,iqama:urls[0].trim(),selfie:urls[1].trim()});
-            });
+        let extractedUrls = r.TeamMembers.match(/https?:\/\/[^\s\|]+/g) || [];
+        for(let i=0; i<extractedUrls.length; i+=2){
+            if(extractedUrls[i] && extractedUrls[i+1]){
+                td.push({person: (i/2)+1, iqama: extractedUrls[i], selfie: extractedUrls[i+1]});
+            }
         }
         if(td.length>0){
             h+=`<div style="grid-column:span 2;background:transparent;border-top:1px solid var(--border-color);padding-top:15px;margin-top:10px;"><strong style="font-size:14px;margin-bottom:15px;">TEAM MEMBERS (${td.length})</strong><div style="display:flex;flex-direction:column;gap:10px;">`;
@@ -877,16 +875,13 @@ async function onScanSuccess(decodedText){
 
         let teamData=[],maxWorkers=1;
         if(data.TeamMembers&&data.TeamMembers.trim()!==""){
-            if(data.TeamMembers.startsWith("[")){
-                try{teamData=JSON.parse(data.TeamMembers);maxWorkers=teamData.length+1}catch(e){}
-            }else{
-                let lines=data.TeamMembers.split('\n');
-                lines.forEach((line,index)=>{
-                    let cleanLine=line.replace(/Member \d+:\s*/,''),urls=cleanLine.split(' | ');
-                    if(urls.length>=2)teamData.push({person:index+1,iqama:urls[0].trim(),selfie:urls[1].trim()});
-                });
-                maxWorkers=teamData.length+1;
+            let extractedUrls = data.TeamMembers.match(/https?:\/\/[^\s\|]+/g) || [];
+            for(let i=0; i<extractedUrls.length; i+=2){
+                if(extractedUrls[i] && extractedUrls[i+1]){
+                    teamData.push({person: (i/2)+1, iqama: extractedUrls[i], selfie: extractedUrls[i+1]});
+                }
             }
+            maxWorkers = teamData.length + 1;
         }
 
         if(data.Type === 'Contractor'){
