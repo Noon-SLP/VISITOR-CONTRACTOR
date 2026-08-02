@@ -518,10 +518,7 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     if(!forceRefresh&&cached&&!isSilent)renderMyPasses(JSON.parse(cached));
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_by_email', email: targetEmail })
-        });
+        const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}`, { cache: 'no-store' });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();localStorage.setItem(cachedKey,JSON.stringify(data));renderMyPasses(data);
     }catch(e){if(!isSilent&&!cached)listDiv.innerHTML='<p style="color:var(--danger);font-size:13px;">Error.</p>'}
@@ -664,10 +661,7 @@ function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkb
 async function loadAdminData(isSilent=false){
     const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_all' })
-        });
+        const res=await fetch(SCRIPT_URL, { cache: 'no-store' });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
@@ -867,10 +861,7 @@ async function onScanSuccess(decodedText){
     currentScannedID=decodedText;
 
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: 'get_single', id: decodedText })
-        });
+        const res=await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}`, { cache: 'no-store' });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         if(data.error)return showScanResult("DENIED","Invalid QR Code","bg-red");
