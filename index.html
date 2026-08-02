@@ -37,7 +37,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
 <div id="login-view"><div class="login-top-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button></div><div class="login-container"><div class="logo-box"></div><div style="text-align:center;margin-bottom:25px;"><h2 style="color:var(--noon-yellow);font-size:24px;margin-bottom:6px;letter-spacing:1px;">NOON SLP</h2><p style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;" data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</p></div>
 <div class="role-tabs" id="role-tabs" style="display:none;"><div class="role-tab active" id="tab-guard" onclick="switchLoginTab('guard')" data-i18n="guard">🛡️ Guard</div><div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')" data-i18n="admin">⚙️ Admin</div></div>
-<div id="login-guard" class="hidden"><div class="input-group"><input type="text" id="lg-name" class="input-field t-ph" data-i18n="name" placeholder="Name"></div><div class="input-group"><input type="text" id="lg-id" class="input-field t-ph" data-i18n="noon_id" placeholder="Noon ID"></div><div class="input-group"><select id="lg-location" class="input-field"><option value="" data-i18n="select_guard_loc">Select Guard Location...</option><option value="RUH01">RUH01</option><option value="JED01">JED01</option><option value="DXB01">DXB01</option></select></div><button class="btn-primary" onclick="login('guard')" data-i18n="login_gate">LOGIN TO GATE</button></div><div id="login-ops"><div class="input-group"><input type="text" id="lo-name" class="input-field t-ph" data-i18n="your_full_name" placeholder="Your Full Name"></div><div class="input-group"><input type="email" id="lo-mail" class="input-field t-ph" data-i18n="your_email" placeholder="Your Gmail / Email"></div><button class="btn-primary" onclick="login('ops')" data-i18n="login_portal">LOGIN TO PORTAL</button></div><div id="login-admin" class="hidden"><div class="input-group"><input type="text" id="la-name" class="input-field t-ph" data-i18n="admin_name" placeholder="Admin Name"></div><div class="input-group"><input type="email" id="la-mail" class="input-field t-ph" data-i18n="admin_email" placeholder="Admin Gmail"></div><div class="input-group"><input type="password" id="la-pass" class="input-field t-ph" data-i18n="admin_password" placeholder="Admin Password"></div><button class="btn-primary" onclick="login('admin')" data-i18n="login_admin">LOGIN AS ADMIN</button></div></div></div>
+<div id="login-guard" class="hidden"><div class="input-group"><input type="text" id="lg-name" class="input-field t-ph" data-i18n="name" placeholder="Name"></div><div class="input-group"><input type="text" id="lg-id" class="input-field t-ph" data-i18n="noon_id" placeholder="Noon ID"></div><div class="input-group"><select id="lg-location" class="input-field"><option value="" data-i18n="select_guard_loc">Select Guard Location...</option><option value="RUH01">RUH01</option><option value="JED01">JED01</option><option value="DXB01">DXB01</option></select></div><button class="btn-primary" onclick="login('guard')" data-i18n="login_gate">LOGIN TO GATE</button></div><div id="login-ops"><div class="input-group"><input type="text" id="lo-name" class="input-field t-ph" data-i18n="your_full_name" placeholder="Your Full Name"></div><div class="input-group"><input type="email" id="lo-mail" class="input-field t-ph" data-i18n="your_email" placeholder="Your Gmail / Email"></div><button class="btn-primary" onclick="login('ops')" data-i18n="login_portal">LOGIN TO PORTAL</button></div>
+<div id="login-admin" class="hidden">
+  <div class="input-group"><input type="text" id="la-name" class="input-field t-ph" data-i18n="admin_name" placeholder="Admin Name"></div>
+  <div class="input-group"><input type="email" id="la-mail" class="input-field t-ph" data-i18n="admin_email" placeholder="Admin Gmail"></div>
+  <div class="input-group"><input type="password" id="la-pass" class="input-field t-ph" data-i18n="admin_password" placeholder="Admin Password"></div>
+  <div class="input-group"><select id="la-location" class="input-field"><option value="" data-i18n="select_guard_loc">Select Guard Location...</option><option value="RUH01">RUH01</option><option value="JED01">JED01</option><option value="DXB01">DXB01</option></select></div>
+  <button class="btn-primary" onclick="login('admin')" data-i18n="login_admin">LOGIN AS ADMIN</button>
+</div></div></div>
 
 <div id="app-layout" class="hidden">
   <aside id="sidebar" class="sidebar">
@@ -361,9 +368,9 @@ function login(role){
         if(!n||!m||!n.value||!m.value)return alert("Enter Name and Gmail");
         currentUser={role:'ops',name:n.value,email:m.value.toLowerCase().trim()};
     }else if(role==='admin'){
-        const n=document.getElementById('la-name'),m=document.getElementById('la-mail'),p=document.getElementById('la-pass');
-        if(!n||!m||!p||!n.value||!m.value||!p.value)return alert("Enter all Admin details");
-        if(p.value==='admin123')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim()};
+        const n=document.getElementById('la-name'),m=document.getElementById('la-mail'),p=document.getElementById('la-pass'),l=document.getElementById('la-location');
+        if(!n||!m||!p||!l||!n.value||!m.value||!p.value||!l.value)return alert("Enter all Admin details");
+        if(p.value==='admin123')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim(),location:l.value};
         else return alert("Incorrect Password");
     }
     saveSession();initApp();
@@ -375,9 +382,9 @@ function initApp(){
         if(lv)lv.classList.add('hidden');if(al)al.classList.remove('hidden');
         if(currentUser&&currentUser.role==='admin'){
             const vn=document.getElementById('req-vname'),ae=document.getElementById('req-admin-email'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),han=document.getElementById('header-admin-name'),sun=document.getElementById('sidebar-user-name'),na=document.getElementById('nav-sidebar-admin'),glt=document.getElementById('guard-loc-text'),agl=document.getElementById('admin-guard-loc');
-            if(vn)vn.value='';if(ae)ae.value='';if(ag)ag.classList.remove('hidden');if(sb)style.display='flex';
+            if(vn)vn.value='';if(ae)ae.value='';if(ag)ag.classList.remove('hidden');if(sb)sb.style.display='flex';
             if(han)han.innerText=currentUser.name;if(sun)sun.innerText=currentUser.name;if(na)na.classList.remove('hidden');
-            if(glt)glt.classList.add('hidden');if(agl){agl.classList.remove('hidden');currentUser.location=agl.value||''}
+            if(glt)glt.classList.add('hidden');if(agl){agl.classList.remove('hidden');agl.value=currentUser.location||'';currentUser.location=agl.value||''}
             loadAdminData(false);switchMainView('admin');
         }else if(currentUser){
             const vn=document.getElementById('req-vname'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),mc=document.getElementById('main-content');
