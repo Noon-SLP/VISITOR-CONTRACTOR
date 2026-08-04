@@ -501,7 +501,11 @@ async function submitRequest(){
 
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
-    let h='';if(data.length===0)h=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_no_history")}</p>`;
+    let h='';
+    if(!Array.isArray(data) || data.length===0){
+        listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_no_history")}</p>`;
+        return;
+    }
     data.reverse().forEach(pass=>{
         const todayNum=new Date().setHours(0,0,0,0);
         let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
@@ -537,12 +541,15 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
         else{if(!isSilent)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_enter_email")}</p>`;return}
     }
     const cachedKey='cached_passes_'+targetEmail,cached=localStorage.getItem(cachedKey);
-    if(!forceRefresh&&cached&&!isSilent)renderMyPasses(JSON.parse(cached));
+    if(!forceRefresh&&cached&&!isSilent){
+        try{ let parsed=JSON.parse(cached); if(Array.isArray(parsed)){ renderMyPasses(parsed); } else localStorage.removeItem(cachedKey); }catch(e){ localStorage.removeItem(cachedKey); }
+    }
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
         const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}&cb=${Date.now()}`);
         if(!res.ok)throw new Error("HTTP error");
-        const data=await res.json();localStorage.setItem(cachedKey,JSON.stringify(data));renderMyPasses(data);
+        const data=await res.json();
+        if(Array.isArray(data)){ localStorage.setItem(cachedKey,JSON.stringify(data)); renderMyPasses(data); }
     }catch(e){if(!isSilent&&!cached)listDiv.innerHTML='<p style="color:var(--danger);font-size:13px;">Error.</p>'}
 }
 
@@ -562,6 +569,7 @@ function setAdminFilter(range,btnElement){
 }
 
 function renderAdminData(data){
+    if(!Array.isArray(data)){ data = []; }
     globalAdminData=data;
     const tPending=document.getElementById('admin-table-pending'),tActive=document.getElementById('admin-table-active'),tHistory=document.getElementById('admin-table-history'),tGuard=document.getElementById('admin-table-guard-approvals');
     let hPending='',hActive='',hHistory='',hGuard='';
@@ -573,7 +581,7 @@ function renderAdminData(data){
     let aDate={},aType={},aFacility={},aStatus={};
 
     data.forEach(row=>{
-        if(!row.UniqueID)return;
+        if(!row||!row.UniqueID)return;
         let endDateObj=new Date((parseFlexibleDate(row.EndDate)||parseFlexibleDate(row.StartDate)||new Date()).getTime());
         endDateObj.setHours(23,59,59,999);
         const isVisitorDone=row.Type==='Visitor'&&!!row.CheckOutTime;
@@ -632,13 +640,15 @@ function renderAdminData(data){
                 if(row.GateLogs.startsWith("[")){
                     try{
                         let logs=JSON.parse(row.GateLogs);
-                        logs.forEach(l=>{
-                            let hc=l.count?`<strong style="color:var(--noon-yellow)">${l.count} Present</strong>`:'-';
-                            let ac=l.action==='IN'?'var(--success)':'var(--danger)';
-                            let guardVal = l.guard || row.ScannedByGuard || '-';
-                            hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(l.time)}</td><td style="color:${ac};font-weight:bold;">${l.action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
-                            guardCount++;logFound=true;
-                        });
+                        if(Array.isArray(logs)){
+                            logs.forEach(l=>{
+                                let hc=l.count?`<strong style="color:var(--noon-yellow)">${l.count} Present</strong>`:'-';
+                                let ac=l.action==='IN'?'var(--success)':'var(--danger)';
+                                let guardVal = l.guard || row.ScannedByGuard || '-';
+                                hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(l.time)}</td><td style="color:${ac};font-weight:bold;">${l.action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
+                                guardCount++;logFound=true;
+                            });
+                        }
                     }catch(e){}
                 }else{
                     let lines=row.GateLogs.split("\n");
@@ -683,12 +693,16 @@ function handlePrintCheckbox(cb){if(cb.checked)checkedPrintIds.add(cb.value);els
 function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkbox.row-checkbox');cbs.forEach(cb=>{cb.checked=src.checked;handlePrintCheckbox(cb)})}
 
 async function loadAdminData(isSilent=false){
-    const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
+    const cached=localStorage.getItem('cached_admin_data');
+    if(cached&&!isSilent){
+        try{ let parsed = JSON.parse(cached); if(Array.isArray(parsed)) renderAdminData(parsed.reverse()); else localStorage.removeItem('cached_admin_data'); }
+        catch(e){ localStorage.removeItem('cached_admin_data'); }
+    }
     try{
         const res=await fetch(`${SCRIPT_URL}?action=get_all&cb=${Date.now()}`);
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
-        localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
+        if(Array.isArray(data)){ localStorage.setItem('cached_admin_data',JSON.stringify(data)); renderAdminData(data.reverse()); }
     }catch(e){if(!isSilent&&!cached)console.log(e)}
 }
 
