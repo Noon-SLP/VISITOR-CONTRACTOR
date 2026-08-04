@@ -825,7 +825,7 @@ function printSelected(){
         cardsHtml+=`<div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${loc}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${st}</p><p class="id">${id}</p></div></div><div class="qr-box"><img src="${qrDataUrl}"></div></div>`;
     });
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}`;
-    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
+    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
     pw.document.close();
     pw.focus();
     setTimeout(()=>{pw.print();pw.close();},250);
@@ -1027,6 +1027,7 @@ async function onScanSuccess(decodedText){
     }catch(e){showScanResult("ERROR","Network failure","bg-red")}
 }
 
+// INSTANT (OPTIMISTIC) UI CONFIRMATION WITH SILENT BACKGROUND RETRY
 async function confirmAction(){
     const btn=document.getElementById('btn-confirm-action');
     let hcVal=1;
@@ -1045,19 +1046,38 @@ async function confirmAction(){
         }
     }
     
-    if(btn)btn.innerText="SAVING...";
-    try{
-        const gInfo=`${currentUser.name} (${currentUser.location})`;
-        const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
-        if(!res.ok)throw new Error("HTTP error");
-        const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
-        try{if(html5QrCode)html5QrCode.resume();}catch(e){}
-        const gunInput = document.getElementById('gun-scan-input');
-        if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
-            gunInput.focus();
-            gunInput.value = "";
+    // 1. INSTANTLY CLOSE RESULT MODAL & RESET SCANNER (0 WAIT TIME FOR GUARDS)
+    const scanResult=document.getElementById('scan-result');
+    if(scanResult) scanResult.classList.add('hidden');
+    try{ if(html5QrCode) html5QrCode.resume(); }catch(e){}
+    const gunInput = document.getElementById('gun-scan-input');
+    if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
+        gunInput.focus();
+        gunInput.value = "";
+    }
+
+    // 2. BACKGROUND DATA SYNC WITH AUTOMATIC RETRY
+    const gInfo = `${currentUser.name} (${currentUser.location})`;
+    const payload = JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo, headCount: hcVal });
+    
+    sendBackgroundSync(payload, 3);
+}
+
+async function sendBackgroundSync(payload, retriesLeft) {
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: payload
+        });
+        if(!res.ok && retriesLeft > 0) {
+            setTimeout(() => sendBackgroundSync(payload, retriesLeft - 1), 1500);
         }
-    }catch(e){alert("Failed to log entry/exit.");if(btn)btn.innerText=t("confirm_action")}
+    } catch(e) {
+        if(retriesLeft > 0) {
+            setTimeout(() => sendBackgroundSync(payload, retriesLeft - 1), 1500);
+        }
+    }
 }
 </script>
 </body>
