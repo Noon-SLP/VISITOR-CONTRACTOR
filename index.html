@@ -184,7 +184,7 @@ const dict={
 };
 
 let currentLang='en';
-function toggleLang(){currentLang=currentLang==='en'?'ar':'en';documentdocumentElement.dir=currentLang==='ar'?'rtl':'ltr';updateUI()}
+function toggleLang(){currentLang=currentLang==='en'?'ar':'en';document.documentElement.dir=currentLang==='ar'?'rtl':'ltr';updateUI()}
 function t(k){return dict[currentLang][k]||k}
 
 function updateUI(){
@@ -514,7 +514,6 @@ async function submitRequest(){
         clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('fmpoc');clearCapturedData('vehicle');
         teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
         
-        // Refresh passes from Google Sheet
         loadMyPasses(true, false);
     }catch(e){
         alert("Network Error.");
@@ -729,11 +728,9 @@ async function loadAdminData(isSilent=false){
     }catch(e){if(!isSilent&&!cached)console.log(e)}
 }
 
-// OPTIMISTIC ADMIN STATUS UPDATE (INSTANT ROW REMOVAL & CACHE CLEAR)
 async function updateStatus(id,newStatus){
     if(!confirm(`Mark ${id} as ${newStatus}?`))return;
     
-    // 1. INSTANT LOCAL UPDATE
     if(Array.isArray(globalAdminData)){
         let item = globalAdminData.find(x => String(x.UniqueID) === String(id));
         if(item) {
@@ -741,14 +738,12 @@ async function updateStatus(id,newStatus){
             localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData));
             renderAdminData(globalAdminData);
             
-            // Clear passes cache for the item's email so user's view updates instantly
             if(item.HostEmail) {
                 localStorage.removeItem('cached_passes_' + item.HostEmail.toLowerCase().trim());
             }
         }
     }
 
-    // 2. BACKEND SYNC
     try{
         const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});
         if(!res.ok)throw new Error("HTTP error");
@@ -997,6 +992,7 @@ window.closeScanResult = function() {
     }
 }
 
+// BULLETPROOF SCAN PROCESSOR (POST FIRST WITH LOCAL CACHE FALLBACK)
 async function onScanSuccess(decodedText){
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section');
@@ -1007,72 +1003,84 @@ async function onScanSuccess(decodedText){
     if(teamSec) teamSec.innerHTML = "";
     currentScannedID=decodedText;
 
+    let data = null;
+
+    // 1. TRY DIRECT POST FETCH
     try{
         const res=await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'get_single', id: decodedText })
         });
-        if(!res.ok)throw new Error("HTTP error");
-        const data=await res.json();
-        if(data.error)return showScanResult("DENIED","Invalid QR Code","bg-red");
-
-        const rName=document.getElementById('r-name'),rType=document.getElementById('r-type'),rLocation=document.getElementById('r-location');
-        if(rName)rName.innerText=data.VisitorName;if(rType)rType.innerText=t(data.Type.toLowerCase());if(rLocation)rLocation.innerText=data.Location;
-
-        const todayStr=formatToDDMMYYYY(new Date()),startStr=formatToDDMMYYYY(data.StartDate),todayNum=new Date().setHours(0,0,0,0);
-        let startObj=parseFlexibleDate(data.StartDate),startNum=startObj?startObj.setHours(0,0,0,0):todayNum;
-        let endObj=parseFlexibleDate(data.EndDate),endNum=endObj?endObj.setHours(0,0,0,0):startNum;
-        const isCheckedOut=!!data.CheckOutTime,isInside=!!data.CheckInTime&&!data.CheckOutTime;
-
-        if(currentUser.role==='admin'&&!currentUser.location)return showScanResult("DENIED",t('msg_admin_select_loc')||"Admin: Please select a facility first.","bg-red");
-        if(data.Status!=='Approved')return showScanResult("DENIED","Pass not approved by Admin","bg-red");
-        else if(data.Location!==currentUser.location)return showScanResult("DENIED",`Wrong Facility (Pass is for ${data.Location})`,"bg-red");
-        else if(data.Type==='Visitor'&&startStr!==todayStr)return showScanResult("DENIED","Pass is not valid for today","bg-red");
-        else if(data.Type==='Contractor'&&(todayNum<startNum||todayNum>endNum))return showScanResult("DENIED","Contractor Pass Expired","bg-red");
-
-        let teamData=[],maxWorkers=1;
-        if(data.TeamMembers&&data.TeamMembers.trim()!==""){
-            let lines = data.TeamMembers.split('\n\n');
-            lines.forEach((block, index)=>{
-                let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
-                if(extractedUrls.length>=2){
-                    teamData.push({person: index+1, iqama: extractedUrls[0], selfie: extractedUrls[1]});
-                }
-            });
-            maxWorkers = teamData.length + 1;
+        if(res.ok) {
+            let resData = await res.json();
+            if(resData && !resData.error) data = resData;
         }
+    } catch(err) {}
 
-        if(data.Type === 'Contractor'){
-            if(teamSec) teamSec.classList.remove('hidden');
-            const hcSec = document.getElementById('guard-headcount-section');
-            if(hcSec) hcSec.classList.add('hidden');
-            if(selfieImg) selfieImg.style.display='none';
-            
-            let attHtml = `<div style="text-align: left; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;"><label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL</label><div style="display:flex; flex-direction:column; gap:12px;">`;
-            
-            attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
-            
-            teamData.forEach(m => {
-                attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <span style="font-size:13px;font-weight:600;">Team Member ${m.person}</span></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
-            });
-            attHtml += `</div></div>`;
-            teamSec.innerHTML = attHtml;
-        }else{
-            if(teamSec) teamSec.classList.add('hidden');
-            if(selfieImg && (data.SelfieBase64||data.SelfieURL)){selfieImg.src=data.SelfieBase64||data.SelfieURL; selfieImg.style.display='block';}
-            const hcSec = document.getElementById('guard-headcount-section');
-            if(hcSec) hcSec.classList.add('hidden'); 
-        }
+    // 2. LOCAL CACHE FALLBACK (IF POST FAILS OR IS BLOCKED BY NETWORK/CORS)
+    if(!data && Array.isArray(globalAdminData)){
+        let cachedMatch = globalAdminData.find(x => String(x.UniqueID).toUpperCase() === String(decodedText).toUpperCase());
+        if(cachedMatch) data = cachedMatch;
+    }
 
-        if(isInside){
-            currentScanAction='check_out';showScanResult("CHECK OUT","Scanning Out.<br><span style='color:#ffc700; font-size:14px;'>⚠️ TAKE ID CARD FROM LEAD.</span>","bg-blue", data.Type==='Contractor');
-            if(confirmBtn){confirmBtn.innerText=t("btn_checkout");confirmBtn.className="btn-primary btn-warning hidden";confirmBtn.classList.remove('hidden')}
-        }else{
-            currentScanAction='check_in';showScanResult("ALLOWED","Pass Validated","bg-green", data.Type==='Contractor');
-            if(confirmBtn){confirmBtn.innerText=t("confirm_action");confirmBtn.className="btn-primary btn-success hidden";confirmBtn.classList.remove('hidden')}
-        }
-    }catch(e){showScanResult("ERROR","Network failure","bg-red")}
+    if(!data || data.error) return showScanResult("DENIED","Invalid or Unrecognized QR Code","bg-red");
+
+    const rName=document.getElementById('r-name'),rType=document.getElementById('r-type'),rLocation=document.getElementById('r-location');
+    if(rName)rName.innerText=data.VisitorName;if(rType)rType.innerText=t(data.Type.toLowerCase());if(rLocation)rLocation.innerText=data.Location;
+
+    const todayStr=formatToDDMMYYYY(new Date()),startStr=formatToDDMMYYYY(data.StartDate),todayNum=new Date().setHours(0,0,0,0);
+    let startObj=parseFlexibleDate(data.StartDate),startNum=startObj?startObj.setHours(0,0,0,0):todayNum;
+    let endObj=parseFlexibleDate(data.EndDate),endNum=endObj?endObj.setHours(0,0,0,0):startNum;
+    const isCheckedOut=!!data.CheckOutTime,isInside=!!data.CheckInTime&&!data.CheckOutTime;
+
+    if(currentUser.role==='admin'&&!currentUser.location)return showScanResult("DENIED",t('msg_admin_select_loc')||"Admin: Please select a facility first.","bg-red");
+    if(data.Status!=='Approved')return showScanResult("DENIED","Pass not approved by Admin","bg-red");
+    else if(data.Location!==currentUser.location)return showScanResult("DENIED",`Wrong Facility (Pass is for ${data.Location})`,"bg-red");
+    else if(data.Type==='Visitor'&&startStr!==todayStr)return showScanResult("DENIED","Pass is not valid for today","bg-red");
+    else if(data.Type==='Contractor'&&(todayNum<startNum||todayNum>endNum))return showScanResult("DENIED","Contractor Pass Expired","bg-red");
+
+    let teamData=[],maxWorkers=1;
+    if(data.TeamMembers&&data.TeamMembers.trim()!==""){
+        let lines = data.TeamMembers.split('\n\n');
+        lines.forEach((block, index)=>{
+            let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
+            if(extractedUrls.length>=2){
+                teamData.push({person: index+1, iqama: extractedUrls[0], selfie: extractedUrls[1]});
+            }
+        });
+        maxWorkers = teamData.length + 1;
+    }
+
+    if(data.Type === 'Contractor'){
+        if(teamSec) teamSec.classList.remove('hidden');
+        const hcSec = document.getElementById('guard-headcount-section');
+        if(hcSec) hcSec.classList.add('hidden');
+        if(selfieImg) selfieImg.style.display='none';
+        
+        let attHtml = `<div style="text-align: left; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;"><label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL</label><div style="display:flex; flex-direction:column; gap:12px;">`;
+        
+        attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+        
+        teamData.forEach(m => {
+            attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <span style="font-size:13px;font-weight:600;">Team Member ${m.person}</span></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+        });
+        attHtml += `</div></div>`;
+        teamSec.innerHTML = attHtml;
+    }else{
+        if(teamSec) teamSec.classList.add('hidden');
+        if(selfieImg && (data.SelfieBase64||data.SelfieURL)){selfieImg.src=data.SelfieBase64||data.SelfieURL; selfieImg.style.display='block';}
+        const hcSec = document.getElementById('guard-headcount-section');
+        if(hcSec) hcSec.classList.add('hidden'); 
+    }
+
+    if(isInside){
+        currentScanAction='check_out';showScanResult("CHECK OUT","Scanning Out.<br><span style='color:#ffc700; font-size:14px;'>⚠️ TAKE ID CARD FROM LEAD.</span>","bg-blue", data.Type==='Contractor');
+        if(confirmBtn){confirmBtn.innerText=t("btn_checkout");confirmBtn.className="btn-primary btn-warning hidden";confirmBtn.classList.remove('hidden')}
+    }else{
+        currentScanAction='check_in';showScanResult("ALLOWED","Pass Validated","bg-green", data.Type==='Contractor');
+        if(confirmBtn){confirmBtn.innerText=t("confirm_action");confirmBtn.className="btn-primary btn-success hidden";confirmBtn.classList.remove('hidden')}
+    }
 }
 
 // INSTANT (OPTIMISTIC) UI CONFIRMATION WITH SILENT BACKGROUND RETRY
