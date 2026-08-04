@@ -70,6 +70,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
             <div class="input-group"><input type="text" id="req-vis-slp" class="input-field t-ph" data-i18n="slp_ticket" placeholder="SLP Ticket No."></div>
             <div class="input-group"><input type="text" id="req-vis-contact" class="input-field t-ph" data-i18n="contact_no" placeholder="Contact No."></div>
             <div class="input-group"><input type="text" id="req-vis-invitedby" class="input-field t-ph" data-i18n="invited_by" placeholder="Invited by Whom"></div>
+            <div class="input-group"><input type="text" id="req-vis-imei" class="input-field" placeholder="IMEI Number"></div>
             <div class="input-group"><label data-i18n="vehicle_plate">Vehicle Plate / Picture (Optional)</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('vehicle')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-vehicle" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('vehicle')"></div><img id="preview-vehicle" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           </div>
           <div id="req-contractor-fields" class="hidden">
@@ -79,11 +80,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
             <div class="input-group"><input type="text" id="req-con-project" class="input-field t-ph" data-i18n="project_name" placeholder="Project Name"></div>
             <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
             <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
+            <div class="input-group"><input type="text" id="req-con-imei" class="input-field" placeholder="IMEI Number"></div>
             <div class="input-group"><label data-i18n="upload_fmpoc">Upload FM POC</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('fmpoc')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-fmpoc" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('fmpoc')"></div><img id="preview-fmpoc" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
-            <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);"><label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;">TEAM MEMBERS (OPTIONAL)</label><div id="team-roster-display" class="team-roster hidden"></div><button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button><div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong><button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button></div><div class="input-group"><label style="font-size: 11px;">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')">📷 Live Camera</button><input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')"></div><img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button></div></div>
+            <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);"><label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;">TEAM MEMBERS (OPTIONAL)</label><div id="team-roster-display" class="team-roster hidden"></div><button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button><div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong><button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button></div><div class="input-group"><label style="font-size: 11px;">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')">📷 Live Camera</button><input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')"></div><img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-imei" class="input-field" placeholder="IMEI Number"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;">Upload IMEI Photo / Screen</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_imei')">📷 Live Camera</button><input type="file" id="req-team-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_imeiphoto')"></div><img id="preview-team_imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button></div></div>
           </div>
           <div class="input-group" style="margin-top: 20px;"><label data-i18n="upload_iqama">Upload Lead Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')"></div><img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           <div class="input-group"><label data-i18n="upload_selfie">Upload Lead Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')"></div><img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
+          <div class="input-group"><label style="color: var(--noon-yellow); font-size: 13px; font-weight: bold;">Upload Lead IMEI Photo / Screen</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('imeiphoto')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('imeiphoto')"></div><img id="preview-imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;" data-i18n="submit_approval">Submit for Approval</button>
         </div>
         <div class="ops-card text-center">
@@ -160,7 +163,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
-let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
+let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
 
 const dict={
     en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture (Optional)","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","upload_fmpoc":"Upload FM POC","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"🕰️ History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER"},
@@ -240,13 +243,13 @@ function showTeamEntry(){
 function hideTeamEntry(){
     const tb=document.getElementById('team-entry-box'),b=document.getElementById('btn-show-team-entry');
     if(tb)tb.classList.add('hidden');if(b)b.classList.remove('hidden');
-    const ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie');
-    if(ii)ii.value="";if(si)si.value="";
-    clearCapturedData('team_iqama');clearCapturedData('team_selfie');
+    const ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie'),imNum=document.getElementById('req-team-imei'),imPho=document.getElementById('req-team-imeiphoto');
+    if(ii)ii.value="";if(si)si.value="";if(imNum)imNum.value="";if(imPho)imPho.value="";
+    clearCapturedData('team_iqama');clearCapturedData('team_selfie');clearCapturedData('team_imeiphoto');
 }
 
 async function saveCurrentTeamMember(){
-    let iB64='',sB64='',ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie');
+    let iB64='',sB64='',imB64='',ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie'),imNum=document.getElementById('req-team-imei'),imPho=document.getElementById('req-team-imeiphoto');
     if(capturedImages.team_iqama)iB64=capturedImages.team_iqama.split(',')[1];
     else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1]}
     else return alert("Please provide Iqama photo.");
@@ -255,10 +258,21 @@ async function saveCurrentTeamMember(){
     else if(si&&si.files.length>0){let f=await getBase64(si.files[0]);sB64=f.split(',')[1]}
     else return alert("Please provide Selfie photo.");
 
-    teamList.push({iqama:"data:image/jpeg;base64,"+iB64,selfie:"data:image/jpeg;base64,"+sB64,rawIqama:iB64,rawSelfie:sB64});
+    if(capturedImages.team_imeiphoto)imB64=capturedImages.team_imeiphoto.split(',')[1];
+    else if(imPho&&imPho.files.length>0){let f=await getBase64(imPho.files[0]);imB64=f.split(',')[1]}
+
+    teamList.push({
+        iqama:"data:image/jpeg;base64,"+iB64,
+        selfie:"data:image/jpeg;base64,"+sB64,
+        imeiPhoto:imB64 ? "data:image/jpeg;base64,"+imB64 : "",
+        rawIqama:iB64,
+        rawSelfie:sB64,
+        rawImeiPhoto:imB64,
+        imeiNumber: imNum ? imNum.value.trim() : ""
+    });
     currentTeamCounter++;renderTeamRoster();
-    if(ii)ii.value="";if(si)si.value="";
-    clearCapturedData('team_iqama');clearCapturedData('team_selfie');
+    if(ii)ii.value="";if(si)si.value="";if(imNum)imNum.value="";if(imPho)imPho.value="";
+    clearCapturedData('team_iqama');clearCapturedData('team_selfie');clearCapturedData('team_imeiphoto');
     const tt=document.getElementById('team-entry-title');if(tt)tt.innerText=`Team Member ${currentTeamCounter}`;
 }
 
@@ -267,7 +281,7 @@ function renderTeamRoster(){
     if(teamList.length>0){
         div.classList.remove('hidden');let h='';
         teamList.forEach((m,idx)=>{
-            h+=`<div class="team-member-row"><span style="color:white;font-size:13px;font-weight:bold;">Person ${idx+1}</span><div style="display:flex;gap:10px;"><img src="${m.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Selfie"><button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;" onclick="removeTeamMember(${idx})">❌</button></div></div>`;
+            h+=`<div class="team-member-row"><span style="color:white;font-size:13px;font-weight:bold;">Person ${idx+1} ${m.imeiNumber ? '(IMEI: '+m.imeiNumber+')':''}</span><div style="display:flex;gap:10px;"><img src="${m.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="Selfie">${m.imeiPhoto ? `<img src="${m.imeiPhoto}" class="team-member-img" onclick="openFullscreenImage(this.src)" title="IMEI Photo">`:''}<button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;" onclick="removeTeamMember(${idx})">❌</button></div></div>`;
         });
         div.innerHTML=h;
     }else div.classList.add('hidden');
@@ -293,7 +307,9 @@ function captureLivePhoto(){
     const p=document.getElementById(`preview-${targetPhotoType}`);
     if(p){p.src=b64;p.classList.remove('hidden');p.onclick=()=>openFullscreenImage(b64)}
     let idStr=`req-${targetPhotoType}`;
-    if(targetPhotoType==='team_iqama')idStr='req-team-iqama';if(targetPhotoType==='team_selfie')idStr='req-team-selfie';
+    if(targetPhotoType==='team_iqama')idStr='req-team-iqama';
+    if(targetPhotoType==='team_selfie')idStr='req-team-selfie';
+    if(targetPhotoType==='team_imeiphoto')idStr='req-team-imeiphoto';
     const fi=document.getElementById(idStr);if(fi)fi.value="";
     closeLiveCamera();
 }
@@ -420,9 +436,10 @@ window.onload=function(){
 
 async function submitRequest(){
     const ti=document.getElementById('req-type');if(!ti)return;
-    const type=ti.value,ii=document.getElementById('req-iqama'),si=document.getElementById('req-selfie'),vi=document.getElementById('req-vehicle'),btn=document.getElementById('btn-submit-req');
+    const type=ti.value,ii=document.getElementById('req-iqama'),si=document.getElementById('req-selfie'),imPho=document.getElementById('req-imeiphoto'),vi=document.getElementById('req-vehicle'),btn=document.getElementById('btn-submit-req');
     if(!btn)return;
-    let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',vB64='',vMime='image/jpeg';
+    let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',imB64='',imMime='image/jpeg',vB64='',vMime='image/jpeg';
+    
     if(capturedImages.iqama)iB64=capturedImages.iqama.split(',')[1];
     else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1];iMime=ii.files[0].type}
     else return alert("Please provide Lead Iqama photo.");
@@ -431,13 +448,16 @@ async function submitRequest(){
     else if(si&&si.files.length>0){let f=await getBase64(si.files[0]);sB64=f.split(',')[1];sMime=si.files[0].type}
     else return alert("Please provide Lead Selfie photo.");
 
+    if(capturedImages.imeiphoto)imB64=capturedImages.imeiphoto.split(',')[1];
+    else if(imPho&&imPho.files.length>0){let f=await getBase64(imPho.files[0]);imB64=f.split(',')[1];imMime=imPho.files[0].type}
+
     let fB64='',fMime='image/jpeg',cleanTeam=[];
     if(type==='Contractor'){
         const fi=document.getElementById('req-fmpoc');
         if(capturedImages.fmpoc)fB64=capturedImages.fmpoc.split(',')[1];
         else if(fi&&fi.files.length>0){let f=await getBase64(fi.files[0]);fB64=f.split(',')[1];fMime=fi.files[0].type}
         else return alert("Please provide FM POC photo.");
-        teamList.forEach(m=>cleanTeam.push({iqama:m.rawIqama,selfie:m.rawSelfie}));
+        teamList.forEach(m=>cleanTeam.push({iqama:m.rawIqama,selfie:m.rawSelfie,imeiPhoto:m.rawImeiPhoto,imeiNumber:m.imeiNumber}));
     }else{
         if(capturedImages.vehicle)vB64=capturedImages.vehicle.split(',')[1];
         else if(vi&&vi.files.length>0){let f=await getBase64(vi.files[0]);vB64=f.split(',')[1];vMime=vi.files[0].type}
@@ -451,13 +471,15 @@ async function submitRequest(){
     const vni=document.getElementById('req-vname'),vName=vni?vni.value.trim():'';
     if(!vName)return alert("Full Name is required.");
 
+    const leadImeiVal = type==='Visitor' ? document.getElementById('req-vis-imei').value : document.getElementById('req-con-imei').value;
+
     btn.innerText=t("fetching");btn.disabled=true;
     try{
         const payload={
             action:'create',hostName:hName,hostEmail:hMail,visitorName:vName,type:type,location:document.getElementById('req-location').value,
             startDate:type==='Visitor'?document.getElementById('req-date-single').value:document.getElementById('req-date-start').value,
             endDate:type==='Visitor'?document.getElementById('req-date-single').value:document.getElementById('req-date-end').value,
-            iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,fmpocBase64:fB64,fmpocMimeType:fMime,
+            iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmpocBase64:fB64,fmpocMimeType:fMime,
             vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,
             slpTicketNo:type==='Visitor'?document.getElementById('req-vis-slp').value:document.getElementById('req-con-slp').value,
             contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,
@@ -467,12 +489,12 @@ async function submitRequest(){
             projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:'',fmPoc:''
         };
         if(!payload.startDate){btn.innerText=t("submit_approval");btn.disabled=false;return alert("Visit dates are required.")}
-        await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
+        await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
         btn.innerText=t("submit_approval");btn.disabled=false;
         if(currentUser.role==='admin'&&vni)vni.value="";
-        if(ii)ii.value="";if(si)si.value="";if(vi)vi.value="";
+        if(ii)ii.value="";if(si)si.value="";if(imPho)imPho.value="";if(vi)vi.value="";
         const fi=document.getElementById('req-fmpoc');if(fi)fi.value="";
-        clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('fmpoc');clearCapturedData('vehicle');
+        clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('fmpoc');clearCapturedData('vehicle');
         teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();loadMyPasses(true,false);
     }catch(e){alert("Network Error.");btn.innerText=t("submit_approval");btn.disabled=false}
 }
@@ -518,7 +540,11 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     if(!forceRefresh&&cached&&!isSilent)renderMyPasses(JSON.parse(cached));
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
-        const res=await fetch(`${SCRIPT_URL}?action=get_by_email&email=${encodeURIComponent(targetEmail)}&cb=${Date.now()}`);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'get_by_email', email: targetEmail })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();localStorage.setItem(cachedKey,JSON.stringify(data));renderMyPasses(data);
     }catch(e){if(!isSilent&&!cached)listDiv.innerHTML='<p style="color:var(--danger);font-size:13px;">Error.</p>'}
@@ -625,7 +651,7 @@ function renderAdminData(data){
                             let action=m[1],count=m[2],time=new Date(m[3]),guard=m[4];
                             let hc=`<strong style="color:var(--noon-yellow)">${count} Present</strong>`;
                             let ac=action==='IN'?'var(--success)':'var(--danger)';
-                            hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(time)}</td><td style="color:${ac};font-weight:bold;">${action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guard||'-'}</td></tr>`;
+                            hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(time)}</td><td style="color:${ac};font-weight:bold;">${action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${l.guard||'-'}</td></tr>`;
                             guardCount++;logFound=true;
                         }
                     });
@@ -661,7 +687,11 @@ function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkb
 async function loadAdminData(isSilent=false){
     const cached=localStorage.getItem('cached_admin_data');if(cached&&!isSilent)renderAdminData(JSON.parse(cached).reverse());
     try{
-        const res=await fetch(`${SCRIPT_URL}?action=get_all&cb=${Date.now()}`);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'get_all' })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         localStorage.setItem('cached_admin_data',JSON.stringify(data));renderAdminData(data.reverse());
@@ -671,7 +701,7 @@ async function loadAdminData(isSilent=false){
 async function updateStatus(id,newStatus){
     if(!confirm(`Mark ${id} as ${newStatus}?`))return;
     try{
-        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});
         if(!res.ok)throw new Error("HTTP error");
         loadAdminData(false);
     }catch(e){alert("Failed to update status")}
@@ -681,7 +711,7 @@ async function adminCheckOut(id){
     if(!confirm(`Force check-out for pass ${id}?`))return;
     try{
         const adminInfo=`Admin: ${currentUser.name} (${currentUser.email})`;
-        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'})});
         if(!res.ok)throw new Error("HTTP error");
         localStorage.removeItem('cached_admin_data');
         setTimeout(()=>{loadAdminData(true)},1000);
@@ -703,7 +733,7 @@ async function submitExtendPass(){
     if(!confirm(`Extend pass ${id}?`))return;
     btn.innerText='SAVING...';btn.disabled=true;
     try{
-        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'extend_pass',id:id,newStartDate:ns,newEndDate:ne})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'extend_pass',id:id,newStartDate:ns,newEndDate:ne})});
         if(!res.ok)throw new Error("HTTP error");
         closeExtendPass();loadAdminData(false);
     }catch(e){alert('Error.')}finally{btn.innerText=t("save_extension");btn.disabled=false}
@@ -711,11 +741,14 @@ async function submitExtendPass(){
 
 function openViewRecord(id){
     const r=globalAdminData.find(x=>String(x.UniqueID)===String(id));if(!r)return;
-    let h=`<div><strong>${t('lbl_host_name')}</strong>${r.HostName||'-'}</div><div><strong>${t('lbl_host_email')}</strong>${r.HostEmail||'-'}</div><div><strong>${t('visitor_name')}</strong>${r.VisitorName||'-'}</div><div><strong>${t('type_header')}</strong>${t(r.Type.toLowerCase())||'-'}</div><div><strong>${t('location_label')}</strong>${r.Location||'-'}</div><div><strong>${t('lbl_validity')}</strong>${r.Type==='Visitor'?formatToDDMMYYYY(r.StartDate):formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate)}</div><div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo||'-'}</div><div><strong>${t('contact_no')}</strong>${r.ContactNo||'-'}</div>`;
+    let h=`<div><strong>${t('lbl_host_name')}</strong>${r.HostName||'-'}</div><div><strong>${t('lbl_host_email')}</strong>${r.HostEmail||'-'}</div><div><strong>${t('visitor_name')}</strong>${r.VisitorName||'-'}</div><div><strong>${t('type_header')}</strong>${t(r.Type.toLowerCase())||'-'}</div><div><strong>${t('location_label')}</strong>${r.Location||'-'}</div><div><strong>${t('lbl_validity')}</strong>${r.Type==='Visitor'?formatToDDMMYYYY(r.StartDate):formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate)}</div><div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo||'-'}</div><div><strong>${t('contact_no')}</strong>${r.ContactNo||'-'}</div><div><strong>IMEI NUMBER</strong>${r.ImeiNumber||'-'}</div>`;
     if(r.Type==='Visitor')h+=`<div><strong>${t('invited_by')}</strong>${r.InvitedBy||'-'}</div>`;
     else h+=`<div><strong>${t('project_name')}</strong>${r.ProjectName||'-'}</div><div><strong>${t('company_name')}</strong>${r.CompanyName||'-'}</div><div><strong>${t('project_manager')}</strong>${r.ProjectManager||'-'}</div>`;
 
     h+=`<div class="record-img-box" style="margin-top:15px;"><div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_iqama')} (Lead)</strong><img src="${r.IqamaURL||''}" onclick="openFullscreenImage(this.src)"></div><div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_selfie')} (Lead)</strong><img src="${r.SelfieURL||''}" onclick="openFullscreenImage(this.src)"></div>`;
+    if(r.ImeiPhotoURL && r.ImeiPhotoURL !== "No File") {
+        h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>IMEI PHOTO (Lead)</strong><img src="${r.ImeiPhotoURL}" onclick="openFullscreenImage(this.src)"></div>`;
+    }
     if(r.Type==='Contractor'){
         if(r.FmPoc&&(r.FmPoc.startsWith('http')||r.FmPoc.startsWith('data:image')))h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('fm_poc')}</strong><img src="${r.FmPoc}" onclick="openFullscreenImage(this.src)"></div>`;
         else h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('fm_poc')}</strong><div style="margin-top:5px;color:var(--text-muted);">${r.FmPoc||'-'}</div></div>`;
@@ -728,15 +761,26 @@ function openViewRecord(id){
 
     if(r.TeamMembers&&r.TeamMembers.trim()!==""){
         let td=[];
-        let extractedUrls = r.TeamMembers.match(/https?:\/\/[^\s\|]+/g) || [];
-        for(let i=0; i<extractedUrls.length; i+=2){
-            if(extractedUrls[i] && extractedUrls[i+1]){
-                td.push({person: (i/2)+1, iqama: extractedUrls[i], selfie: extractedUrls[i+1]});
+        let lines = r.TeamMembers.split('\n\n');
+        lines.forEach((block, idx)=>{
+            let imeiMatch = block.match(/\(IMEI:\s*([^)]+)\)/);
+            let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
+            if(extractedUrls.length >= 2){
+                td.push({
+                    person: idx+1,
+                    imei: imeiMatch ? imeiMatch[1] : 'N/A',
+                    iqama: extractedUrls[0],
+                    selfie: extractedUrls[1],
+                    imeiPhoto: extractedUrls[2] || null
+                });
             }
-        }
+        });
+
         if(td.length>0){
             h+=`<div style="grid-column:span 2;background:transparent;border-top:1px solid var(--border-color);padding-top:15px;margin-top:10px;"><strong style="font-size:14px;margin-bottom:15px;">TEAM MEMBERS (${td.length})</strong><div style="display:flex;flex-direction:column;gap:10px;">`;
-            td.forEach(m=>{h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><span style="color:var(--noon-yellow);font-weight:bold;">Person ${m.person}</span><div style="display:flex;gap:10px;"><img src="${m.iqama}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie"></div></div>`});
+            td.forEach(m=>{
+                h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><div><span style="color:var(--noon-yellow);font-weight:bold;">Person ${m.person}</span><br><span style="font-size:11px;color:var(--text-muted);">IMEI: ${m.imei}</span></div><div style="display:flex;gap:10px;"><img src="${m.iqama}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie">${m.imeiPhoto ? `<img src="${m.imeiPhoto}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="IMEI Photo">`:''}</div></div>`;
+            });
             h+=`</div></div>`;
         }
     }
@@ -760,7 +804,7 @@ function printSelected(){
         cardsHtml+=`<div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${loc}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${st}</p><p class="id">${id}</p></div></div><div class="qr-box"><img src="${qrDataUrl}"></div></div>`;
     });
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}`;
-    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
+    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
     pw.document.close();
     pw.focus();
     setTimeout(()=>{pw.print();pw.close();},250);
@@ -861,7 +905,11 @@ async function onScanSuccess(decodedText){
     currentScannedID=decodedText;
 
     try{
-        const res=await fetch(`${SCRIPT_URL}?action=get_single&id=${decodedText}&cb=${Date.now()}`);
+        const res=await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'get_single', id: decodedText })
+        });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         if(data.error)return showScanResult("DENIED","Invalid QR Code","bg-red");
@@ -882,12 +930,13 @@ async function onScanSuccess(decodedText){
 
         let teamData=[],maxWorkers=1;
         if(data.TeamMembers&&data.TeamMembers.trim()!==""){
-            let extractedUrls = data.TeamMembers.match(/https?:\/\/[^\s\|]+/g) || [];
-            for(let i=0; i<extractedUrls.length; i+=2){
-                if(extractedUrls[i] && extractedUrls[i+1]){
-                    teamData.push({person: (i/2)+1, iqama: extractedUrls[i], selfie: extractedUrls[i+1]});
+            let lines = data.TeamMembers.split('\n\n');
+            lines.forEach((block, index)=>{
+                let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
+                if(extractedUrls.length>=2){
+                    teamData.push({person: index+1, iqama: extractedUrls[0], selfie: extractedUrls[1]});
                 }
-            }
+            });
             maxWorkers = teamData.length + 1;
         }
 
@@ -944,7 +993,7 @@ async function confirmAction(){
     if(btn)btn.innerText="SAVING...";
     try{
         const gInfo=`${currentUser.name} (${currentUser.location})`;
-        const res=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
+        const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:currentScanAction,id:currentScannedID,guardInfo:gInfo,headCount:hcVal})});
         if(!res.ok)throw new Error("HTTP error");
         const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
         try{if(html5QrCode)html5QrCode.resume();}catch(e){}
