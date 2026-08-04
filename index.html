@@ -102,13 +102,26 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
         <div class="header-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px;" onclick="logout()" data-i18n="logout">LOGOUT</button></div>
       </div>
       <div style="max-width: 450px; margin: 0 auto;">
-        <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;" data-i18n="start_camera">START CAMERA SCANNER</button>
         
-        <div id="reader-container" class="hidden">
-            <div id="reader" style="width:100%; border:none; border-radius:12px; overflow:hidden; background:var(--card-bg); box-shadow:0 10px 40px rgba(0,0,0,0.6);"></div>
-            <div style="display:flex;gap:10px;margin-top:15px;justify-content:center;flex-wrap:wrap;">
-                <button class="btn-primary btn-outline" style="width:auto;" onclick="switchScannerCamera()">🔄 FLIP CAM</button>
-                <button class="btn-primary btn-danger" style="width:auto;" onclick="stopScanner()">❌ CANCEL</button>
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <button class="btn-primary" id="btn-mode-camera" onclick="switchScanMode('camera')" style="font-size: 14px; padding: 14px; flex:1;">📷 CAMERA SCANNER</button>
+            <button class="btn-primary btn-outline" id="btn-mode-gun" onclick="switchScanMode('gun')" style="font-size: 14px; padding: 14px; flex:1;">🔌 HARDWARE GUN</button>
+        </div>
+
+        <div id="gun-scanner-container" class="hidden" style="background:var(--card-bg); padding:25px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
+            <p style="color:var(--noon-yellow); font-weight:bold; margin-bottom:10px; font-size:14px;">HARDWARE SCANNER READY</p>
+            <p style="color:var(--text-muted); font-size:12px; margin-bottom:15px;">Point your handheld gun scanner at the QR code and trigger.</p>
+            <input type="text" id="gun-scan-input" class="input-field" placeholder="Awaiting hardware scan..." style="font-size:16px; font-weight:bold; text-align:center; border-color:var(--noon-yellow);" onkeydown="handleGunScan(event)" autofocus>
+        </div>
+
+        <div id="camera-mode-wrapper" class="hidden">
+            <button class="btn-primary mb-4" id="btn-start-scan" onclick="startScanner()" style="font-size: 16px; padding: 18px;">START CAMERA SCANNER</button>
+            <div id="reader-container" class="hidden">
+                <div id="reader" style="width:100%; border:none; border-radius:12px; overflow:hidden; background:var(--card-bg); box-shadow:0 10px 40px rgba(0,0,0,0.6);"></div>
+                <div style="display:flex;gap:10px;margin-top:15px;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn-primary btn-outline" style="width:auto;" onclick="switchScannerCamera()">🔄 FLIP CAM</button>
+                    <button class="btn-primary btn-danger" style="width:auto;" onclick="stopScanner()">❌ CANCEL</button>
+                </div>
             </div>
         </div>
 
@@ -812,7 +825,7 @@ function printSelected(){
         cardsHtml+=`<div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${loc}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${st}</p><p class="id">${id}</p></div></div><div class="qr-box"><img src="${qrDataUrl}"></div></div>`;
     });
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}`;
-    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
+    pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
     pw.document.close();
     pw.focus();
     setTimeout(()=>{pw.print();pw.close();},250);
@@ -830,6 +843,39 @@ function printQR(name,type,location,id,status,date){
     pw.document.close();
     pw.focus();
     setTimeout(()=>{pw.print();pw.close();},250);
+}
+
+function switchScanMode(mode) {
+    const btnCam = document.getElementById('btn-mode-camera');
+    const btnGun = document.getElementById('btn-mode-gun');
+    const gunContainer = document.getElementById('gun-scanner-container');
+    const camWrapper = document.getElementById('camera-mode-wrapper');
+    const gunInput = document.getElementById('gun-scan-input');
+
+    if (mode === 'gun') {
+        if(btnCam) btnCam.className = "btn-primary btn-outline";
+        if(btnGun) btnGun.className = "btn-primary";
+        if(camWrapper) camWrapper.classList.add('hidden');
+        if(gunContainer) gunContainer.classList.remove('hidden');
+        stopScanner();
+        if(gunInput) { gunInput.focus(); gunInput.value = ""; }
+    } else {
+        if(btnCam) btnCam.className = "btn-primary";
+        if(btnGun) btnGun.className = "btn-primary btn-outline";
+        if(gunContainer) gunContainer.classList.add('hidden');
+        if(camWrapper) camWrapper.classList.remove('hidden');
+    }
+}
+
+function handleGunScan(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const code = event.target.value.trim();
+        if (code) {
+            onScanSuccess(code);
+            event.target.value = "";
+        }
+    }
 }
 
 function startScanner() {
@@ -900,6 +946,11 @@ window.closeScanResult = function() {
     const sr = document.getElementById('scan-result');
     if(sr) sr.classList.add('hidden');
     try{if(html5QrCode) html5QrCode.resume();}catch(e){}
+    const gunInput = document.getElementById('gun-scan-input');
+    if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
+        gunInput.focus();
+        gunInput.value = "";
+    }
 }
 
 async function onScanSuccess(decodedText){
@@ -1001,6 +1052,11 @@ async function confirmAction(){
         if(!res.ok)throw new Error("HTTP error");
         const scanResult=document.getElementById('scan-result');if(scanResult)scanResult.classList.add('hidden');
         try{if(html5QrCode)html5QrCode.resume();}catch(e){}
+        const gunInput = document.getElementById('gun-scan-input');
+        if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
+            gunInput.focus();
+            gunInput.value = "";
+        }
     }catch(e){alert("Failed to log entry/exit.");if(btn)btn.innerText=t("confirm_action")}
 }
 </script>
