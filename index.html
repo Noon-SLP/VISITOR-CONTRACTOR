@@ -850,10 +850,15 @@ function openViewRecord(id){
     if(r.Type==='Contractor' && r.FmPoc && (r.FmPoc.startsWith('http')||r.FmPoc.startsWith('data:image'))){
         h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('fm_poc')} (Legacy Image)</strong><img src="${r.FmPoc}" onclick="openFullscreenImage(this.src)"></div>`;
     }
-    if(r.VehiclePlateNo && (r.VehiclePlateNo.startsWith('http')||r.VehiclePlateNo.startsWith('data:image'))){
-        h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" onclick="openFullscreenImage(this.src)"></div>`;
-        else h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px;color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
+    
+    if(r.VehiclePlateNo){
+        if(r.VehiclePlateNo.startsWith('http')||r.VehiclePlateNo.startsWith('data:image')){
+            h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${r.VehiclePlateNo}" onclick="openFullscreenImage(this.src)"></div>`;
+        } else {
+            h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px;color:var(--text-muted);">${r.VehiclePlateNo}</div></div>`;
+        }
     }
+    
     h+=`</div>`;
 
     if(r.TeamMembers&&r.TeamMembers.trim()!==""){
