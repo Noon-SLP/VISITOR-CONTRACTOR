@@ -412,7 +412,7 @@ function login(role){
     }else if(role==='admin'){
         const n=document.getElementById('la-name'),m=document.getElementById('la-mail'),p=document.getElementById('la-pass'),l=document.getElementById('la-location');
         if(!n||!m||!p||!l||!n.value||!m.value||!p.value||!l.value)return alert("Enter all Admin details");
-        if(p.value==='admin123')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim(),location:l.value};
+        if(p.value==='NoonCCTVSLP#2026')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim(),location:l.value};
         else return alert("Incorrect Password");
     }
     saveSession();initApp();
