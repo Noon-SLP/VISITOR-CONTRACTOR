@@ -412,7 +412,7 @@ function login(role){
     }else if(role==='admin'){
         const n=document.getElementById('la-name'),m=document.getElementById('la-mail'),p=document.getElementById('la-pass'),l=document.getElementById('la-location');
         if(!n||!m||!p||!l||!n.value||!m.value||!p.value||!l.value)return alert("Enter all Admin details");
-        if(p.value==='NoonCCTVSLP#2026')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim(),location:l.value};
+        if(p.value==='admin123')currentUser={role:'admin',name:n.value,email:m.value.toLowerCase().trim(),location:l.value};
         else return alert("Incorrect Password");
     }
     saveSession();initApp();
@@ -1098,13 +1098,13 @@ async function onScanSuccess(decodedText){
     let teamData=[],maxWorkers=1;
     if(data.TeamMembers&&data.TeamMembers.trim()!==""){
         let lines = data.TeamMembers.split('\n\n');
-        lines.forEach((block, index)=>{
+        lines.forEach((block, idx)=>{
             let nameMatch = block.match(/Name:\s*(.+?)\s*\|/);
             let iqamaMatch = block.match(/Iqama:\s*([^\n]+)/);
             let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             if(extractedUrls.length >= 2){
                 teamData.push({
-                    person: index+1,
+                    person: idx+1,
                     name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
                     iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
                     iqama: extractedUrls[0],
