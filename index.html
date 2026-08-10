@@ -638,7 +638,18 @@ function renderMyPasses(data){
         let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
         if(pass.Status==='Approved'&&(pass.Type!=='Visitor'||!pass.CheckOutTime)&&todayNum<=endNum){
             const qre=document.getElementById(`qr-${pass.UniqueID}`);
-            if(qre)new QRCode(qre,{text:pass.UniqueID,width:120,height:120,colorDark:"#000",colorLight:"#fff"});
+            if(qre) {
+                new QRCode(qre,{text:pass.UniqueID,width:120,height:120,colorDark:"#000",colorLight:"#fff"});
+                setTimeout(() => {
+                    const canvas = qre.querySelector('canvas');
+                    const img = qre.querySelector('img');
+                    if (canvas && img) {
+                        img.src = canvas.toDataURL('image/png');
+                        img.style.display = 'block';
+                        canvas.style.display = 'none';
+                    }
+                }, 250);
+            }
         }
     });
 }
@@ -1160,7 +1171,7 @@ async function onScanSuccess(decodedText){
     let teamData=[],maxWorkers=1;
     if(data.TeamMembers&&data.TeamMembers.trim()!==""){
         let lines = data.TeamMembers.split('\n\n');
-        lines.forEach((block, index)=>{
+        lines.forEach((block, idx)=>{
             let nameMatch = block.match(/Name:\s*(.+?)\s*\|/);
             let iqamaMatch = block.match(/Iqama:\s*([^\n]+)/);
             let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
