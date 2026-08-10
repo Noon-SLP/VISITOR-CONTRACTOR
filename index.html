@@ -96,7 +96,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
             <img id="preview-imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
           </div>
 
-          <div id="team-members-section" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+          <div id="team-members-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
             <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;" data-i18n="btn_add_team">TEAM MEMBERS (OPTIONAL)</label>
             <div id="team-roster-display" class="team-roster hidden"></div>
             <button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
@@ -245,10 +245,9 @@ function logout(){
 
 function toggleDateFields(){
     const te=document.getElementById('req-type');if(!te)return;
-    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields'),tms=document.getElementById('team-members-section');
+    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields');
     if(vf)vf.classList.toggle('hidden',type==='Contractor');
     if(cf)cf.classList.toggle('hidden',type==='Visitor');
-    if(tms)tms.classList.toggle('hidden',type==='Visitor');
 }
 
 function switchLoginTab(role){
@@ -464,7 +463,6 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
-    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
