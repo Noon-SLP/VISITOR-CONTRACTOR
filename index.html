@@ -15,7 +15,7 @@ body[dir="rtl"]{font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 #app-layout{display:flex;width:100vw;height:100vh;overflow:hidden}.sidebar{width:240px;background:var(--sidebar-bg);border-inline-end:1px solid var(--border-color);display:flex;flex-direction:column;transition:width 0.3s;z-index:100}.sidebar.minimized{width:75px}.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--border-color)}.sidebar.minimized .sidebar-brand{display:none}.sidebar-brand h1{font-size:16px;color:var(--noon-yellow);margin-bottom:2px}.sidebar-brand p{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px}.toggle-btn{background:transparent;color:white;border:none;font-size:20px;cursor:pointer;padding:5px}.sidebar-nav{flex:1;padding:20px 0;display:flex;flex-direction:column;gap:5px}.sidebar-nav a{display:flex;align-items:center;padding:12px 20px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:600;border-left:3px solid transparent;transition:0.2s}.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,199,0,0.05);color:var(--noon-yellow);border-left:3px solid var(--noon-yellow)}.sidebar-nav a .icon{font-size:18px;min-width:35px}.sidebar.minimized .nav-text{display:none}.sidebar-footer{padding:20px;border-top:1px solid var(--border-color);text-align:center}.sidebar.minimized .sidebar-footer{padding:20px 10px}
 #main-content{flex:1;height:100vh;overflow-y:auto;position:relative;background-image:radial-gradient(circle at center,rgba(20,22,28,0.4) 0%,rgba(5,5,7,0.95) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E")}
 .dashboard{width:100%;padding:20px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;gap:15px}.header h2{color:var(--noon-yellow);font-size:22px;margin:0;display:flex;align-items:center;gap:15px}.header-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}#dashboard-ops{max-width:950px;margin-top:20px}#dashboard-guard{max-width:600px;margin-top:20px}#dashboard-admin{max-width:100%;padding:30px 2.5vw;padding-top:0}
-.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start;position:relative;overflow:hidden}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
 #reader{width:100%;border:none;border-radius:12px;overflow:hidden;background:var(--card-bg);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 .scan-result-card{padding:30px;border-radius:12px;text-align:center;margin-top:25px;color:white;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}.bg-green{background-color:var(--success)}.bg-red{background-color:var(--danger)}.bg-blue{background-color:#3b82f6}.visitor-photo{width:160px;height:160px;border-radius:12px;object-fit:cover;border:3px solid white;margin:0 auto 20px auto;display:none;box-shadow:0 8px 25px rgba(0,0,0,0.5)}
 .fullscreen-scan{position:fixed !important;top:0;left:0;width:100vw !important;height:100vh !important;z-index:999999;overflow-y:auto;border-radius:0 !important;margin:0 !important;display:flex;flex-direction:column;justify-content:flex-start}
@@ -464,6 +464,7 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
+    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -582,13 +583,17 @@ async function downloadPass(id) {
     
     if (btnContainer) btnContainer.style.display = 'none';
     
+    // Give the DOM a tiny bit of time to register the new <img> tag
+    await new Promise(r => setTimeout(r, 500));
+    
     try {
-        const canvas = await html2canvas(passCard, {
+        const capturedCanvas = await html2canvas(passCard, {
             backgroundColor: '#090b10', 
-            scale: 2 
+            scale: 2,
+            useCORS: true
         });
         
-        const dataUrl = canvas.toDataURL('image/png');
+        const dataUrl = capturedCanvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataUrl;
         link.download = `Noon_Pass_${id}.png`;
@@ -641,13 +646,14 @@ function renderMyPasses(data){
             if(qre) {
                 new QRCode(qre, {text:pass.UniqueID, width:120, height:120, colorDark:"#000", colorLight:"#fff", correctLevel: QRCode.CorrectLevel.H});
                 
+                // FORCE CONVERT TO IMAGE IMMEDIATELY
                 setTimeout(() => {
                     let canvas = qre.querySelector("canvas");
                     if (canvas) {
                         let qrDataUrl = canvas.toDataURL("image/png");
-                        qre.innerHTML = `<img src="${qrDataUrl}" style="width:120px;height:120px;display:block;margin:0 auto;border-radius:4px;">`;
+                        qre.innerHTML = `<img src="${qrDataUrl}" style="width:120px;height:120px;display:block;margin:0 auto;">`;
                     }
-                }, 150);
+                }, 1000); // 1 second delay to ensure it draws completely
             }
         }
     });
