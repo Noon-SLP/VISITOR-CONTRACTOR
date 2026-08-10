@@ -153,7 +153,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
         <div id="admin-manual-search-box" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
             <p style="color:var(--noon-yellow); font-weight:bold; margin-bottom:10px; font-size:13px; text-transform:uppercase;">Manual Pass Search</p>
             <div style="display:flex; gap:10px;">
-                <input type="text" id="guard-search-input" class="input-field" placeholder="Search Name, Iqama, Ticket, or ID" onkeydown="if(event.key === 'Enter') performManualSearch()">
+                <input type="text" id="guard-search-input" class="input-field" placeholder="Search Name, Iqama, Ticket, Email, or ID" onkeydown="if(event.key === 'Enter') performManualSearch()">
                 <button class="btn-primary" style="width:auto; padding:0 20px;" onclick="performManualSearch()">🔍</button>
             </div>
             <div id="manual-search-results" style="margin-top:10px; text-align:left;"></div>
@@ -184,8 +184,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
         <div id="scan-result" class="scan-result-card hidden" style="position:relative;"><button onclick="closeScanResult()" style="position:absolute;top:10px;right:15px;background:transparent;border:none;color:white;font-size:26px;cursor:pointer;z-index:10;">&times;</button>
           <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
           <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
+          
           <div id="scan-result-top-info"></div>
           <div id="guard-details-preview" style="margin-bottom:15px; text-align:left;"></div>
+          
+          <div id="guard-search-filter-container" class="hidden" style="margin-bottom:15px; text-align:left;">
+              <input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="border-color: var(--border-color); width:100%;">
+          </div>
+          
           <div id="guard-team-section" class="hidden" style="margin-bottom: 20px;"></div>
           
           <div id="guard-headcount-section" class="hidden" style="margin-top: 20px; text-align: left;"><div class="input-group" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;"><label style="color: white; font-weight: bold;">Number of Workers Present Today:</label><input type="number" id="guard-headcount" class="input-field" placeholder="E.g., 8" style="font-size: 18px; font-weight: bold; text-align: center;"></div></div>
@@ -536,7 +542,6 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
-    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -576,7 +581,7 @@ async function performManualSearch() {
         
         let matches = data.filter(r => {
             if(!r.UniqueID || r.Status !== 'Approved') return false;
-            let fullStr = (r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo).toLowerCase();
+            let fullStr = (r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
             return fullStr.includes(q);
         }).slice(0, 5); 
         
@@ -763,7 +768,7 @@ function renderMyPasses(data){
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
                 <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;"></div>
-                <div style="margin-top:15px;">
+                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
                     <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
                 </div>
             </div>`;
@@ -1089,8 +1094,7 @@ function openViewRecord(id){
         if(td.length>0){
             h+=`<div style="grid-column:span 2;background:transparent;border-top:1px solid var(--border-color);padding-top:15px;margin-top:10px;"><strong style="font-size:14px;margin-bottom:15px;">TEAM MEMBERS (${td.length})</strong><div style="display:flex;flex-direction:column;gap:10px;">`;
             td.forEach(m=>{
-                let devHtml = m.device !== 'None' ? `<span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:bold;">${m.device}</span>` : '';
-                h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><div><span style="color:var(--noon-yellow);font-weight:bold;">${m.name}</span>${devHtml}<br><span style="font-size:11px;color:var(--text-muted);">ID: ${m.iqamaText}</span></div><div style="display:flex;gap:10px;"><img src="${m.iqama}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie"></div></div>`;
+                h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><div><span style="color:var(--noon-yellow);font-weight:bold;">${m.name}</span><br><span style="font-size:11px;color:var(--text-muted);">ID: ${m.iqamaText}</span></div><div style="display:flex;gap:10px;"><img src="${m.iqama}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama"><img src="${m.selfie}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie"></div></div>`;
             });
             h+=`</div></div>`;
         }
@@ -1300,6 +1304,9 @@ async function onScanSuccess(decodedText){
     else if(data.Type==='Visitor'&&startStr!==todayStr)return showScanResult("DENIED","Pass is not valid for today","bg-red");
     else if(data.Type==='Contractor'&&(todayNum<startNum||todayNum>endNum))return showScanResult("DENIED","Contractor Pass Expired","bg-red");
 
+    const searchFilterBox=document.getElementById('guard-search-filter-container'); 
+    if(searchFilterBox) searchFilterBox.classList.add('hidden'); 
+
     if(topInfoBox){
         let topInfo = `<div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.6; margin-bottom:15px;">`;
         if(data.Type === 'Contractor') {
@@ -1321,14 +1328,13 @@ async function onScanSuccess(decodedText){
         let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
         let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? safeImei : 'None';
         let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px;">`;
-        previewHtml += `<div style="margin-bottom:8px; text-align:left;"><strong style="color:var(--noon-yellow);">LEAD DEVICE:</strong> <span style="color:white; font-weight:bold;">${leadDevStr}</span></div>`;
+        previewHtml += `<div style="margin-bottom:8px; text-align:left;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">Device & Photos for all:</strong> <span style="color:white; font-weight:bold;">${leadDevStr}</span></div>`;
         previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; margin-bottom:15px; text-align:left;">`;
         if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">SELFIE</strong><img src="${data.SelfieURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         previewHtml += `</div>`;
-        previewHtml += `<div style="text-align:left;"><input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="border-color: var(--border-color); width:100%;"></div>`;
         previewHtml += `</div>`;
         detailsPrev.innerHTML = previewHtml;
     }
@@ -1358,12 +1364,12 @@ async function onScanSuccess(decodedText){
 
     if(data.Type === 'Contractor' || data.Type === 'Visitor'){
         if(teamSec) teamSec.classList.remove('hidden');
+        if(searchFilterBox) searchFilterBox.classList.remove('hidden');
         const hcSec = document.getElementById('guard-headcount-section');
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
         
         let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">`;
-        
         attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
         
         let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
