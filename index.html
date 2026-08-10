@@ -81,8 +81,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
             <div class="input-group"><input type="text" id="req-con-company" class="input-field t-ph" data-i18n="company_name" placeholder="Company / Contractor Name"></div>
             <div class="input-group"><input type="text" id="req-con-pm" class="input-field t-ph" data-i18n="project_manager" placeholder="Project Manager"></div>
             <div class="input-group"><input type="text" id="req-con-fmpoc" class="input-field t-ph" data-i18n="fm_poc" placeholder="FM POC Name / Details"></div>
-            <div class="input-group" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);"><label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;" data-i18n="btn_add_team">TEAM MEMBERS (OPTIONAL)</label><div id="team-roster-display" class="team-roster hidden"></div><button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button><div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;"><strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong><button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button></div><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-name" class="input-field" placeholder="Full Name"></div><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-iqamatext" class="input-field" placeholder="Iqama / ID Number"></div><div class="input-group"><label style="font-size: 11px;" data-i18n="upload_iqama">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;" data-i18n="upload_selfie">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')"></div><img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button></div></div>
           </div>
+          
           <div class="input-group" style="margin-top: 20px;"><label data-i18n="upload_iqama">Upload Lead Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('iqama')"></div><img id="preview-iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           <div class="input-group"><label data-i18n="upload_selfie">Upload Lead Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')"></div><img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           
@@ -96,7 +96,24 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
             <img id="preview-imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
           </div>
 
-          <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 10px;" data-i18n="submit_approval">Submit for Approval</button>
+          <div id="team-members-section" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+            <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;" data-i18n="btn_add_team">TEAM MEMBERS (OPTIONAL)</label>
+            <div id="team-roster-display" class="team-roster hidden"></div>
+            <button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
+            <div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong>
+                <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button>
+              </div>
+              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-name" class="input-field" placeholder="Full Name"></div>
+              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-iqamatext" class="input-field" placeholder="Iqama / ID Number"></div>
+              <div class="input-group"><label style="font-size: 11px;" data-i18n="upload_iqama">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
+              <div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;" data-i18n="upload_selfie">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')"></div><img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
+              <button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-submit-req" onclick="submitRequest()" style="margin-top: 15px;" data-i18n="submit_approval">Submit for Approval</button>
         </div>
         <div class="ops-card text-center">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><h3 style="color: var(--noon-yellow);" data-i18n="my_passes">My Passes</h3><button class="btn-primary btn-outline btn-sm" style="width: auto;" onclick="loadMyPasses(true, false)" data-i18n="refresh">Refresh</button></div>
@@ -189,8 +206,8 @@ const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z
 let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
 
 const dict={
-    en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date / Validity (From - To)","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC Name / Details","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"Access & Gate History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER","camera_scanner_btn":"📷 CAMERA SCANNER","hardware_gun_btn":"🔌 HARDWARE GUN","hw_scanner_ready":"HARDWARE SCANNER READY","hw_scanner_inst":"Point your handheld gun scanner at the QR code and trigger.","awaiting_scan":"Awaiting hardware scan..."},
-    ar:{"guard":"🛡️ الحارس","visitor_ops":"📋 الزوار/العمليات","admin":"⚙️ الإدارة","name":"الاسم","noon_id":"الرقم الوظيفي (Noon ID)","select_guard_loc":"اختر موقع الحارس...","login_gate":"الدخول للبوابة","your_full_name":"الاسم الكامل","your_email":"البريد الإلكتروني","login_portal":"تسجيل الدخول للبوابة","admin_name":"اسم المشرف","admin_email":"بريد المشرف","admin_password":"كلمة المرور","login_admin":"دخول كمسؤول","system_admin":"إدارة النظام","visitor_portal":"بوابة الزوار","gate_scanner":"ماسح البوابة","admin_dashboard":"لوحة التحكم","logout":"تسجيل خروج","visitor_contractor_portal":"بوابة الزوار والمقاولين","submit_new_request":"تقديم طلب جديد","type":"النوع","visitor":"زائر","contractor":"مقاول","req_email_ph":"البريد الإلكتروني (لتتبع التصريح)","req_vname_ph":"الاسم الكامل للزائر/المقاول","visit_date":"تاريخ الزيارة / الصلاحية (من - إلى)","slp_ticket":"رقم تذكرة SLP","contact_no":"رقم الاتصال","invited_by":"بدعوة من","vehicle_plate":"صورة / لوحة السيارة","live_camera":"📷 كاميرا مباشرة","contract_exp":"صلاحية العقد (من - إلى)","project_name":"اسم المشروع","company_name":"اسم الشركة / المقاول","project_manager":"مدير المشروع","fm_poc":"اسم/تفاصيل مسؤول المرافق (FM POC)","upload_iqama":"رفع صورة الهوية/الإقامة","upload_selfie":"رفع صورة شخصية","submit_approval":"إرسال للموافقة","my_passes":"تصاريحي","refresh":"تحديث","fetching":"جاري جلب التصاريح...","start_camera":"تشغيل ماسح الكاميرا","name_label":"الاسم:","type_label":"النوع:","location_label":"الموقع:","confirm_action":"تأكيد الإجراء","access_approvals":"📋 موافقات الدخول","history":"سجل الدخول والبوابة","guard_approvals":"🛡️ عمليات البوابة","analytics":"📊 الإحصائيات","all_time":"الكل","today":"اليوم","weekly":"أسبوعي","monthly":"شهري","6months":"٦ أشهر","1year":"سنة","custom":"مخصص","to":"إلى","apply":"تطبيق","pending_req":"الطلبات المعلقة","active_req":"الطلبات النشطة","print_selected":"🖨️ طباعة المحدد","val_period":"فترة الصلاحية","name_header":"الاسم","type_header":"النوع","facility_header":"المنشأة","action":"الإجراء","access_history":"سجل الدخول والبوابة","final_status":"الحالة النهائية","check_in":"دخول","check_out":"خروج","scanned_by":"تم المسح بواسطة","live_gate":"عمليات البوابة المباشرة","check_in_time":"وقت الدخول","check_out_time":"وقت الخروج","visitor_name":"اسم الزائر","date_analytics":"📅 إحصائيات التواريخ","type_analytics":"👤 إحصائيات الأنواع","facility_analytics":"🏢 إحصائيات المنشآت","status_analytics":"✅ إحصائيات الحالات","detailed_record":"عرض السجل التفصيلي","extend_pass":"تمديد صلاحية التصريح","new_start_date":"تاريخ الزيارة/البداية الجديد","new_end_date":"تاريخ النهاية الجديد","save_extension":"حفظ التمديد","capture":"📸 التقاط","flip_cam":"🔄 قلب الكاميرا","cancel":"❌ إلغاء","click_to_close":"انقر في أي مكان للإغلاق","btn_approve":"موافقة","btn_reject":"رفض","btn_extend":"📅 تمديد","btn_view":"🔍 عرض البيانات","btn_print":"🖨️ طباعة","btn_checkout":"🚪 خروج","lbl_host_name":"اسم المضيف","lbl_host_email":"بريد المضيف","lbl_validity":"فترة الصلاحية","lbl_iqama":"صورة الهوية/الإقامة","lbl_selfie":"الصورة الشخصية","lbl_vehicle":"لوحة السيارة","status_approved":"مقبول","status_pending":"قيد الانتظار","status_rejected":"مرفوض","status_expired":"منتهي","status_completed":"مكتمل","msg_no_pending":"لا توجد طلبات معلقة في هذه الفترة.","msg_no_active":"لا توجد طلبات نشطة في هذه الفترة.","msg_no_history":"لا يوجد سجل في هذه الفترة.","msg_no_gate":"لا توجد عمليات بوابة في هذه الفترة.","msg_enter_email":"أدخل بريداً إلكترونياً لعرض التصاريح.","msg_loading":"جاري التحميل...","msg_inside":"داخل المنشأة","msg_admin_select_loc":"المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية.","btn_add_team":"➕ إضافة عضو للفريق","camera_scanner_btn":"📷 ماسح الكاميرا","hardware_gun_btn":"🔌 ماسح الباركود اليدوي","hw_scanner_ready":"ماسح الباركود جاهز","hw_scanner_inst":"قم بتوجيه الماسح الضوئي نحو رمز الاستجابة السريعة (QR).","awaiting_scan":"بانتظار المسح..."}
+    en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date / Validity (From - To)","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC Name / Details","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"Access & Gate History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER","camera_scanner_btn":"📷 CAMERA SCANNER","hardware_gun_btn":"🔌 HARDWARE GUN","hw_scanner_ready":"HARDWARE SCANNER READY","hw_scanner_inst":"Point your handheld gun scanner at the QR code and trigger.","awaiting_scan":"Awaiting hardware scan...","save_qr":"⬇️ SAVE QR CODE"},
+    ar:{"guard":"🛡️ الحارس","visitor_ops":"📋 الزوار/العمليات","admin":"⚙️ الإدارة","name":"الاسم","noon_id":"الرقم الوظيفي (Noon ID)","select_guard_loc":"اختر موقع الحارس...","login_gate":"الدخول للبوابة","your_full_name":"الاسم الكامل","your_email":"البريد الإلكتروني","login_portal":"تسجيل الدخول للبوابة","admin_name":"اسم المشرف","admin_email":"بريد المشرف","admin_password":"كلمة المرور","login_admin":"دخول كمسؤول","system_admin":"إدارة النظام","visitor_portal":"بوابة الزوار","gate_scanner":"ماسح البوابة","admin_dashboard":"لوحة التحكم","logout":"تسجيل خروج","visitor_contractor_portal":"بوابة الزوار والمقاولين","submit_new_request":"تقديم طلب جديد","type":"النوع","visitor":"زائر","contractor":"مقاول","req_email_ph":"البريد الإلكتروني (لتتبع التصريح)","req_vname_ph":"الاسم الكامل للزائر/المقاول","visit_date":"تاريخ الزيارة / الصلاحية (من - إلى)","slp_ticket":"رقم تذكرة SLP","contact_no":"رقم الاتصال","invited_by":"بدعوة من","vehicle_plate":"صورة / لوحة السيارة","live_camera":"📷 كاميرا مباشرة","contract_exp":"صلاحية العقد (من - إلى)","project_name":"اسم المشروع","company_name":"اسم الشركة / المقاول","project_manager":"مدير المشروع","fm_poc":"اسم/تفاصيل مسؤول المرافق (FM POC)","upload_iqama":"رفع صورة الهوية/الإقامة","upload_selfie":"رفع صورة شخصية","submit_approval":"إرسال للموافقة","my_passes":"تصاريحي","refresh":"تحديث","fetching":"جاري جلب التصاريح...","start_camera":"تشغيل ماسح الكاميرا","name_label":"الاسم:","type_label":"النوع:","location_label":"الموقع:","confirm_action":"تأكيد الإجراء","access_approvals":"📋 موافقات الدخول","history":"سجل الدخول والبوابة","guard_approvals":"🛡️ عمليات البوابة","analytics":"📊 الإحصائيات","all_time":"الكل","today":"اليوم","weekly":"أسبوعي","monthly":"شهري","6months":"٦ أشهر","1year":"سنة","custom":"مخصص","to":"إلى","apply":"تطبيق","pending_req":"الطلبات المعلقة","active_req":"الطلبات النشطة","print_selected":"🖨️ طباعة المحدد","val_period":"فترة الصلاحية","name_header":"الاسم","type_header":"النوع","facility_header":"المنشأة","action":"الإجراء","access_history":"سجل الدخول والبوابة","final_status":"الحالة النهائية","check_in":"دخول","check_out":"خروج","scanned_by":"تم المسح بواسطة","live_gate":"عمليات البوابة المباشرة","check_in_time":"وقت الدخول","check_out_time":"وقت الخروج","visitor_name":"اسم الزائر","date_analytics":"📅 إحصائيات التواريخ","type_analytics":"👤 إحصائيات الأنواع","facility_analytics":"🏢 إحصائيات المنشآت","status_analytics":"✅ إحصائيات الحالات","detailed_record":"عرض السجل التفصيلي","extend_pass":"تمديد صلاحية التصريح","new_start_date":"تاريخ الزيارة/البداية الجديد","new_end_date":"تاريخ النهاية الجديد","save_extension":"حفظ التمديد","capture":"📸 التقاط","flip_cam":"🔄 قلب الكاميرا","cancel":"❌ إلغاء","click_to_close":"انقر في أي مكان للإغلاق","btn_approve":"موافقة","btn_reject":"رفض","btn_extend":"📅 تمديد","btn_view":"🔍 عرض البيانات","btn_print":"🖨️ طباعة","btn_checkout":"🚪 خروج","lbl_host_name":"اسم المضيف","lbl_host_email":"بريد المضيف","lbl_validity":"فترة الصلاحية","lbl_iqama":"صورة الهوية/الإقامة","lbl_selfie":"الصورة الشخصية","lbl_vehicle":"لوحة السيارة","status_approved":"مقبول","status_pending":"قيد الانتظار","status_rejected":"مرفوض","status_expired":"منتهي","status_completed":"مكتمل","msg_no_pending":"لا توجد طلبات معلقة في هذه الفترة.","msg_no_active":"لا توجد طلبات نشطة في هذه الفترة.","msg_no_history":"لا يوجد سجل في هذه الفترة.","msg_no_gate":"لا توجد عمليات بوابة في هذه الفترة.","msg_enter_email":"أدخل بريداً إلكترونياً لعرض التصاريح.","msg_loading":"جاري التحميل...","msg_inside":"داخل المنشأة","msg_admin_select_loc":"المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية.","btn_add_team":"➕ إضافة عضو للفريق","camera_scanner_btn":"📷 ماسح الكاميرا","hardware_gun_btn":"🔌 ماسح الباركود اليدوي","hw_scanner_ready":"ماسح الباركود جاهز","hw_scanner_inst":"قم بتوجيه الماسح الضوئي نحو رمز الاستجابة السريعة (QR).","awaiting_scan":"بانتظار المسح...","save_qr":"⬇️ حفظ الرمز"}
 };
 
 let currentLang='en';
@@ -228,9 +245,10 @@ function logout(){
 
 function toggleDateFields(){
     const te=document.getElementById('req-type');if(!te)return;
-    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields');
+    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields'),tms=document.getElementById('team-members-section');
     if(vf)vf.classList.toggle('hidden',type==='Contractor');
     if(cf)cf.classList.toggle('hidden',type==='Visitor');
+    if(tms)tms.classList.toggle('hidden',type==='Visitor');
 }
 
 function switchLoginTab(role){
@@ -446,7 +464,6 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
-    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -456,7 +473,17 @@ window.onload=function(){
     const session=sessionStorage.getItem('noon_session');
     if(session){
         const p=JSON.parse(session),h=(Date.now()-p.time)/(1000*60*60);
-        if(h<12){currentUser=p.user;initApp()}else sessionStorage.removeItem('noon_session');
+        if(h<12){
+            currentUser=p.user;
+            initApp();
+            const s=document.getElementById('splash');
+            if(s) s.style.display='none';
+        } else {
+            sessionStorage.removeItem('noon_session');
+            setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
+        }
+    } else {
+        setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     }
 };
 
@@ -548,6 +575,29 @@ async function submitRequest(){
     }
 }
 
+function downloadQR(id) {
+    const box = document.getElementById('qr-' + id);
+    if (!box) return;
+    const img = box.querySelector('img');
+    const canvas = box.querySelector('canvas');
+    let dataUrl = '';
+    
+    if (canvas && canvas.toDataURL) {
+        dataUrl = canvas.toDataURL('image/png');
+    } else if (img && img.src) {
+        dataUrl = img.src;
+    }
+    
+    if (dataUrl) {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `Noon_Pass_${id}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
     let h='';
@@ -565,7 +615,14 @@ function renderMyPasses(data){
         if(isComp){st=t(isExp?'status_expired':'status_completed');sc='var(--text-muted)'}
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
         h+=`<div class="pass-item"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
-        if(pass.Status==='Approved'&&!isComp)h+=`<div style="text-align:center;"><div class="qr-box" id="qr-${pass.UniqueID}"></div></div>`;
+        if(pass.Status==='Approved'&&!isComp) {
+            h+=`<div style="text-align:center;margin-top:10px;">
+                <div class="qr-box" id="qr-${pass.UniqueID}"></div>
+                <div style="margin-top:10px;">
+                    <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
+                </div>
+            </div>`;
+        }
         else if(isComp)h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
         h+=`</div>`;
     });
@@ -1165,57 +1222,29 @@ async function confirmAction(){
         }
     }
     
-    // INSTANTLY CLOSE RESULT MODAL & RESET SCANNER
-    const scanResult=document.getElementById('scan-result');
-    if(scanResult) scanResult.classList.add('hidden');
-    try{ if(html5QrCode) html5QrCode.resume(); }catch(e){}
-    const gunInput = document.getElementById('gun-scan-input');
-    if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
-        gunInput.focus();
-        gunInput.value = "";
-    }
+    btn.innerText="SAVING & REFRESHING...";
+    btn.disabled=true;
 
     const gInfo = `${currentUser.name} (${currentUser.location})`;
-    
-    // OPTIMISTIC LOCAL CACHE UPDATE FOR GUARD APPROVALS TABLE
-    if(Array.isArray(globalAdminData)){
-        let item = globalAdminData.find(x => String(x.UniqueID) === String(currentScannedID));
-        if(item) {
-            let now = new Date();
-            if(currentScanAction === 'check_in') {
-                item.CheckInTime = now.toISOString();
-            } else {
-                item.CheckOutTime = now.toISOString();
-                item.Status = 'Completed';
-            }
-            item.ScannedByGuard = gInfo;
-            let newLog = (currentScanAction === 'check_in' ? 'IN' : 'OUT') + " (" + hcVal + ") at " + now.toLocaleString() + " by " + gInfo;
-            item.GateLogs = item.GateLogs ? item.GateLogs + "\n" + newLog : newLog;
-            
-            localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData));
-            renderAdminData(globalAdminData);
-        }
-    }
-
-    // BACKGROUND DATA SYNC WITH AUTOMATIC RETRY
     const payload = JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo, headCount: hcVal });
-    sendBackgroundSync(payload, 3);
-}
-
-async function sendBackgroundSync(payload, retriesLeft) {
+    
     try {
         const res = await fetch(SCRIPT_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: payload
         });
-        if(!res.ok && retriesLeft > 0) {
-            setTimeout(() => sendBackgroundSync(payload, retriesLeft - 1), 1500);
+        if(res.ok) {
+            window.location.reload();
+        } else {
+            alert("Sync failed. Please try again.");
+            btn.innerText = t("confirm_action");
+            btn.disabled = false;
         }
     } catch(e) {
-        if(retriesLeft > 0) {
-            setTimeout(() => sendBackgroundSync(payload, retriesLeft - 1), 1500);
-        }
+        alert("Network error. Please try again.");
+        btn.innerText = t("confirm_action");
+        btn.disabled = false;
     }
 }
 </script>
