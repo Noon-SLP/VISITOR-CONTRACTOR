@@ -464,6 +464,7 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
+    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -639,16 +640,13 @@ function renderMyPasses(data){
         if(pass.Status==='Approved'&&(pass.Type!=='Visitor'||!pass.CheckOutTime)&&todayNum<=endNum){
             const qre=document.getElementById(`qr-${pass.UniqueID}`);
             if(qre) {
-                new QRCode(qre,{text:pass.UniqueID,width:120,height:120,colorDark:"#000",colorLight:"#fff"});
-                setTimeout(() => {
-                    const canvas = qre.querySelector('canvas');
-                    const img = qre.querySelector('img');
-                    if (canvas && img) {
-                        img.src = canvas.toDataURL('image/png');
-                        img.style.display = 'block';
-                        canvas.style.display = 'none';
-                    }
-                }, 250);
+                let tempDiv = document.createElement("div");
+                new QRCode(tempDiv, {text:pass.UniqueID, width:120, height:120, colorDark:"#000", colorLight:"#fff"});
+                let canvas = tempDiv.querySelector("canvas");
+                if (canvas) {
+                    let qrDataUrl = canvas.toDataURL("image/png");
+                    qre.innerHTML = `<img src="${qrDataUrl}" style="width:120px;height:120px;display:block;margin:0 auto;border-radius:4px;">`;
+                }
             }
         }
     });
@@ -1177,7 +1175,7 @@ async function onScanSuccess(decodedText){
             let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             if(extractedUrls.length >= 2){
                 teamData.push({
-                    person: index+1,
+                    person: idx+1,
                     name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
                     iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
                     iqama: extractedUrls[0],
