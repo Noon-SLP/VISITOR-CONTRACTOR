@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Noon SLP - Access System</title><link rel="icon" type="image/jpeg" href="logo.jpeg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Noon SLP - Access System</title><link rel="icon" type="image/jpeg" href="logo.jpeg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
 :root{--bg-dark:#0b0e14;--card-bg:#12151c;--border-color:#242b3b;--noon-yellow:#ffc700;--text-main:#f0f2f5;--text-muted:#8b95a5;--input-bg:#090b10;--success:#10b981;--danger:#ef4444;--sidebar-bg:#12161f}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
@@ -464,7 +464,6 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
-    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -576,38 +575,6 @@ async function submitRequest(){
     }
 }
 
-async function downloadPass(id) {
-    const passCard = document.getElementById('pass-card-' + id);
-    const btnContainer = document.getElementById('save-btn-container-' + id);
-    if (!passCard) return;
-    
-    if (btnContainer) btnContainer.style.display = 'none';
-    
-    // Give the DOM a tiny bit of time to register the new <img> tag
-    await new Promise(r => setTimeout(r, 500));
-    
-    try {
-        const capturedCanvas = await html2canvas(passCard, {
-            backgroundColor: '#090b10', 
-            scale: 2,
-            useCORS: true
-        });
-        
-        const dataUrl = capturedCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `Noon_Pass_${id}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (err) {
-        console.error("Screenshot failed", err);
-        alert("Failed to save the pass image.");
-    }
-    
-    if (btnContainer) btnContainer.style.display = 'block';
-}
-
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
     let h='';
@@ -628,9 +595,6 @@ function renderMyPasses(data){
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
                 <div class="qr-box" id="qr-${pass.UniqueID}"></div>
-                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
-                    <button class="btn-primary btn-outline btn-sm" onclick="downloadPass('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
-                </div>
             </div>`;
         }
         else if(isComp)h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
@@ -645,15 +609,6 @@ function renderMyPasses(data){
             const qre=document.getElementById(`qr-${pass.UniqueID}`);
             if(qre) {
                 new QRCode(qre, {text:pass.UniqueID, width:120, height:120, colorDark:"#000", colorLight:"#fff", correctLevel: QRCode.CorrectLevel.H});
-                
-                // FORCE CONVERT TO IMAGE IMMEDIATELY
-                setTimeout(() => {
-                    let canvas = qre.querySelector("canvas");
-                    if (canvas) {
-                        let qrDataUrl = canvas.toDataURL("image/png");
-                        qre.innerHTML = `<img src="${qrDataUrl}" style="width:120px;height:120px;display:block;margin:0 auto;">`;
-                    }
-                }, 1000); // 1 second delay to ensure it draws completely
             }
         }
     });
