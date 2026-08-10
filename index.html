@@ -87,9 +87,16 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
           <div class="input-group"><label data-i18n="upload_selfie">Upload Lead Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')"></div><img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           
           <div class="input-group">
-            <label style="color: var(--noon-yellow); font-size: 13px; font-weight: bold;">Lead IMEI Number & Photo Screen</label>
+            <label style="color: var(--noon-yellow); font-size: 13px; font-weight: bold;">Lead Device Details & Photo Screen</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select id="req-lead-device-type" class="input-field" style="flex: 1;" onchange="toggleLeadDeviceInput()">
+                    <option value="None">No Device</option>
+                    <option value="Mobile">Mobile</option>
+                    <option value="Laptop">Laptop</option>
+                </select>
+                <input type="text" id="req-lead-device-id" class="input-field hidden" placeholder="IMEI / Serial Number" style="flex: 2;">
+            </div>
             <div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-                <input type="text" id="req-lead-imei" class="input-field" placeholder="IMEI Number" style="flex: 1; min-width: 150px;">
                 <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px; min-width: 120px;" onclick="openLiveCamera('imeiphoto')" data-i18n="live_camera">📷 Live Camera</button>
                 <input type="file" id="req-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px; min-width: 150px;" onchange="clearCapturedData('imeiphoto')">
             </div>
@@ -143,7 +150,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
       </div>
       <div style="max-width: 450px; margin: 0 auto;">
         
-        <div id="guard-manual-search-box" style="background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
+        <div id="admin-manual-search-box" class="hidden" style="background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid var(--border-color); margin-bottom:20px;">
             <p style="color:var(--noon-yellow); font-weight:bold; margin-bottom:10px; font-size:13px; text-transform:uppercase;">Manual Pass Search</p>
             <div style="display:flex; gap:10px;">
                 <input type="text" id="guard-search-input" class="input-field" placeholder="Search Name, Iqama, Ticket, or ID" onkeydown="if(event.key === 'Enter') performManualSearch()">
@@ -268,9 +275,10 @@ function logout(){
 
 function toggleDateFields(){
     const te=document.getElementById('req-type');if(!te)return;
-    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields');
+    const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields'),tms=document.getElementById('team-members-section');
     if(vf)vf.classList.toggle('hidden',type==='Contractor');
     if(cf)cf.classList.toggle('hidden',type==='Visitor');
+    if(tms)tms.classList.toggle('hidden',type==='Visitor');
 }
 
 function switchLoginTab(role){
@@ -317,6 +325,18 @@ function hideTeamEntry(){
     clearCapturedData('team_iqama');clearCapturedData('team_selfie');
 }
 
+function toggleLeadDeviceInput() {
+    let type = document.getElementById('req-lead-device-type').value;
+    let input = document.getElementById('req-lead-device-id');
+    if(type === 'None') {
+        input.classList.add('hidden');
+        input.value = '';
+    } else {
+        input.classList.remove('hidden');
+        input.placeholder = type === 'Mobile' ? 'IMEI Number' : 'Serial Number';
+    }
+}
+
 function toggleTeamDeviceInput() {
     let type = document.getElementById('req-team-device-type').value;
     let group = document.getElementById('req-team-device-id-group');
@@ -338,7 +358,10 @@ async function saveCurrentTeamMember(){
     if(!tIqama || !tIqama.value.trim()) return alert("Please provide Team Member Iqama / ID Number.");
 
     if(devType !== 'None' && !devId.trim()) return alert("Please provide the device IMEI/Serial number.");
+    
     let currentDeviceCount = teamList.filter(m => m.deviceType !== 'None').length;
+    let leadDevType = document.getElementById('req-lead-device-type').value;
+    if(leadDevType !== 'None') currentDeviceCount++;
     if(devType !== 'None' && currentDeviceCount >= 10) return alert("Maximum of 10 devices allowed per request.");
 
     if(capturedImages.team_iqama)iB64=capturedImages.team_iqama.split(',')[1];
@@ -489,9 +512,11 @@ function initApp(){
         if(lv)lv.classList.add('hidden');if(al)al.classList.remove('hidden');
         if(currentUser&&currentUser.role==='admin'){
             const vn=document.getElementById('req-vname'),ae=document.getElementById('req-admin-email'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),han=document.getElementById('header-admin-name'),sun=document.getElementById('sidebar-user-name'),na=document.getElementById('nav-sidebar-admin'),glt=document.getElementById('guard-loc-text'),agl=document.getElementById('admin-guard-loc');
+            const msb=document.getElementById('admin-manual-search-box');
             if(vn)vn.value='';if(ae)ae.value='';if(ag)ag.classList.remove('hidden');if(sb)sb.style.display='flex';
             if(han)han.innerText=currentUser.name;if(sun)sun.innerText=currentUser.name;if(na)na.classList.remove('hidden');
             if(glt)glt.classList.add('hidden');if(agl){agl.classList.remove('hidden');agl.value=currentUser.location||'';currentUser.location=agl.value||''}
+            if(msb)msb.classList.remove('hidden');
             loadAdminData(false);switchMainView('admin');
         }else if(currentUser){
             const vn=document.getElementById('req-vname'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),mc=document.getElementById('main-content');
@@ -580,6 +605,16 @@ async function submitRequest(){
     if(!btn)return;
     let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',imB64='',imMime='image/jpeg',vB64='',vMime='image/jpeg';
     
+    let leadDevType = document.getElementById('req-lead-device-type').value;
+    let leadDevId = document.getElementById('req-lead-device-id').value;
+    
+    if(leadDevType !== 'None' && !leadDevId.trim()) return alert("Please provide the Lead device IMEI/Serial number.");
+    let leadImeiVal = leadDevType !== 'None' ? `${leadDevType} (${leadDevId.trim()})` : '';
+
+    let currentDeviceCount = teamList.filter(m => m.deviceType !== 'None').length;
+    if(leadDevType !== 'None') currentDeviceCount++;
+    if(currentDeviceCount > 10) return alert("Maximum of 10 devices allowed per request.");
+
     if(capturedImages.iqama)iB64=capturedImages.iqama.split(',')[1];
     else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1];iMime=ii.files[0].type}
     else return alert("Please provide Lead Iqama photo.");
@@ -621,7 +656,6 @@ async function submitRequest(){
     const vni=document.getElementById('req-vname'),vName=vni?vni.value.trim():'';
     if(!vName)return alert("Full Name is required.");
 
-    const leadImeiVal = document.getElementById('req-lead-imei').value.trim();
     const startDateVal = document.getElementById('req-date-start').value;
     const endDateVal = document.getElementById('req-date-end').value;
 
@@ -644,7 +678,7 @@ async function submitRequest(){
     if(currentUser.role==='admin'&&vni)vni.value="";
     if(ii)ii.value="";if(si)si.value="";if(imPho)imPho.value="";if(vi)vi.value="";
     const fmPocInput = document.getElementById('req-con-fmpoc'); if(fmPocInput) fmPocInput.value="";
-    const imeiInput = document.getElementById('req-lead-imei'); if(imeiInput) imeiInput.value="";
+    document.getElementById('req-lead-device-type').value = "None"; toggleLeadDeviceInput();
     
     clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('vehicle');
     teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
@@ -673,41 +707,6 @@ async function submitRequest(){
     }
 }
 
-function downloadQR(id) {
-    const qrBox = document.getElementById('qr-' + id);
-    if (!qrBox) return;
-
-    let canvas = qrBox.querySelector('canvas');
-    let img = qrBox.querySelector('img');
-    let sourceImage = canvas && canvas.style.display !== 'none' ? canvas : (img && img.src ? img : null);
-
-    if (!sourceImage) return alert("QR Code not ready yet.");
-
-    let size = 150;
-    let padding = 20;
-    let newCanvas = document.createElement('canvas');
-    newCanvas.width = size + (padding * 2);
-    newCanvas.height = size + (padding * 2);
-    let ctx = newCanvas.getContext('2d');
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-
-    if (sourceImage.tagName.toLowerCase() === 'canvas') {
-        ctx.drawImage(sourceImage, padding, padding, size, size);
-    } else {
-        ctx.drawImage(sourceImage, padding, padding, size, size);
-    }
-
-    const dataUrl = newCanvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `Noon_Pass_QR_${id}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
     let h='';
@@ -724,13 +723,10 @@ function renderMyPasses(data){
         let sc=(pass.Status==='Approved'?'var(--success)':pass.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)');
         if(isComp){st=t(isExp?'status_expired':'status_completed');sc='var(--text-muted)'}
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
-        h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
+        h+=`<div class="pass-item"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
-                <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;"></div>
-                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
-                    <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
-                </div>
+                <div class="qr-box" id="qr-${pass.UniqueID}"></div>
             </div>`;
         }
         else if(isComp)h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
@@ -1208,6 +1204,18 @@ window.closeScanResult = function() {
     }
 }
 
+function filterTeamMembers(query) {
+    let q = query.toLowerCase();
+    let rows = document.querySelectorAll('.team-member-scan-row');
+    rows.forEach(row => {
+        if(row.innerText.toLowerCase().includes(q)) {
+            row.style.display = 'flex';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
 // BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
@@ -1259,11 +1267,12 @@ async function onScanSuccess(decodedText){
     // BUILD DETAILED VISITOR/CONTRACTOR PREVIEW FOR GUARDS
     if(detailsPrev){
         let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px;">`;
-        previewHtml += `<div style="margin-bottom:8px;"><strong style="color:var(--noon-yellow);">IMEI NUMBER:</strong> ${data.ImeiNumber || 'N/A'}</div>`;
+        let leadDevStr = data.ImeiNumber && data.ImeiNumber !== 'None' && data.ImeiNumber.trim() !== '' ? data.ImeiNumber : 'None';
+        previewHtml += `<div style="margin-bottom:8px;"><strong style="color:var(--noon-yellow);">DEVICE:</strong> <span style="color:white; font-weight:bold;">${leadDevStr}</span></div>`;
         previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">`;
         if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">SELFIE</strong><img src="${data.SelfieURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
-        if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">IMEI SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
+        if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         previewHtml += `</div></div>`;
         detailsPrev.innerHTML = previewHtml;
@@ -1315,13 +1324,19 @@ async function onScanSuccess(decodedText){
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
         
-        let attHtml = `<div style="text-align: left; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;"><label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div style="display:flex; flex-direction:column; gap:12px;">`;
+        let attHtml = `<div style="text-align: left; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">`;
         
-        attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <div><span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span></div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+        attHtml += `<input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="margin-bottom: 15px; border-color: var(--border-color);">`;
+        
+        attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
+        
+        let leadDevStr = data.ImeiNumber && data.ImeiNumber !== 'None' && data.ImeiNumber.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${data.ImeiNumber}</span>` : '';
+        
+        attHtml += `<label class="team-member-scan-row" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span>${leadDevStr}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
         
         teamData.forEach(m => {
-            let devHtml = m.device !== 'None' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
-            attHtml += `<label style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Iqama"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();" title="Selfie"> <div><span style="font-size:13px;font-weight:600;">${m.name}</span><br><span style="font-size:10px;color:var(--text-muted);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+            let devHtml = m.device && m.device !== 'None' && m.device.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
+            attHtml += `<label class="team-member-scan-row" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${m.name}</span><br><span style="font-size:10px;color:var(--text-muted);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
         });
         attHtml += `</div></div>`;
         teamSec.innerHTML = attHtml;
