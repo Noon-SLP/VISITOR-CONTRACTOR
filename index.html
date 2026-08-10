@@ -580,13 +580,13 @@ async function performManualSearch() {
         }
         
         let matches = data.filter(r => {
-            if(!r.UniqueID || r.Status !== 'Approved') return false;
+            if(!r.UniqueID || r.Status === 'Rejected') return false;
             let fullStr = (r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
             return fullStr.includes(q);
         }).slice(0, 5); 
         
         if(matches.length === 0) {
-            resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No approved passes found.</p>';
+            resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
         } else {
             let h = '';
             matches.forEach(m => {
@@ -765,7 +765,7 @@ function renderMyPasses(data){
         if(isComp){st=t(isExp?'status_expired':'status_completed');sc='var(--text-muted)'}
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
         h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
-        if(pass.Status==='Approved'&&!isComp) {
+        if(!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
                 <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;"></div>
                 <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
@@ -781,7 +781,7 @@ function renderMyPasses(data){
         const todayNum=new Date().setHours(0,0,0,0);
         let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
         let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
-        if(pass.Status==='Approved'&&(pass.Type!=='Visitor'||!pass.CheckOutTime)&&todayNum<=endNum){
+        if(!isComp){
             const qre=document.getElementById(`qr-${pass.UniqueID}`);
             if(qre) {
                 new QRCode(qre, {text:pass.UniqueID, width:120, height:120, colorDark:"#000", colorLight:"#fff", correctLevel: QRCode.CorrectLevel.H});
@@ -1294,9 +1294,6 @@ async function onScanSuccess(decodedText){
 
     if(!data || data.error) return showScanResult("DENIED","Invalid or Unrecognized QR Code","bg-red");
 
-    const rName=document.getElementById('r-name'),rType=document.getElementById('r-type'),rLocation=document.getElementById('r-location');
-    if(rName)rName.innerText=data.VisitorName;if(rType)rType.innerText=t(data.Type.toLowerCase());if(rLocation)rLocation.innerText=data.Location;
-
     const todayStr=formatToDDMMYYYY(new Date()),startStr=formatToDDMMYYYY(data.StartDate),todayNum=new Date().setHours(0,0,0,0);
     let startObj=parseFlexibleDate(data.StartDate),startNum=startObj?startObj.setHours(0,0,0,0):todayNum;
     let endObj=parseFlexibleDate(data.EndDate),endNum=endObj?endObj.setHours(0,0,0,0):startNum;
@@ -1340,7 +1337,6 @@ async function onScanSuccess(decodedText){
         if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         previewHtml += `</div>`;
-        previewHtml += `<div style="text-align:left;"><input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="border-color: var(--border-color); width:100%;"></div>`;
         previewHtml += `</div>`;
         detailsPrev.innerHTML = previewHtml;
     }
@@ -1370,12 +1366,12 @@ async function onScanSuccess(decodedText){
 
     if(data.Type === 'Contractor' || data.Type === 'Visitor'){
         if(teamSec) teamSec.classList.remove('hidden');
+        if(searchFilterBox) searchFilterBox.classList.remove('hidden');
         const hcSec = document.getElementById('guard-headcount-section');
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
         
         let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">`;
-        
         attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
         
         let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
