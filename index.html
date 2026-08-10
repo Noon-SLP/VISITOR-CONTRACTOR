@@ -126,6 +126,12 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
               </div>
               <div class="input-group hidden" id="req-team-device-id-group" style="margin-bottom: 15px;">
                   <input type="text" id="req-team-device-id" class="input-field" placeholder="IMEI / Serial Number">
+                  <label style="font-size: 11px; margin-top:10px;">Upload Device Photo/Screen</label>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                      <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_imeiphoto')" data-i18n="live_camera">📷 Live Camera</button>
+                      <input type="file" id="req-team-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_imeiphoto')">
+                  </div>
+                  <img id="preview-team_imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)">
               </div>
 
               <div class="input-group"><label style="font-size: 11px;" data-i18n="upload_iqama">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
@@ -326,10 +332,11 @@ function hideTeamEntry(){
     if(tb)tb.classList.add('hidden');if(b)b.classList.remove('hidden');
     const ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie'),tName=document.getElementById('req-team-name'),tIqama=document.getElementById('req-team-iqamatext');
     const devType=document.getElementById('req-team-device-type'), devId=document.getElementById('req-team-device-id');
+    const tDev=document.getElementById('req-team-imeiphoto');
     if(ii)ii.value="";if(si)si.value="";if(tName)tName.value="";if(tIqama)tIqama.value="";
-    if(devType)devType.value="None"; if(devId)devId.value="";
+    if(devType)devType.value="None"; if(devId)devId.value=""; if(tDev)tDev.value="";
     toggleTeamDeviceInput();
-    clearCapturedData('team_iqama');clearCapturedData('team_selfie');
+    clearCapturedData('team_iqama');clearCapturedData('team_selfie');clearCapturedData('team_imeiphoto');
 }
 
 function toggleLeadDeviceInput() {
@@ -348,9 +355,12 @@ function toggleTeamDeviceInput() {
     let type = document.getElementById('req-team-device-type').value;
     let group = document.getElementById('req-team-device-id-group');
     let input = document.getElementById('req-team-device-id');
+    let tDev = document.getElementById('req-team-imeiphoto');
     if(type === 'None') {
         group.classList.add('hidden');
         input.value = '';
+        if(tDev) tDev.value = '';
+        clearCapturedData('team_imeiphoto');
     } else {
         group.classList.remove('hidden');
         input.placeholder = type === 'Mobile' ? 'IMEI Number' : 'Serial Number';
@@ -358,18 +368,24 @@ function toggleTeamDeviceInput() {
 }
 
 async function saveCurrentTeamMember(){
-    let iB64='',sB64='',ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie'),tName=document.getElementById('req-team-name'),tIqama=document.getElementById('req-team-iqamatext');
+    let iB64='',sB64='',tDevB64='',ii=document.getElementById('req-team-iqama'),si=document.getElementById('req-team-selfie'),tName=document.getElementById('req-team-name'),tIqama=document.getElementById('req-team-iqamatext');
     let devType=document.getElementById('req-team-device-type').value, devId=document.getElementById('req-team-device-id').value;
-    
+    let tDev=document.getElementById('req-team-imeiphoto');
+
     if(!tName || !tName.value.trim()) return alert("Please provide Team Member Name.");
     if(!tIqama || !tIqama.value.trim()) return alert("Please provide Team Member Iqama / ID Number.");
 
-    if(devType !== 'None' && !devId.trim()) return alert("Please provide the device IMEI/Serial number.");
-    
     let currentDeviceCount = teamList.filter(m => m.deviceType !== 'None').length;
     let leadDevType = document.getElementById('req-lead-device-type').value;
     if(leadDevType !== 'None') currentDeviceCount++;
     if(devType !== 'None' && currentDeviceCount >= 10) return alert("Maximum of 10 devices allowed per request.");
+
+    if(devType !== 'None') {
+        if(!devId.trim()) return alert("Please provide the device IMEI/Serial number.");
+        if(capturedImages.team_imeiphoto) tDevB64=capturedImages.team_imeiphoto.split(',')[1];
+        else if(tDev&&tDev.files.length>0){let f=await getBase64(tDev.files[0]); tDevB64=f.split(',')[1]}
+        else return alert("Please provide Device Screen photo for the team member.");
+    }
 
     if(capturedImages.team_iqama)iB64=capturedImages.team_iqama.split(',')[1];
     else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1]}
@@ -384,6 +400,7 @@ async function saveCurrentTeamMember(){
         selfie:"data:image/jpeg;base64,"+sB64,
         rawIqama:iB64,
         rawSelfie:sB64,
+        rawDevicePhoto:tDevB64,
         name: tName.value.trim(),
         iqamaText: tIqama.value.trim(),
         deviceType: devType,
@@ -392,7 +409,7 @@ async function saveCurrentTeamMember(){
     currentTeamCounter++;renderTeamRoster();
     if(ii)ii.value="";if(si)si.value="";if(tName)tName.value="";if(tIqama)tIqama.value="";
     document.getElementById('req-team-device-type').value = "None"; document.getElementById('req-team-device-id').value = ""; toggleTeamDeviceInput();
-    clearCapturedData('team_iqama');clearCapturedData('team_selfie');
+    clearCapturedData('team_iqama');clearCapturedData('team_selfie');clearCapturedData('team_imeiphoto');
     const tt=document.getElementById('team-entry-title');if(tt)tt.innerText=`Team Member ${currentTeamCounter}`;
 }
 
@@ -442,7 +459,7 @@ function captureLivePhoto(){
     let idStr=`req-${targetPhotoType}`;
     if(targetPhotoType==='team_iqama')idStr='req-team-iqama';
     if(targetPhotoType==='team_selfie')idStr='req-team-selfie';
-    if(targetPhotoType==='imeiphoto')idStr='req-imeiphoto';
+    if(targetPhotoType==='team_imeiphoto')idStr='req-team-imeiphoto';
     const fi=document.getElementById(idStr);if(fi)fi.value="";
     closeLiveCamera();
 }
@@ -691,6 +708,7 @@ async function submitRequest(){
         cleanTeam.push({
             iqama:m.rawIqama, 
             selfie:m.rawSelfie, 
+            devicePhoto: m.rawDevicePhoto,
             name:m.name, 
             iqamaText:m.iqamaText,
             deviceString: devStr 
@@ -1385,14 +1403,14 @@ function filterTeamMembers(query) {
         }
     });
 
-    let leadPhotos = document.getElementById('lead-device-photos');
-    if(leadPhotos) {
-        if(leadPhotos.getAttribute('data-search').includes(q)) {
-            leadPhotos.style.display = 'block';
+    let deviceCards = document.querySelectorAll('.device-photo-card');
+    deviceCards.forEach(card => {
+        if(card.getAttribute('data-search').includes(q)) {
+            card.style.display = 'block';
         } else {
-            leadPhotos.style.display = 'none';
+            card.style.display = 'none';
         }
-    }
+    });
 }
 
 // BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
@@ -1400,9 +1418,13 @@ async function onScanSuccess(decodedText){
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
     
+    // Clear styling and instantly hide to avoid color bleed
     if(resultCard){
-        // Ensure neutral transition color while fetching
-        resultCard.className = 'scan-result-card bg-blue fullscreen-scan'; 
+        resultCard.className = 'scan-result-card hidden'; 
+        void resultCard.offsetWidth; // Force CSS refresh
+        resultCard.classList.remove('hidden');
+        resultCard.classList.add('bg-blue'); // Default loading state
+        if(decodedText) resultCard.classList.add('fullscreen-scan');
     }
     
     if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
@@ -1477,39 +1499,24 @@ async function onScanSuccess(decodedText){
     if(topInfoBox){
         let topInfo = `<div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.8; margin-bottom:15px; border: 1px solid rgba(255,255,255,0.1);">`;
         if(dType === 'Contractor') {
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Project Name:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectName || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Project Manager:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectManager || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Location:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">FM POC:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.FmPoc || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Type:</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">Contractor</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Project Name:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectName || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Project Manager:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectManager || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Location:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">FM POC:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.FmPoc || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Type:</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">Contractor</span></p>`;
         } else {
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Name:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.VisitorName}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Type:</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${dType}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.7); display:inline-block; width:130px;">Location:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Name:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.VisitorName}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Type:</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${dType}</span></p>`;
+            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">Location:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
         }
         topInfo += `</div>`;
         topInfoBox.innerHTML = topInfo;
     }
 
-    if(detailsPrev){
-        let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
-        let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? safeImei : 'None';
-        let searchString = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
-        
-        let previewHtml = `<div id="lead-device-photos" data-search="${searchString}" style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">`;
-        previewHtml += `<div style="margin-bottom:12px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">Device & Photos for all:</strong> <span style="color:white; font-weight:bold; margin-left:8px; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px;">${leadDevStr}</span></div>`;
-        previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap; text-align:left;">`;
-        if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-        if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${data.SelfieURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-        if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-        if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-        previewHtml += `</div></div>`;
-        detailsPrev.innerHTML = previewHtml;
-    }
-
     let teamData=[],maxWorkers=1;
-    if(data.TeamMembers&&data.TeamMembers.trim()!==""){
-        let lines = data.TeamMembers.split('\n\n');
+    let tMembers = String(data.TeamMembers || '');
+    if(tMembers.trim()!==""){
+        let lines = tMembers.split('\n\n');
         lines.forEach((block, idx)=>{
             let nameMatch = block.match(/Name:\s*(.*?)\s*\|/);
             let iqamaMatch = block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/);
@@ -1523,7 +1530,8 @@ async function onScanSuccess(decodedText){
                     iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
                     device: deviceMatch ? deviceMatch[1].trim() : 'None',
                     iqama: extractedUrls[0],
-                    selfie: extractedUrls[1]
+                    selfie: extractedUrls[1],
+                    devicePhoto: extractedUrls.length > 2 ? extractedUrls[2] : 'No File'
                 });
             }
         });
@@ -1531,26 +1539,74 @@ async function onScanSuccess(decodedText){
     }
 
     if(dType === 'Contractor' || dType === 'Visitor'){
-        if(teamSec) teamSec.classList.remove('hidden');
+        
         if(searchFilterBox) searchFilterBox.classList.remove('hidden');
+        
+        // -------------------------
+        // MIDDLE: TEAM MEMBERS LIST
+        // -------------------------
+        if(teamSec) {
+            teamSec.classList.remove('hidden');
+            let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">`;
+            attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
+            
+            let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
+            let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${safeImei}</span>` : '';
+            
+            let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
+
+            attHtml += `<label class="team-member-scan-row" data-search="${leadSearchStr}" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span>${leadDevStr}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+            
+            teamData.forEach(m => {
+                let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
+                let devHtml = m.device && m.device !== 'None' && m.device.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
+                attHtml += `<label class="team-member-scan-row" data-search="${mSearchStr}" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${m.name}</span><br><span style="font-size:10px;color:rgba(255,255,255,0.6);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+            });
+            attHtml += `</div></div>`;
+            teamSec.innerHTML = attHtml;
+        }
+
+        // -------------------------
+        // BOTTOM: DEVICES & PHOTOS
+        // -------------------------
+        if(detailsPrev){
+            let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
+            let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
+            
+            let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px; margin-top:20px;">`;
+            previewHtml += `<div style="margin-bottom:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">DEVICE & PHOTOS FOR ALL</strong></div>`;
+            
+            // Lead Photos
+            let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? safeImei : 'None';
+            previewHtml += `<div class="device-photo-card" data-search="${leadSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
+            previewHtml += `<strong style="display:block; color:white; margin-bottom:8px;">Lead (${data.VisitorName}) - Device: <span style="color:var(--noon-yellow)">${leadDevStr}</span></strong>`;
+            previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+            if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+            if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${data.SelfieURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+            if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+            if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+            previewHtml += `</div></div>`;
+
+            // Team Photos
+            teamData.forEach(m => {
+                let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
+                let mDevStr = m.device && m.device !== 'None' && m.device.trim() !== '' ? m.device : 'None';
+                previewHtml += `<div class="device-photo-card" data-search="${mSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
+                previewHtml += `<strong style="display:block; color:white; margin-bottom:8px;">${m.name} - Device: <span style="color:var(--noon-yellow)">${mDevStr}</span></strong>`;
+                previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                if(m.iqama && m.iqama !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${m.iqama}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                if(m.selfie && m.selfie !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${m.selfie}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                if(m.devicePhoto && m.devicePhoto !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${m.devicePhoto}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                previewHtml += `</div></div>`;
+            });
+
+            previewHtml += `</div>`;
+            detailsPrev.innerHTML = previewHtml;
+        }
+
         const hcSec = document.getElementById('guard-headcount-section');
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
-        
-        let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">`;
-        attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
-        
-        let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
-        let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${safeImei}</span>` : '';
-        
-        attHtml += `<label class="team-member-scan-row" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span>${leadDevStr}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
-        
-        teamData.forEach(m => {
-            let devHtml = m.device && m.device !== 'None' && m.device.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
-            attHtml += `<label class="team-member-scan-row" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${m.name}</span><br><span style="font-size:10px;color:rgba(255,255,255,0.6);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
-        });
-        attHtml += `</div></div>`;
-        teamSec.innerHTML = attHtml;
     }
 
     const hcSec = document.getElementById('guard-headcount-section');
