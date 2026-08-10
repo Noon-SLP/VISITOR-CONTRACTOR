@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Noon SLP - Access System</title><link rel="icon" type="image/jpeg" href="logo.jpeg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Noon SLP - Access System</title><link rel="icon" type="image/jpeg" href="logo.jpeg"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{--bg-dark:#0b0e14;--card-bg:#12151c;--border-color:#242b3b;--noon-yellow:#ffc700;--text-main:#f0f2f5;--text-muted:#8b95a5;--input-bg:#090b10;--success:#10b981;--danger:#ef4444;--sidebar-bg:#12161f}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
@@ -575,27 +575,32 @@ async function submitRequest(){
     }
 }
 
-function downloadQR(id) {
-    const box = document.getElementById('qr-' + id);
-    if (!box) return;
-    const img = box.querySelector('img');
-    const canvas = box.querySelector('canvas');
-    let dataUrl = '';
+async function downloadPass(id) {
+    const passCard = document.getElementById('pass-card-' + id);
+    const btnContainer = document.getElementById('save-btn-container-' + id);
+    if (!passCard) return;
     
-    if (canvas && canvas.toDataURL) {
-        dataUrl = canvas.toDataURL('image/png');
-    } else if (img && img.src) {
-        dataUrl = img.src;
-    }
+    if (btnContainer) btnContainer.style.display = 'none';
     
-    if (dataUrl) {
+    try {
+        const canvas = await html2canvas(passCard, {
+            backgroundColor: '#090b10', 
+            scale: 2 
+        });
+        
+        const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataUrl;
         link.download = `Noon_Pass_${id}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    } catch (err) {
+        console.error("Screenshot failed", err);
+        alert("Failed to save the pass image.");
     }
+    
+    if (btnContainer) btnContainer.style.display = 'block';
 }
 
 function renderMyPasses(data){
@@ -614,12 +619,12 @@ function renderMyPasses(data){
         let sc=(pass.Status==='Approved'?'var(--success)':pass.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)');
         if(isComp){st=t(isExp?'status_expired':'status_completed');sc='var(--text-muted)'}
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
-        h+=`<div class="pass-item"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
+        h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
                 <div class="qr-box" id="qr-${pass.UniqueID}"></div>
-                <div style="margin-top:10px;">
-                    <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
+                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
+                    <button class="btn-primary btn-outline btn-sm" onclick="downloadPass('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
                 </div>
             </div>`;
         }
@@ -1155,13 +1160,13 @@ async function onScanSuccess(decodedText){
     let teamData=[],maxWorkers=1;
     if(data.TeamMembers&&data.TeamMembers.trim()!==""){
         let lines = data.TeamMembers.split('\n\n');
-        lines.forEach((block, idx)=>{
+        lines.forEach((block, index)=>{
             let nameMatch = block.match(/Name:\s*(.+?)\s*\|/);
             let iqamaMatch = block.match(/Iqama:\s*([^\n]+)/);
             let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             if(extractedUrls.length >= 2){
                 teamData.push({
-                    person: idx+1,
+                    person: index+1,
                     name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
                     iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
                     iqama: extractedUrls[0],
