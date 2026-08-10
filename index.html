@@ -15,7 +15,7 @@ body[dir="rtl"]{font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 #app-layout{display:flex;width:100vw;height:100vh;overflow:hidden}.sidebar{width:240px;background:var(--sidebar-bg);border-inline-end:1px solid var(--border-color);display:flex;flex-direction:column;transition:width 0.3s;z-index:100}.sidebar.minimized{width:75px}.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--border-color)}.sidebar.minimized .sidebar-brand{display:none}.sidebar-brand h1{font-size:16px;color:var(--noon-yellow);margin-bottom:2px}.sidebar-brand p{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px}.toggle-btn{background:transparent;color:white;border:none;font-size:20px;cursor:pointer;padding:5px}.sidebar-nav{flex:1;padding:20px 0;display:flex;flex-direction:column;gap:5px}.sidebar-nav a{display:flex;align-items:center;padding:12px 20px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:600;border-left:3px solid transparent;transition:0.2s}.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,199,0,0.05);color:var(--noon-yellow);border-left:3px solid var(--noon-yellow)}.sidebar-nav a .icon{font-size:18px;min-width:35px}.sidebar.minimized .nav-text{display:none}.sidebar-footer{padding:20px;border-top:1px solid var(--border-color);text-align:center}.sidebar.minimized .sidebar-footer{padding:20px 10px}
 #main-content{flex:1;height:100vh;overflow-y:auto;position:relative;background-image:radial-gradient(circle at center,rgba(20,22,28,0.4) 0%,rgba(5,5,7,0.95) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E")}
 .dashboard{width:100%;padding:20px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;gap:15px}.header h2{color:var(--noon-yellow);font-size:22px;margin:0;display:flex;align-items:center;gap:15px}.header-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}#dashboard-ops{max-width:950px;margin-top:20px}#dashboard-guard{max-width:600px;margin-top:20px}#dashboard-admin{max-width:100%;padding:30px 2.5vw;padding-top:0}
-.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start;position:relative;overflow:hidden}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
 #reader{width:100%;border:none;border-radius:12px;overflow:hidden;background:var(--card-bg);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 .scan-result-card{padding:30px;border-radius:12px;text-align:center;margin-top:25px;color:white;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}.bg-green{background-color:var(--success)}.bg-red{background-color:var(--danger)}.bg-blue{background-color:#3b82f6}.visitor-photo{width:160px;height:160px;border-radius:12px;object-fit:cover;border:3px solid white;margin:0 auto 20px auto;display:none;box-shadow:0 8px 25px rgba(0,0,0,0.5)}
 .fullscreen-scan{position:fixed !important;top:0;left:0;width:100vw !important;height:100vh !important;z-index:999999;overflow-y:auto;border-radius:0 !important;margin:0 !important;display:flex;flex-direction:column;justify-content:flex-start}
@@ -184,10 +184,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
         <div id="scan-result" class="scan-result-card hidden" style="position:relative;"><button onclick="closeScanResult()" style="position:absolute;top:10px;right:15px;background:transparent;border:none;color:white;font-size:26px;cursor:pointer;z-index:10;">&times;</button>
           <h1 id="r-decision" style="font-size: 38px; margin-bottom: 10px; letter-spacing: 1px;">-</h1>
           <p id="r-reason" style="font-size: 16px; margin-bottom: 20px; font-weight: 500;"></p>
-          <img id="r-selfie" class="visitor-photo" src="" alt="Visitor Photo">
+          <div id="scan-result-top-info"></div>
           <div id="guard-details-preview" style="margin-bottom:15px; text-align:left;"></div>
           <div id="guard-team-section" class="hidden" style="margin-bottom: 20px;"></div>
-          <div id="scan-result-bottom-info"></div>
+          
           <div id="guard-headcount-section" class="hidden" style="margin-top: 20px; text-align: left;"><div class="input-group" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;"><label style="color: white; font-weight: bold;">Number of Workers Present Today:</label><input type="number" id="guard-headcount" class="input-field" placeholder="E.g., 8" style="font-size: 18px; font-weight: bold; text-align: center;"></div></div>
           <button id="btn-confirm-action" class="btn-primary btn-success hidden" style="margin-top: 25px; padding: 16px; font-size: 16px;" onclick="confirmAction()" data-i18n="confirm_action">CONFIRM ACTION</button>
         </div>
@@ -536,6 +536,7 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
+    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -707,6 +708,41 @@ async function submitRequest(){
     }
 }
 
+function downloadQR(id) {
+    const qrBox = document.getElementById('qr-' + id);
+    if (!qrBox) return;
+
+    let canvas = qrBox.querySelector('canvas');
+    let img = qrBox.querySelector('img');
+    let sourceImage = canvas && canvas.style.display !== 'none' ? canvas : (img && img.src ? img : null);
+
+    if (!sourceImage) return alert("QR Code not ready yet.");
+
+    let size = 150;
+    let padding = 20;
+    let newCanvas = document.createElement('canvas');
+    newCanvas.width = size + (padding * 2);
+    newCanvas.height = size + (padding * 2);
+    let ctx = newCanvas.getContext('2d');
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+
+    if (sourceImage.tagName.toLowerCase() === 'canvas') {
+        ctx.drawImage(sourceImage, padding, padding, size, size);
+    } else {
+        ctx.drawImage(sourceImage, padding, padding, size, size);
+    }
+
+    const dataUrl = newCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `Noon_Pass_QR_${id}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
     let h='';
@@ -726,7 +762,10 @@ function renderMyPasses(data){
         h+=`<div class="pass-item"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
-                <div class="qr-box" id="qr-${pass.UniqueID}"></div>
+                <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;"></div>
+                <div style="margin-top:15px;">
+                    <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
+                </div>
             </div>`;
         }
         else if(isComp)h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
@@ -1219,14 +1258,14 @@ function filterTeamMembers(query) {
 // BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
-    const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),bottomInfoBox=document.getElementById('scan-result-bottom-info');
+    const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
     if(resultCard)resultCard.classList.remove('hidden');if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
     const rDecision=document.getElementById('r-decision'),rReason=document.getElementById('r-reason');
     if(rDecision)rDecision.innerText="VERIFYING...";if(rReason)rReason.innerHTML="";
     if(selfieImg){selfieImg.style.display='none';selfieImg.src=""}
     if(teamSec) teamSec.innerHTML = "";
     if(detailsPrev) detailsPrev.innerHTML = "";
-    if(bottomInfoBox) bottomInfoBox.innerHTML = "";
+    if(topInfoBox) topInfoBox.innerHTML = "";
     currentScannedID=decodedText;
 
     let data = null;
@@ -1250,9 +1289,6 @@ async function onScanSuccess(decodedText){
 
     if(!data || data.error) return showScanResult("DENIED","Invalid or Unrecognized QR Code","bg-red");
 
-    const rName=document.getElementById('r-name'),rType=document.getElementById('r-type'),rLocation=document.getElementById('r-location');
-    if(rName)rName.innerText=data.VisitorName;if(rType)rType.innerText=t(data.Type.toLowerCase());if(rLocation)rLocation.innerText=data.Location;
-
     const todayStr=formatToDDMMYYYY(new Date()),startStr=formatToDDMMYYYY(data.StartDate),todayNum=new Date().setHours(0,0,0,0);
     let startObj=parseFlexibleDate(data.StartDate),startNum=startObj?startObj.setHours(0,0,0,0):todayNum;
     let endObj=parseFlexibleDate(data.EndDate),endNum=endObj?endObj.setHours(0,0,0,0):startNum;
@@ -1264,35 +1300,37 @@ async function onScanSuccess(decodedText){
     else if(data.Type==='Visitor'&&startStr!==todayStr)return showScanResult("DENIED","Pass is not valid for today","bg-red");
     else if(data.Type==='Contractor'&&(todayNum<startNum||todayNum>endNum))return showScanResult("DENIED","Contractor Pass Expired","bg-red");
 
-    // BUILD DETAILED VISITOR/CONTRACTOR PREVIEW FOR GUARDS
+    if(topInfoBox){
+        let topInfo = `<div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.6; margin-bottom:15px;">`;
+        if(data.Type === 'Contractor') {
+            topInfo += `<p><strong style="color:var(--text-muted);">Project Name:</strong> <span style="color:white;">${data.ProjectName || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">Project Manager:</strong> <span style="color:white;">${data.ProjectManager || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">Location:</strong> <span style="color:white;">${data.Location}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">FM POC:</strong> <span style="color:white;">${data.FmPoc || 'N/A'}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">Type:</strong> <span style="color:var(--noon-yellow);">Contractor</span></p>`;
+        } else {
+            topInfo += `<p><strong style="color:var(--text-muted);">Name:</strong> <span style="color: var(--noon-yellow);">${data.VisitorName}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">Type:</strong> <span style="color:white;">${data.Type}</span></p>`;
+            topInfo += `<p><strong style="color:var(--text-muted);">Location:</strong> <span style="color:white;">${data.Location}</span></p>`;
+        }
+        topInfo += `</div>`;
+        topInfoBox.innerHTML = topInfo;
+    }
+
     if(detailsPrev){
+        let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
+        let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? safeImei : 'None';
         let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px;">`;
-        let leadDevStr = data.ImeiNumber && data.ImeiNumber !== 'None' && data.ImeiNumber.trim() !== '' ? data.ImeiNumber : 'None';
-        previewHtml += `<div style="margin-bottom:8px;"><strong style="color:var(--noon-yellow);">DEVICE:</strong> <span style="color:white; font-weight:bold;">${leadDevStr}</span></div>`;
-        previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">`;
+        previewHtml += `<div style="margin-bottom:8px; text-align:left;"><strong style="color:var(--noon-yellow);">LEAD DEVICE:</strong> <span style="color:white; font-weight:bold;">${leadDevStr}</span></div>`;
+        previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; margin-bottom:15px; text-align:left;">`;
         if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">SELFIE</strong><img src="${data.SelfieURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
         if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:var(--noon-yellow);">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:1px solid #444;" onclick="openFullscreenImage(this.src)"></div>`;
-        previewHtml += `</div></div>`;
+        previewHtml += `</div>`;
+        previewHtml += `<div style="text-align:left;"><input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="border-color: var(--border-color); width:100%;"></div>`;
+        previewHtml += `</div>`;
         detailsPrev.innerHTML = previewHtml;
-    }
-
-    if(bottomInfoBox){
-        let bottomInfo = `<div style="background: rgba(0,0,0,0.25); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.6;">`;
-        if(data.Type === 'Contractor') {
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Project Name:</strong> <span style="color:white;">${data.ProjectName || 'N/A'}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Project Manager:</strong> <span style="color:white;">${data.ProjectManager || 'N/A'}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Location:</strong> <span style="color:white;">${data.Location}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">FM POC:</strong> <span style="color:white;">${data.FmPoc || 'N/A'}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Type:</strong> <span style="color:var(--noon-yellow);">Contractor</span></p>`;
-        } else {
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Name:</strong> <span style="color: var(--noon-yellow);">${data.VisitorName}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Type:</strong> <span style="color:white;">${data.Type}</span></p>`;
-            bottomInfo += `<p><strong style="color:var(--text-muted);">Location:</strong> <span style="color:white;">${data.Location}</span></p>`;
-        }
-        bottomInfo += `</div>`;
-        bottomInfoBox.innerHTML = bottomInfo;
     }
 
     let teamData=[],maxWorkers=1;
@@ -1324,13 +1362,12 @@ async function onScanSuccess(decodedText){
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
         
-        let attHtml = `<div style="text-align: left; margin-top: 15px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">`;
-        
-        attHtml += `<input type="text" id="team-search-filter" class="input-field" placeholder="Search team by name or ID..." onkeyup="filterTeamMembers(this.value)" style="margin-bottom: 15px; border-color: var(--border-color);">`;
+        let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">`;
         
         attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> SELECT ALL MEMBERS</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
         
-        let leadDevStr = data.ImeiNumber && data.ImeiNumber !== 'None' && data.ImeiNumber.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${data.ImeiNumber}</span>` : '';
+        let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
+        let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${safeImei}</span>` : '';
         
         attHtml += `<label class="team-member-scan-row" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; cursor:pointer;"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">Lead (${data.VisitorName})</span>${leadDevStr}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
         
