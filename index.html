@@ -755,7 +755,10 @@ function renderMyPasses(data){
         listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_no_history")}</p>`;
         return;
     }
-    data.reverse().forEach(pass=>{
+    
+    let reversedData = [...data].reverse();
+
+    reversedData.forEach(pass=>{
         const todayNum=new Date().setHours(0,0,0,0);
         let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
         let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
@@ -767,7 +770,7 @@ function renderMyPasses(data){
         h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
         if(!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
-                <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;width:140px;height:140px;"></div>
+                <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;min-width:140px;min-height:140px;"></div>
                 <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
                     <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
                 </div>
@@ -777,10 +780,12 @@ function renderMyPasses(data){
         h+=`</div>`;
     });
     listDiv.innerHTML=h;
-    data.forEach(pass=>{
+    
+    reversedData.forEach(pass=>{
         const todayNum=new Date().setHours(0,0,0,0);
         let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
         let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
+        const isDone=pass.Type==='Visitor'&&!!pass.CheckOutTime,isExp=todayNum>endNum,isComp=isDone||isExp;
         if(!isComp){
             setTimeout(() => {
                 const qre=document.getElementById(`qr-${pass.UniqueID}`);
@@ -924,7 +929,7 @@ function renderAdminData(data){
                             let hc=`<strong style="color:var(--noon-yellow)">${count} Present</strong>`;
                             let ac=action==='IN'?'var(--success)':'var(--danger)';
                             let guardVal = guard || row.ScannedByGuard || '-';
-                            hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(time)}</td><td style="color:${ac};font-weight:bold;">${action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
+                            hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(l.time)}</td><td style="color:${ac};font-weight:bold;">${action}</td><td><strong>${row.VisitorName}</strong></td><td>${t(row.Type.toLowerCase())}</td><td>${row.Location}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
                             guardCount++;logFound=true;
                         }
                     });
@@ -1237,6 +1242,14 @@ function showScanResult(d,rHtml,cClass,isContractor=false){
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
+    if(d==="DENIED"){
+        setTimeout(()=>{
+            if (document.getElementById('r-decision').innerText === "DENIED") {
+                sr.classList.add('hidden');
+                try{if(html5QrCode)html5QrCode.resume();}catch(e){}
+            }
+        },3500);
+    }
 }
 
 window.closeScanResult = function() {
