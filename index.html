@@ -464,6 +464,7 @@ function initApp(){
 
 window.onload=function(){
     updateUI();
+    setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     const params = new URLSearchParams(window.location.search);
     const r = params.get('role');
     if(r==='staff'||r==='guard'||r==='admin'){
@@ -578,27 +579,36 @@ async function submitRequest(){
 function downloadQR(id) {
     const qrBox = document.getElementById('qr-' + id);
     if (!qrBox) return;
-    
+
     let canvas = qrBox.querySelector('canvas');
     let img = qrBox.querySelector('img');
-    let dataUrl = '';
-    
-    if (canvas && canvas.style.display !== 'none') {
-        dataUrl = canvas.toDataURL('image/png');
-    } else if (img && img.src) {
-        dataUrl = img.src;
-    }
-    
-    if (dataUrl) {
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `Noon_Pass_QR_${id}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    let sourceImage = canvas && canvas.style.display !== 'none' ? canvas : (img && img.src ? img : null);
+
+    if (!sourceImage) return alert("QR Code not ready yet.");
+
+    let size = 150;
+    let padding = 20;
+    let newCanvas = document.createElement('canvas');
+    newCanvas.width = size + (padding * 2);
+    newCanvas.height = size + (padding * 2);
+    let ctx = newCanvas.getContext('2d');
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+
+    if (sourceImage.tagName.toLowerCase() === 'canvas') {
+        ctx.drawImage(sourceImage, padding, padding, size, size);
     } else {
-        alert("QR Code not ready yet. Please try again in a second.");
+        ctx.drawImage(sourceImage, padding, padding, size, size);
     }
+
+    const dataUrl = newCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `Noon_Pass_QR_${id}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function renderMyPasses(data){
@@ -617,11 +627,11 @@ function renderMyPasses(data){
         let sc=(pass.Status==='Approved'?'var(--success)':pass.Status==='Rejected'?'var(--danger)':'var(--noon-yellow)');
         if(isComp){st=t(isExp?'status_expired':'status_completed');sc='var(--text-muted)'}
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
-        h+=`<div class="pass-item"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
+        h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(pass.Type.toLowerCase())} • ${pass.Location}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
         if(pass.Status==='Approved'&&!isComp) {
             h+=`<div style="text-align:center;margin-top:10px;">
                 <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;"></div>
-                <div style="margin-top:15px;">
+                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
                     <button class="btn-primary btn-outline btn-sm" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
                 </div>
             </div>`;
