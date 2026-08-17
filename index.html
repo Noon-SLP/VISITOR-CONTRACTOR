@@ -459,7 +459,7 @@ function captureLivePhoto(){
     let idStr=`req-${targetPhotoType}`;
     if(targetPhotoType==='team_iqama')idStr='req-team-iqama';
     if(targetPhotoType==='team_selfie')idStr='req-team-selfie';
-    if(targetPhotoType==='team_imeiphoto')idStr='req-team-imeiphoto';
+    if(targetPhotoType==='imeiphoto')idStr='req-imeiphoto';
     const fi=document.getElementById(idStr);if(fi)fi.value="";
     closeLiveCamera();
 }
@@ -1570,38 +1570,50 @@ async function onScanSuccess(decodedText){
         // BOTTOM: DEVICES & PHOTOS
         // -------------------------
         if(detailsPrev){
+            let cardsHtml = '';
+            
+            // Check Lead Device
             let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
-            let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
+            let hasLeadDevice = safeImei && safeImei !== 'None' && safeImei !== '';
             
-            let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px; margin-top:20px;">`;
-            previewHtml += `<div style="margin-bottom:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">DEVICE & PHOTOS FOR ALL</strong></div>`;
-            
-            // Lead Photos
-            let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? safeImei : 'None';
-            previewHtml += `<div class="device-photo-card" data-search="${leadSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
-            previewHtml += `<strong style="display:block; color:white; margin-bottom:8px;">Lead (${data.VisitorName}) - Device: <span style="color:var(--noon-yellow)">${leadDevStr}</span></strong>`;
-            previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-            if(data.IqamaURL && data.IqamaURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-            if(data.SelfieURL && data.SelfieURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${data.SelfieURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-            if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-            if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-            previewHtml += `</div></div>`;
+            if (hasLeadDevice) {
+                let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
+                cardsHtml += `<div class="device-photo-card" data-search="${leadSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
+                cardsHtml += `<strong style="display:block; color:white; margin-bottom:8px;">Lead (${data.VisitorName}) - Device: <span style="color:var(--noon-yellow)">${safeImei}</span></strong>`;
+                cardsHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                if(data.IqamaURL && data.IqamaURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${data.IqamaURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                if(data.SelfieURL && data.SelfieURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${data.SelfieURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${data.ImeiPhotoURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">VEHICLE</strong><img src="${data.VehiclePlateNo}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                cardsHtml += `</div></div>`;
+            }
 
-            // Team Photos
+            // Check Team Devices
             teamData.forEach(m => {
-                let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
                 let mDevStr = m.device && m.device !== 'None' && m.device.trim() !== '' ? m.device : 'None';
-                previewHtml += `<div class="device-photo-card" data-search="${mSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
-                previewHtml += `<strong style="display:block; color:white; margin-bottom:8px;">${m.name} - Device: <span style="color:var(--noon-yellow)">${mDevStr}</span></strong>`;
-                previewHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-                if(m.iqama && m.iqama !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${m.iqama}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                if(m.selfie && m.selfie !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${m.selfie}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                if(m.devicePhoto && m.devicePhoto !== 'No File') previewHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${m.devicePhoto}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                previewHtml += `</div></div>`;
+                if (mDevStr !== 'None') {
+                    let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
+                    cardsHtml += `<div class="device-photo-card" data-search="${mSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
+                    cardsHtml += `<strong style="display:block; color:white; margin-bottom:8px;">${m.name} - Device: <span style="color:var(--noon-yellow)">${mDevStr}</span></strong>`;
+                    cardsHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                    if(m.iqama && m.iqama !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">IQAMA / ID</strong><img src="${m.iqama}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                    if(m.selfie && m.selfie !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">SELFIE</strong><img src="${m.selfie}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                    if(m.devicePhoto && m.devicePhoto !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">DEVICE SCREEN</strong><img src="${m.devicePhoto}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                    cardsHtml += `</div></div>`;
+                }
             });
 
-            previewHtml += `</div>`;
-            detailsPrev.innerHTML = previewHtml;
+            if (cardsHtml !== '') {
+                let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px; margin-top:20px;">`;
+                previewHtml += `<div style="margin-bottom:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">DEVICE & PHOTOS FOR ALL</strong></div>`;
+                previewHtml += cardsHtml;
+                previewHtml += `</div>`;
+                detailsPrev.innerHTML = previewHtml;
+                detailsPrev.classList.remove('hidden');
+            } else {
+                detailsPrev.innerHTML = "";
+                detailsPrev.classList.add('hidden');
+            }
         }
 
         const hcSec = document.getElementById('guard-headcount-section');
