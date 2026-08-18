@@ -281,7 +281,7 @@ function toggleSidebar(){
 
 function logout(){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
-    sessionStorage.removeItem('noon_session');
+    localStorage.removeItem('noon_session');
     try{if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop();}catch(e){}
     location.reload();
 }
@@ -554,7 +554,7 @@ function isDateInRange(s,ft,stStr,enStr){
     return true;
 }
 
-function saveSession(){try{sessionStorage.setItem('noon_session',JSON.stringify({user:currentUser,time:Date.now()}))}catch(e){}}
+function saveSession(){try{localStorage.setItem('noon_session',JSON.stringify({user:currentUser,time:Date.now()}))}catch(e){}}
 
 function startAutoRefresh(r){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
@@ -620,7 +620,7 @@ window.onload=function(){
         const rt=document.getElementById('role-tabs');if(rt)rt.style.display='flex';
         switchLoginTab(r==='admin'?'admin':'guard');
     }
-    const session=sessionStorage.getItem('noon_session');
+    const session=localStorage.getItem('noon_session');
     if(session){
         const p=JSON.parse(session),h=(Date.now()-p.time)/(1000*60*60);
         if(h<12){
@@ -629,7 +629,7 @@ window.onload=function(){
             const s=document.getElementById('splash');
             if(s) s.style.display='none';
         } else {
-            sessionStorage.removeItem('noon_session');
+            localStorage.removeItem('noon_session');
             setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
         }
     } else {
@@ -1403,11 +1403,13 @@ function hideScannerUI() {
 function showScanResult(d,rHtml,cClass,isContractor=false){
     const sr=document.getElementById('scan-result');
     
+    // Completely wipe class to ensure no old color bleeds through
     sr.className = '';
     
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     
+    // Give it a split second so the browser registers the empty class before adding new ones
     setTimeout(() => {
         sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
     }, 10);
@@ -1457,6 +1459,7 @@ function filterTeamMembers(query) {
     });
 }
 
+// BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     if (isProcessingScan) return;
     isProcessingScan = true;
@@ -1468,11 +1471,12 @@ async function onScanSuccess(decodedText){
 
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
     
+    // Clear styling and instantly hide to avoid color bleed
     if(resultCard){
         resultCard.className = 'scan-result-card hidden'; 
-        void resultCard.offsetWidth; 
+        void resultCard.offsetWidth; // Force CSS refresh
         resultCard.classList.remove('hidden');
-        resultCard.classList.add('bg-blue'); 
+        resultCard.classList.add('bg-blue'); // Default loading state
         if(decodedText) resultCard.classList.add('fullscreen-scan');
     }
     
@@ -1511,7 +1515,10 @@ async function onScanSuccess(decodedText){
         if(cachedMatch) data = cachedMatch;
     }
 
-    if(!data || data.error) return showScanResult("DENIED","Invalid or Unrecognized QR Code","bg-red", false);
+    if(!data || data.error) {
+        showScanResult("DENIED","Invalid or Unrecognized QR Code","bg-red", false);
+        return;
+    }
 
     let dType = String(data.Type || '');
     let dStatus = String(data.Status || '');
