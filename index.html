@@ -653,14 +653,35 @@ async function performManualSearch() {
             resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
         } else {
             let h = '';
+            const todayStr = formatToDDMMYYYY(new Date());
+            const todayNum = new Date().setHours(0,0,0,0);
+
             matches.forEach(m => {
-                let rStatus = String(m.Status || 'Pending');
-                let sc = (rStatus==='Approved'?'var(--success)':'var(--noon-yellow)');
+                let dType = String(m.Type || '');
+                let dStatus = String(m.Status || 'Pending');
+                let dLoc = String(m.Location || '');
+                let startStr = formatToDDMMYYYY(m.StartDate);
+                let startObj = parseFlexibleDate(m.StartDate);
+                let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
+                let endObj = parseFlexibleDate(m.EndDate);
+                let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
+
+                let displayStatus = dStatus;
+                let sc = 'var(--noon-yellow)';
+
+                if (currentUser && currentUser.role === 'admin' && !currentUser.location) { displayStatus = "NO FACILITY SELECTED"; sc = "var(--danger)"; }
+                else if (dStatus === 'Pending') { displayStatus = "PENDING"; sc = "var(--noon-yellow)"; }
+                else if (dStatus !== 'Approved') { displayStatus = "DENIED"; sc = "var(--danger)"; }
+                else if (currentUser && dLoc !== currentUser.location) { displayStatus = "WRONG FACILITY"; sc = "var(--danger)"; }
+                else if (dType === 'Visitor' && startStr !== todayStr) { displayStatus = "INVALID DATE"; sc = "var(--danger)"; }
+                else if (dType === 'Contractor' && (todayNum < startNum || todayNum > endNum)) { displayStatus = "EXPIRED"; sc = "var(--danger)"; }
+                else { displayStatus = "APPROVED"; sc = "var(--success)"; }
+
                 h += `<div style="background:var(--input-bg); border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <strong style="color:white;font-size:13px;">${m.VisitorName}</strong><br>
                         <span style="font-size:11px;color:var(--text-muted);">${m.UniqueID} | ${m.Type} | ${m.Location}</span>
-                        <br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${rStatus}</span>
+                        <br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${displayStatus}</span>
                     </div>
                     <button class="btn-primary btn-sm" style="width:auto; padding:6px 15px;" onclick="document.getElementById('manual-search-results').innerHTML=''; onScanSuccess('${m.UniqueID}')">OPEN</button>
                 </div>`;
@@ -1428,6 +1449,70 @@ function filterTeamMembers(query) {
     });
 }
 
+async function performManualSearch() {
+    let q = document.getElementById('guard-search-input').value.toLowerCase().trim();
+    let resDiv = document.getElementById('manual-search-results');
+    if(!q) { resDiv.innerHTML = ''; return; }
+    resDiv.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Searching...</p>';
+    
+    try {
+        let data = globalAdminData;
+        if(!data || data.length === 0) {
+            const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
+            data = await res.json();
+            globalAdminData = data;
+        }
+        
+        let matches = data.filter(r => {
+            if(!r.UniqueID || r.Status === 'Rejected') return false;
+            let fullStr = String(r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
+            return fullStr.includes(q);
+        }).slice(0, 5); 
+        
+        if(matches.length === 0) {
+            resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
+        } else {
+            let h = '';
+            const todayStr = formatToDDMMYYYY(new Date());
+            const todayNum = new Date().setHours(0,0,0,0);
+
+            matches.forEach(m => {
+                let dType = String(m.Type || '');
+                let dStatus = String(m.Status || 'Pending');
+                let dLoc = String(m.Location || '');
+                let startStr = formatToDDMMYYYY(m.StartDate);
+                let startObj = parseFlexibleDate(m.StartDate);
+                let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
+                let endObj = parseFlexibleDate(m.EndDate);
+                let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
+
+                let displayStatus = dStatus;
+                let sc = 'var(--noon-yellow)';
+
+                if (currentUser && currentUser.role === 'admin' && !currentUser.location) { displayStatus = "NO FACILITY SELECTED"; sc = "var(--danger)"; }
+                else if (dStatus === 'Pending') { displayStatus = "PENDING"; sc = "var(--noon-yellow)"; }
+                else if (dStatus !== 'Approved') { displayStatus = "DENIED"; sc = "var(--danger)"; }
+                else if (currentUser && dLoc !== currentUser.location) { displayStatus = "WRONG FACILITY"; sc = "var(--danger)"; }
+                else if (dType === 'Visitor' && startStr !== todayStr) { displayStatus = "INVALID DATE"; sc = "var(--danger)"; }
+                else if (dType === 'Contractor' && (todayNum < startNum || todayNum > endNum)) { displayStatus = "EXPIRED"; sc = "var(--danger)"; }
+                else { displayStatus = "APPROVED"; sc = "var(--success)"; }
+
+                h += `<div style="background:var(--input-bg); border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="color:white;font-size:13px;">${m.VisitorName}</strong><br>
+                        <span style="font-size:11px;color:var(--text-muted);">${m.UniqueID} | ${m.Type} | ${m.Location}</span>
+                        <br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${displayStatus}</span>
+                    </div>
+                    <button class="btn-primary btn-sm" style="width:auto; padding:6px 15px;" onclick="document.getElementById('manual-search-results').innerHTML=''; onScanSuccess('${m.UniqueID}')">OPEN</button>
+                </div>`;
+            });
+            resDiv.innerHTML = h;
+        }
+    } catch(e) {
+        resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">Search failed.</p>';
+    }
+}
+
 // BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
@@ -1435,7 +1520,11 @@ async function onScanSuccess(decodedText){
     
     // Clear styling and instantly hide to avoid color bleed
     if(resultCard){
-        resultCard.className = 'scan-result-card bg-blue fullscreen-scan'; 
+        resultCard.className = 'scan-result-card hidden'; 
+        void resultCard.offsetWidth; // Force CSS refresh
+        resultCard.classList.remove('hidden');
+        resultCard.classList.add('bg-blue'); // Default loading state
+        if(decodedText) resultCard.classList.add('fullscreen-scan');
     }
     
     if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
