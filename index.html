@@ -1303,7 +1303,6 @@ function printQR(name,type,location,id,status,date){
     setTimeout(()=>{pw.print();pw.close();},250);
 }
 
-let isProcessingScan = false;
 
 function switchScanMode(mode) {
     const btnCam = document.getElementById('btn-mode-camera');
