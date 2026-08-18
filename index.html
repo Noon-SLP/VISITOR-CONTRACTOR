@@ -15,7 +15,7 @@ body[dir="rtl"]{font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 #app-layout{display:flex;width:100vw;height:100vh;overflow:hidden}.sidebar{width:240px;background:var(--sidebar-bg);border-inline-end:1px solid var(--border-color);display:flex;flex-direction:column;transition:width 0.3s;z-index:100}.sidebar.minimized{width:75px}.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--border-color)}.sidebar.minimized .sidebar-brand{display:none}.sidebar-brand h1{font-size:16px;color:var(--noon-yellow);margin-bottom:2px}.sidebar-brand p{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px}.toggle-btn{background:transparent;color:white;border:none;font-size:20px;cursor:pointer;padding:5px}.sidebar-nav{flex:1;padding:20px 0;display:flex;flex-direction:column;gap:5px}.sidebar-nav a{display:flex;align-items:center;padding:12px 20px;color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:600;border-left:3px solid transparent;transition:0.2s}.sidebar-nav a:hover,.sidebar-nav a.active{background:rgba(255,199,0,0.05);color:var(--noon-yellow);border-left:3px solid var(--noon-yellow)}.sidebar-nav a .icon{font-size:18px;min-width:35px}.sidebar.minimized .nav-text{display:none}.sidebar-footer{padding:20px;border-top:1px solid var(--border-color);text-align:center}.sidebar.minimized .sidebar-footer{padding:20px 10px}
 #main-content{flex:1;height:100vh;overflow-y:auto;position:relative;background-image:radial-gradient(circle at center,rgba(20,22,28,0.4) 0%,rgba(5,5,7,0.95) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66ZM28 100L0 84L0 50L28 66L56 50L56 84L28 100Z' fill='none' stroke='%2322262f' stroke-width='1.5'/%3E%3Cpath d='M28 0L28 33M0 16L28 33M56 16L28 33M0 50L28 66M56 50L28 66' fill='none' stroke='%23151820' stroke-width='1'/%3E%3C/svg%3E")}
 .dashboard{width:100%;padding:20px;margin:0 auto}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:1px solid var(--border-color);flex-wrap:wrap;gap:15px}.header h2{color:var(--noon-yellow);font-size:22px;margin:0;display:flex;align-items:center;gap:15px}.header-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}#dashboard-ops{max-width:950px;margin-top:20px}#dashboard-guard{max-width:600px;margin-top:20px}#dashboard-admin{max-width:100%;padding:30px 2.5vw;padding-top:0}
-.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start;position:relative;overflow:hidden}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}
+.ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}.ops-card{background:var(--card-bg);padding:24px;border-radius:12px;border:1px solid var(--border-color);box-shadow:0 10px 30px rgba(0,0,0,0.5)}.pass-item{background:var(--input-bg);padding:15px;border-radius:8px;border:1px solid var(--border-color);margin-bottom:12px;text-align:start;position:relative;overflow:hidden}.pass-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px}.qr-box{background:white;padding:10px;border-radius:6px;display:inline-block;margin-top:10px}
 #reader{width:100%;border:none;border-radius:12px;overflow:hidden;background:var(--card-bg);box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 .scan-result-card{padding:30px;border-radius:12px;text-align:center;margin-top:25px;color:white;font-weight:bold;box-shadow:0 10px 30px rgba(0,0,0,0.4)}.bg-green{background-color:var(--success)}.bg-red{background-color:var(--danger)}.bg-blue{background-color:#3b82f6}.bg-yellow{background-color:var(--noon-yellow);color:#000 !important}.bg-yellow h1, .bg-yellow p{color:#000 !important}.visitor-photo{width:160px;height:160px;border-radius:12px;object-fit:cover;border:3px solid white;margin:0 auto 20px auto;display:none;box-shadow:0 8px 25px rgba(0,0,0,0.5)}
 .fullscreen-scan{position:fixed !important;top:0;left:0;width:100vw !important;height:100vh !important;z-index:999999;overflow-y:auto;border-radius:0 !important;margin:0 !important;display:flex;flex-direction:column;justify-content:flex-start}
@@ -246,7 +246,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzFQCv1Ng_n-U13NiMLz1Z2ldPzore4YBlnc6Iu4w5kkOSzaoNkPz80QlbD7PDOwld1_A/exec';
-let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1;
+let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1; let isProcessingScan = false;
 
 const dict={
     en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date / Validity (From - To)","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC Name / Details","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"Access & Gate History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER","camera_scanner_btn":"📷 CAMERA SCANNER","hardware_gun_btn":"🔌 HARDWARE GUN","hw_scanner_ready":"HARDWARE SCANNER READY","hw_scanner_inst":"Point your handheld gun scanner at the QR code and trigger.","awaiting_scan":"Awaiting hardware scan...","save_qr":"⬇️ SAVE QR CODE"},
@@ -634,7 +634,7 @@ async function performManualSearch() {
     let resDiv = document.getElementById('manual-search-results');
     if(!q) { resDiv.innerHTML = ''; return; }
     resDiv.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Searching...</p>';
-    
+
     try {
         let data = globalAdminData;
         if(!data || data.length === 0) {
@@ -642,13 +642,13 @@ async function performManualSearch() {
             data = await res.json();
             globalAdminData = data;
         }
-        
+
         let matches = data.filter(r => {
             if(!r.UniqueID || r.Status === 'Rejected') return false;
             let fullStr = String(r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
             return fullStr.includes(q);
-        }).slice(0, 5); 
-        
+        }).slice(0, 5);
+
         if(matches.length === 0) {
             resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
         } else {
@@ -1303,6 +1303,8 @@ function printQR(name,type,location,id,status,date){
     setTimeout(()=>{pw.print();pw.close();},250);
 }
 
+let isProcessingScan = false;
+
 function switchScanMode(mode) {
     const btnCam = document.getElementById('btn-mode-camera');
     const btnGun = document.getElementById('btn-mode-gun');
@@ -1328,10 +1330,10 @@ function switchScanMode(mode) {
 function handleGunScan(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
-        const code = event.target.value.trim();
+        const code = event.target.value.replace(/\s+/g, '').trim().toUpperCase();
         if (code) {
-            onScanSuccess(code);
             event.target.value = "";
+            onScanSuccess(code);
         }
     }
 }
@@ -1395,13 +1397,11 @@ function hideScannerUI() {
 function showScanResult(d,rHtml,cClass,isContractor=false){
     const sr=document.getElementById('scan-result');
     
-    // Completely wipe class to ensure no old color bleeds through
     sr.className = '';
     
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     
-    // Give it a split second so the browser registers the empty class before adding new ones
     setTimeout(() => {
         sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
     }, 10);
@@ -1410,6 +1410,7 @@ function showScanResult(d,rHtml,cClass,isContractor=false){
         setTimeout(()=>{
             if (document.getElementById('r-decision').innerText === "DENIED") {
                 sr.className = 'scan-result-card hidden';
+                isProcessingScan = false;
                 try{if(html5QrCode)html5QrCode.resume();}catch(e){}
             }
         },3500);
@@ -1417,6 +1418,7 @@ function showScanResult(d,rHtml,cClass,isContractor=false){
 }
 
 window.closeScanResult = function() {
+    isProcessingScan = false;
     const sr = document.getElementById('scan-result');
     if(sr) sr.className = 'scan-result-card hidden';
     try{if(html5QrCode) html5QrCode.resume();}catch(e){}
@@ -1449,81 +1451,23 @@ function filterTeamMembers(query) {
     });
 }
 
-async function performManualSearch() {
-    let q = document.getElementById('guard-search-input').value.toLowerCase().trim();
-    let resDiv = document.getElementById('manual-search-results');
-    if(!q) { resDiv.innerHTML = ''; return; }
-    resDiv.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Searching...</p>';
-    
-    try {
-        let data = globalAdminData;
-        if(!data || data.length === 0) {
-            const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
-            data = await res.json();
-            globalAdminData = data;
-        }
-        
-        let matches = data.filter(r => {
-            if(!r.UniqueID || r.Status === 'Rejected') return false;
-            let fullStr = String(r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
-            return fullStr.includes(q);
-        }).slice(0, 5); 
-        
-        if(matches.length === 0) {
-            resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
-        } else {
-            let h = '';
-            const todayStr = formatToDDMMYYYY(new Date());
-            const todayNum = new Date().setHours(0,0,0,0);
-
-            matches.forEach(m => {
-                let dType = String(m.Type || '');
-                let dStatus = String(m.Status || 'Pending');
-                let dLoc = String(m.Location || '');
-                let startStr = formatToDDMMYYYY(m.StartDate);
-                let startObj = parseFlexibleDate(m.StartDate);
-                let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
-                let endObj = parseFlexibleDate(m.EndDate);
-                let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
-
-                let displayStatus = dStatus;
-                let sc = 'var(--noon-yellow)';
-
-                if (currentUser && currentUser.role === 'admin' && !currentUser.location) { displayStatus = "NO FACILITY SELECTED"; sc = "var(--danger)"; }
-                else if (dStatus === 'Pending') { displayStatus = "PENDING"; sc = "var(--noon-yellow)"; }
-                else if (dStatus !== 'Approved') { displayStatus = "DENIED"; sc = "var(--danger)"; }
-                else if (currentUser && dLoc !== currentUser.location) { displayStatus = "WRONG FACILITY"; sc = "var(--danger)"; }
-                else if (dType === 'Visitor' && startStr !== todayStr) { displayStatus = "INVALID DATE"; sc = "var(--danger)"; }
-                else if (dType === 'Contractor' && (todayNum < startNum || todayNum > endNum)) { displayStatus = "EXPIRED"; sc = "var(--danger)"; }
-                else { displayStatus = "APPROVED"; sc = "var(--success)"; }
-
-                h += `<div style="background:var(--input-bg); border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong style="color:white;font-size:13px;">${m.VisitorName}</strong><br>
-                        <span style="font-size:11px;color:var(--text-muted);">${m.UniqueID} | ${m.Type} | ${m.Location}</span>
-                        <br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${displayStatus}</span>
-                    </div>
-                    <button class="btn-primary btn-sm" style="width:auto; padding:6px 15px;" onclick="document.getElementById('manual-search-results').innerHTML=''; onScanSuccess('${m.UniqueID}')">OPEN</button>
-                </div>`;
-            });
-            resDiv.innerHTML = h;
-        }
-    } catch(e) {
-        resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">Search failed.</p>';
-    }
-}
-
 // BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
+    if (isProcessingScan) return;
+    isProcessingScan = true;
+
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
+    
+    decodedText = String(decodedText).replace(/\s+/g, '').trim().toUpperCase();
+    if (!decodedText) { isProcessingScan = false; return; }
+
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
     
-    // Clear styling and instantly hide to avoid color bleed
     if(resultCard){
         resultCard.className = 'scan-result-card hidden'; 
-        void resultCard.offsetWidth; // Force CSS refresh
+        void resultCard.offsetWidth; 
         resultCard.classList.remove('hidden');
-        resultCard.classList.add('bg-blue'); // Default loading state
+        resultCard.classList.add('bg-blue'); 
         if(decodedText) resultCard.classList.add('fullscreen-scan');
     }
     
@@ -1780,11 +1724,13 @@ async function confirmAction(){
             alert("Sync failed. Please try again.");
             btn.innerText = t("confirm_action");
             btn.disabled = false;
+            isProcessingScan = false;
         }
     } catch(e) {
         alert("Network error. Please try again.");
         btn.innerText = t("confirm_action");
         btn.disabled = false;
+        isProcessingScan = false;
     }
 }
 </script>
