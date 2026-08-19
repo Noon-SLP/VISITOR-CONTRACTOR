@@ -1473,13 +1473,17 @@ function filterTeamMembers(query) {
     });
 }
 
+// BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     if (isProcessingScan) return;
     isProcessingScan = true;
 
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
     
-    decodedText = String(decodedText).replace(/\s+/g, '').trim().toUpperCase();
+    let rawText = String(decodedText).toUpperCase();
+    let exactMatch = rawText.match(/NOON-\d+/);
+    decodedText = exactMatch ? exactMatch[0] : rawText.replace(/\s+/g, '').trim();
+
     if (!decodedText) { isProcessingScan = false; return; }
 
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
