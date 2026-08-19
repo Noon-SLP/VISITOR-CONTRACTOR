@@ -152,7 +152,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
     <div id="dashboard-guard" class="dashboard hidden text-center">
       <div class="header">
         <h2><span data-i18n="gate_scanner">Gate Scanner</span> <span id="guard-loc-text" style="color: var(--text-muted); font-size: 18px;">(<span id="guard-loc-display"></span>)</span><select id="admin-guard-loc" class="input-field hidden" style="width: auto; padding: 6px 12px; font-size: 14px; margin: 0; min-width: 150px;" onchange="updateAdminGuardLoc()"><option value="" data-i18n="select_guard_loc">Select Guard Location...</option><option value="RUH01">RUH01</option><option value="JED01">JED01</option></select></h2>
-        <div class="header-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px;" onclick="logout()" data-i18n="logout">LOGOUT</button></div>
+        <div class="header-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="hardRefreshApp()" title="Hard Refresh Cache">🔄</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 16px; font-size: 12px;" onclick="logout()" data-i18n="logout">LOGOUT</button></div>
       </div>
       <div style="max-width: 450px; margin: 0 auto;">
         
@@ -272,7 +272,7 @@ function updateUI(){
 
 function toggleFullScreen(){
     const d=document,de=d.documentElement;
-    const req=de.requestFullscreen||de.mozRequestFullScreen||de.webkitRequestFullscreen||de.msRequestFullscreen;
+    const req=de.requestFullscreen||de.mozRequestFullScreen||de.webkitRequestFullScreen||de.msRequestFullscreen;
     const exit=d.exitFullscreen||d.mozCancelFullScreen||d.webkitExitFullscreen||d.msExitFullscreen;
     if(!d.fullscreenElement&&!d.mozFullScreenElement&&!d.webkitFullscreenElement&&!d.msFullscreenElement){if(req)req.call(de).catch(e=>console.log(e));else alert("Fullscreen not supported")}
     else{if(exit)exit.call(d).catch(e=>console.log(e))}
@@ -292,12 +292,12 @@ function logout(){
 
 function hardRefreshApp() {
     if(confirm("Perform a Hard Refresh? This will clear all saved cache and fetch the latest data.")) {
-        let currentSession = localStorage.getItem(SESSION_KEY);
-        localStorage.clear();
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('cached_')) {
+                localStorage.removeItem(key);
+            }
+        });
         sessionStorage.clear();
-        if(currentSession) {
-            localStorage.setItem(SESSION_KEY, currentSession);
-        }
         window.location.reload(true);
     }
 }
@@ -1584,7 +1584,7 @@ async function onScanSuccess(decodedText){
             let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             
             if(extractedUrls.length >= 2){
-                td.push({
+                teamData.push({
                     person: idx+1,
                     name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
                     iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
