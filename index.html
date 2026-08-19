@@ -64,6 +64,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
           <div class="input-group"><label style="font-weight: 700; color: var(--noon-yellow);" data-i18n="type">Type</label><select id="req-type" class="input-field" onchange="toggleDateFields()"><option value="Visitor" data-i18n="visitor">Visitor</option><option value="Contractor" data-i18n="contractor">Contractor</option></select></div>
           <div class="input-group hidden" id="admin-email-group"><input type="email" id="req-admin-email" class="input-field t-ph" data-i18n="req_email_ph" placeholder="Email Address (For Pass Tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false, false)"></div>
           <div class="input-group"><input type="text" id="req-vname" class="input-field t-ph" data-i18n="req_vname_ph" placeholder="Visitor / Contractor Full Name"></div>
+          <div class="input-group"><input type="text" id="req-iqamatext" class="input-field" placeholder="Lead Iqama / ID Number"></div>
           <div class="input-group"><select id="req-location" class="input-field"><option value="RUH01">Facility: RUH01</option><option value="JED01">Facility: JED01</option></select></div>
           <div class="input-group"><label data-i18n="visit_date">Visit Date / Validity (From - To)</label><div style="display: flex; gap: 10px;"><input type="date" id="req-date-start" class="input-field"><input type="date" id="req-date-end" class="input-field"></div></div>
           
@@ -764,8 +765,14 @@ async function submitRequest(){
         hName=currentUser.name;const ei=document.getElementById('req-admin-email');if(ei)hMail=ei.value.toLowerCase().trim();
         if(!hMail)return alert("Please enter Email Address.");
     }
-    const vni=document.getElementById('req-vname'),vName=vni?vni.value.trim():'';
-    if(!vName)return alert("Full Name is required.");
+    const vni=document.getElementById('req-vname'),vNameRaw=vni?vni.value.trim():'';
+    if(!vNameRaw)return alert("Full Name is required.");
+    
+    const leadIqamaInp=document.getElementById('req-iqamatext');
+    const leadIqamaVal=leadIqamaInp?leadIqamaInp.value.trim():'';
+    if(!leadIqamaVal)return alert("Lead Iqama / ID Number is required.");
+    
+    const vName = vNameRaw + " (ID: " + leadIqamaVal + ")";
 
     const startDateVal = document.getElementById('req-date-start').value;
     const endDateVal = document.getElementById('req-date-end').value;
@@ -791,6 +798,7 @@ async function submitRequest(){
     renderMyPasses(existingPasses);
 
     if(currentUser.role==='admin'&&vni)vni.value="";
+    const lIqamaClear=document.getElementById('req-iqamatext'); if(lIqamaClear) lIqamaClear.value="";
     if(ii)ii.value="";if(si)si.value="";if(imPho)imPho.value="";if(vi)vi.value="";
     const fmPocInput = document.getElementById('req-con-fmpoc'); if(fmPocInput) fmPocInput.value="";
     document.getElementById('req-lead-device-type').value = "None"; toggleLeadDeviceInput();
