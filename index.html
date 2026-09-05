@@ -37,8 +37,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
 <div id="pin-create-modal" class="popup-modal hidden"><div class="record-modal-box" style="max-width: 350px;"><div class="record-modal-header"><h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Set Security PIN</h3><button onclick="closePinCreate()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button></div><div style="padding: 25px; display: flex; flex-direction: column; gap: 15px; text-align:center;"><p style="color:var(--text-muted); font-size:13px;">Create a 4-digit PIN to secure your passes. You will need this to view your QR codes on other devices.</p><input type="password" id="new-pin-input" class="input-field" placeholder="****" maxlength="4" style="text-align:center; font-size:24px; letter-spacing:10px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><button class="btn-primary" onclick="confirmPinCreate()">SAVE PIN</button></div></div></div>
 <div id="pin-verify-modal" class="popup-modal hidden"><div class="record-modal-box" style="max-width: 350px;"><div class="record-modal-header"><h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">Security PIN Required</h3><button onclick="closePinVerify()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button></div><div style="padding: 25px; display: flex; flex-direction: column; gap: 15px; text-align:center;"><p style="color:var(--text-muted); font-size:13px;">Please enter your 4-digit PIN to unlock and view your passes.</p><input type="password" id="verify-pin-input" class="input-field" placeholder="****" maxlength="4" style="text-align:center; font-size:24px; letter-spacing:10px;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><p id="pin-error-msg" class="hidden" style="color:var(--danger); font-size:12px; margin:0;">Incorrect PIN.</p><button class="btn-primary" onclick="confirmPinVerify()">UNLOCK</button></div></div></div>
-
-<div id="add-more-modal" class="popup-modal hidden"><div class="record-modal-box" style="max-width: 500px;"><div class="record-modal-header"><h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;">➕ Add More People</h3><button onclick="closeAddMoreModal()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button></div><div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;"><p style="color:var(--danger); font-size:12px; font-weight:bold; margin-bottom:5px;">⚠️ WARNING: Submitting this will change the pass status back to PENDING. It cannot be used until the Admin approves it again.</p><div id="add-team-roster-display" class="team-roster hidden"></div><div id="add-team-entry-box" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02);"><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-name" class="input-field" placeholder="Full Name"></div><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-iqamatext" class="input-field" placeholder="Iqama / ID Number"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px; color:var(--noon-yellow);">Device Type</label><select id="req-add-team-device-type" class="input-field" onchange="toggleAddTeamDeviceInput()"><option value="None">No Device</option><option value="Mobile">Mobile</option><option value="Laptop">Laptop</option></select></div><div class="input-group hidden" id="req-add-team-device-id-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-device-id" class="input-field" placeholder="IMEI / Serial Number"><label style="font-size: 11px; margin-top:10px;">Upload Device Photo/Screen</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_imeiphoto')">📷 Live Camera</button><input type="file" id="req-add-team-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_imeiphoto')"></div><img id="preview-add_team_imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group"><label style="font-size: 11px;">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_iqama')">📷 Live Camera</button><input type="file" id="req-add-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_iqama')"></div><img id="preview-add_team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_selfie')">📷 Live Camera</button><input type="file" id="req-add-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_selfie')"></div><img id="preview-add_team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveAddTeamMember()">✅ SAVE PERSON TO LIST</button></div><button id="btn-submit-add-more" class="btn-primary" onclick="submitAddMorePeople()">SUBMIT & SEND FOR APPROVAL</button></div></div></div>
+<div id="add-more-modal" class="popup-modal hidden"><div class="record-modal-box" style="max-width: 500px;"><div class="record-modal-header"><h3 style="color: var(--noon-yellow); margin: 0; font-size: 16px; text-transform: uppercase;" data-i18n="add_more_people">➕ Add More People</h3><button onclick="closeAddMoreModal()" style="background: transparent; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button></div><div style="padding: 25px; display: flex; flex-direction: column; gap: 15px;"><p style="color:var(--danger); font-size:12px; font-weight:bold; margin-bottom:5px;" data-i18n="add_more_warning">⚠️ WARNING: Submitting this will change the pass status back to PENDING. It cannot be used until the Admin approves it again.</p><div id="add-team-roster-display" class="team-roster hidden"></div><div id="add-team-entry-box" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02);"><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-name" class="input-field" data-i18n="full_name_ph" placeholder="Full Name"></div><div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-iqamatext" class="input-field" data-i18n="iqama_id_ph" placeholder="Iqama / ID Number"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px; color:var(--noon-yellow);" data-i18n="device_type_label">Device Type</label><select id="req-add-team-device-type" class="input-field" onchange="toggleAddTeamDeviceInput()"><option value="None" data-i18n="no_device">No Device</option><option value="Mobile">Mobile</option><option value="Laptop">Laptop</option></select></div><div class="input-group hidden" id="req-add-team-device-id-group" style="margin-bottom: 15px;"><input type="text" id="req-add-team-device-id" class="input-field" placeholder="IMEI / Serial Number"><label style="font-size: 11px; margin-top:10px;" data-i18n="upload_device_photo">Upload Device Photo/Screen</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_imeiphoto')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-add-team-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_imeiphoto')"></div><img id="preview-add_team_imeiphoto" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group"><label style="font-size: 11px;" data-i18n="upload_iqama">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-add-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_iqama')"></div><img id="preview-add_team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;" data-i18n="upload_selfie">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('add_team_selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-add-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('add_team_selfie')"></div><img id="preview-add_team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div><button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveAddTeamMember()" data-i18n="save_person_list">✅ SAVE PERSON TO LIST</button></div><button id="btn-submit-add-more" class="btn-primary" onclick="submitAddMorePeople()" data-i18n="submit_send_approval">SUBMIT & SEND FOR APPROVAL</button></div></div></div>
 
 <div id="login-view"><div class="login-top-controls"><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="hardRefreshApp()" title="Hard Refresh Cache">🔄</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 16px;" onclick="toggleFullScreen()" title="Fullscreen">⛶</button><button class="btn-primary btn-outline" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="toggleLang()">عربي / EN</button></div><div class="login-container"><div class="logo-box"></div><div style="text-align:center;margin-bottom:25px;"><h2 style="color:var(--noon-yellow);font-size:24px;margin-bottom:6px;letter-spacing:1px;">NOON SLP</h2><p style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;" data-i18n="visitor_contractor_portal">Visitor & Contractor Portal</p></div>
 <div class="role-tabs" id="role-tabs" style="display:none;"><div class="role-tab active" id="tab-guard" onclick="switchLoginTab('guard')" data-i18n="guard">🛡️ Guard</div><div class="role-tab" id="tab-admin" onclick="switchLoginTab('admin')" data-i18n="admin">⚙️ Admin</div></div>
@@ -69,7 +68,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
           <div class="input-group"><label style="font-weight: 700; color: var(--noon-yellow);" data-i18n="type">Type</label><select id="req-type" class="input-field" onchange="toggleDateFields()"><option value="Visitor" data-i18n="visitor">Visitor</option><option value="Contractor" data-i18n="contractor">Contractor</option></select></div>
           <div class="input-group hidden" id="admin-email-group"><input type="email" id="req-admin-email" class="input-field t-ph" data-i18n="req_email_ph" placeholder="Email Address (For Pass Tracking)" onchange="if(currentUser && currentUser.role === 'admin') loadMyPasses(false, false)"></div>
           <div class="input-group"><input type="text" id="req-vname" class="input-field t-ph" data-i18n="req_vname_ph" placeholder="Visitor / Contractor Full Name"></div>
-          <div class="input-group"><input type="text" id="req-iqamatext" class="input-field" placeholder="Lead Iqama / ID Number"></div>
+          <div class="input-group"><input type="text" id="req-iqamatext" class="input-field t-ph" data-i18n="iqama_id_ph" placeholder="Lead Iqama / ID Number"></div>
           <div class="input-group"><select id="req-location" class="input-field"><option value="RUH01">Facility: RUH01</option><option value="JED01">Facility: JED01</option></select></div>
           <div class="input-group"><label data-i18n="visit_date">Visit Date / Validity (From - To)</label><div style="display: flex; gap: 10px;"><input type="date" id="req-date-start" class="input-field"><input type="date" id="req-date-end" class="input-field"></div></div>
           
@@ -93,10 +92,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
           <div class="input-group"><label data-i18n="upload_selfie">Upload Lead Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('selfie')"></div><img id="preview-selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
           
           <div class="input-group">
-            <label style="color: var(--noon-yellow); font-size: 13px; font-weight: bold;">Lead Device Details & Photo Screen</label>
+            <label style="color: var(--noon-yellow); font-size: 13px; font-weight: bold;" data-i18n="lead_device_details">Lead Device Details & Photo Screen</label>
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <select id="req-lead-device-type" class="input-field" style="flex: 1;" onchange="toggleLeadDeviceInput()">
-                    <option value="None">No Device</option>
+                    <option value="None" data-i18n="no_device">No Device</option>
                     <option value="Mobile">Mobile</option>
                     <option value="Laptop">Laptop</option>
                 </select>
@@ -111,7 +110,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
           <div id="team-members-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
             <label style="color: var(--noon-yellow); font-size: 14px; font-weight: bold;" data-i18n="btn_add_team">TEAM MEMBERS (OPTIONAL)</label>
-            <p style="color:var(--text-muted); font-size:11px; margin-top:5px; margin-bottom:15px;">* Note: A maximum of 10 members are allowed to bring devices (Mobile/Laptop).</p>
+            <p style="color:var(--text-muted); font-size:11px; margin-top:5px; margin-bottom:15px;" data-i18n="max_devices_note">* Note: A maximum of 10 members are allowed to bring devices (Mobile/Laptop).</p>
             <div id="team-roster-display" class="team-roster hidden"></div>
             <button type="button" id="btn-show-team-entry" class="btn-primary btn-outline" style="font-size: 12px;" onclick="showTeamEntry()" data-i18n="btn_add_team">➕ ADD TEAM MEMBER</button>
             <div id="team-entry-box" class="hidden" style="border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; background: rgba(255,255,255,0.02); margin-top: 15px;">
@@ -119,20 +118,20 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
                 <strong id="team-entry-title" style="color: white; font-size: 13px;">Team Member 1</strong>
                 <button type="button" style="background:transparent; border:none; color:var(--danger); cursor:pointer; font-size:16px;" onclick="hideTeamEntry()">❌</button>
               </div>
-              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-name" class="input-field" placeholder="Full Name"></div>
-              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-iqamatext" class="input-field" placeholder="Iqama / ID Number"></div>
+              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-name" class="input-field t-ph" data-i18n="full_name_ph" placeholder="Full Name"></div>
+              <div class="input-group" style="margin-bottom: 15px;"><input type="text" id="req-team-iqamatext" class="input-field t-ph" data-i18n="iqama_id_ph" placeholder="Iqama / ID Number"></div>
               
               <div class="input-group" style="margin-bottom: 15px;">
-                  <label style="font-size: 11px; color:var(--noon-yellow);">Device Type</label>
+                  <label style="font-size: 11px; color:var(--noon-yellow);" data-i18n="device_type_label">Device Type</label>
                   <select id="req-team-device-type" class="input-field" onchange="toggleTeamDeviceInput()">
-                      <option value="None">No Device</option>
+                      <option value="None" data-i18n="no_device">No Device</option>
                       <option value="Mobile">Mobile</option>
                       <option value="Laptop">Laptop</option>
                   </select>
               </div>
               <div class="input-group hidden" id="req-team-device-id-group" style="margin-bottom: 15px;">
                   <input type="text" id="req-team-device-id" class="input-field" placeholder="IMEI / Serial Number">
-                  <label style="font-size: 11px; margin-top:10px;">Upload Device Photo/Screen</label>
+                  <label style="font-size: 11px; margin-top:10px;" data-i18n="upload_device_photo">Upload Device Photo/Screen</label>
                   <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                       <button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_imeiphoto')" data-i18n="live_camera">📷 Live Camera</button>
                       <input type="file" id="req-team-imeiphoto" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_imeiphoto')">
@@ -142,7 +141,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:14px 20px
 
               <div class="input-group"><label style="font-size: 11px;" data-i18n="upload_iqama">Upload Iqama/ID Copy</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_iqama')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-iqama" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_iqama')"></div><img id="preview-team_iqama" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
               <div class="input-group" style="margin-bottom: 15px;"><label style="font-size: 11px;" data-i18n="upload_selfie">Upload Selfie Photo</label><div style="display: flex; gap: 10px; margin-bottom: 10px;"><button type="button" class="btn-primary btn-outline" style="flex: 1; padding: 10px; font-size: 12px;" onclick="openLiveCamera('team_selfie')" data-i18n="live_camera">📷 Live Camera</button><input type="file" id="req-team-selfie" class="file-input" accept="image/*" style="flex: 1; padding: 8px;" onchange="clearCapturedData('team_selfie')"></div><img id="preview-team_selfie" class="hidden" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color); cursor: pointer;" onclick="openFullscreenImage(this.src)"></div>
-              <button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()">✅ SAVE & ADD NEXT</button>
+              <button type="button" class="btn-primary btn-success" style="font-size: 12px;" onclick="saveCurrentTeamMember()" data-i18n="save_add_next">✅ SAVE & ADD NEXT</button>
             </div>
           </div>
 
@@ -256,9 +255,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const currentRoleParam = urlParams.get('role') || 'default';
 const SESSION_KEY = 'noon_session_' + currentRoleParam;
 
-let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1; let isProcessingScan = false; let userSecurityPin = null; let lockedPassesData = null;
+let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1; let isProcessingScan = false; let userSecurityPin = null; let lockedPassesData = null; let pinCreateMode = 'submit';
 
-function confirmPinCreate() {
+async function confirmPinCreate() {
     let pin = document.getElementById('new-pin-input').value.trim();
     if(pin.length !== 4) return alert("Please enter a valid 4-digit PIN.");
     userSecurityPin = pin;
@@ -266,11 +265,16 @@ function confirmPinCreate() {
     if(currentUser.role === 'admin') { const ei = document.getElementById('req-admin-email'); if(ei && ei.value) email = ei.value.toLowerCase().trim(); }
     localStorage.setItem('user_pin_' + email, pin);
     document.getElementById('pin-create-modal').classList.add('hidden');
-    submitRequest();
+    if (pinCreateMode === 'reset') {
+        try { await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'update_pin', email: email, pin: pin }) }); } catch(e) {}
+        renderMyPasses(lockedPassesData);
+    } else submitRequest();
 }
+
 function closePinCreate() { document.getElementById('pin-create-modal').classList.add('hidden'); }
 
 function processAndRenderPasses(data, email, isSilent) {
+    if (currentUser && currentUser.role === 'admin') { renderMyPasses(data); return; }
     let backendPin = null;
     if (Array.isArray(data)) {
         for(let i=data.length-1; i>=0; i--) {
@@ -279,14 +283,33 @@ function processAndRenderPasses(data, email, isSilent) {
     }
     let localPin = localStorage.getItem('user_pin_' + email);
     if (backendPin && backendPin !== localPin) {
-        if (!isSilent) {
-            lockedPassesData = data;
-            document.getElementById('pin-verify-modal').classList.remove('hidden');
-            document.getElementById('pin-error-msg').classList.add('hidden');
-            document.getElementById('verify-pin-input').value = '';
+        lockedPassesData = data;
+        const verifyModal = document.getElementById('pin-verify-modal');
+        if (!isSilent || !verifyModal.classList.contains('hidden')) {
+            if(verifyModal.classList.contains('hidden')) {
+                verifyModal.classList.remove('hidden');
+                document.getElementById('pin-error-msg').classList.add('hidden');
+                document.getElementById('verify-pin-input').value = '';
+            }
         }
+        const listDiv = document.getElementById('my-passes-list');
+        if(listDiv) listDiv.innerHTML = '<p style="color:var(--text-muted);font-size:13px; margin-top:20px; text-align:center;">Passes locked. <button class="btn-primary btn-sm" style="width:auto; padding:4px 10px; margin-left:10px;" onclick="loadMyPasses(true, false)">UNLOCK</button></p>';
         return; 
-    } else if (backendPin && backendPin === localPin) { userSecurityPin = backendPin; }
+    } else if (backendPin && backendPin === localPin) { userSecurityPin = backendPin; } 
+    else if (!backendPin && Array.isArray(data) && data.length > 0) {
+        lockedPassesData = data;
+        const createModal = document.getElementById('pin-create-modal');
+        if (!isSilent || !createModal.classList.contains('hidden')) {
+            if(createModal.classList.contains('hidden')) {
+                pinCreateMode = 'reset';
+                createModal.classList.remove('hidden');
+                document.getElementById('new-pin-input').value = '';
+            }
+        }
+        const listDiv = document.getElementById('my-passes-list');
+        if(listDiv) listDiv.innerHTML = '<p style="color:var(--text-muted);font-size:13px; margin-top:20px; text-align:center;">Passes locked. Awaiting new PIN.</p>';
+        return;
+    }
     renderMyPasses(data);
 }
 
@@ -305,23 +328,21 @@ function confirmPinVerify() {
         renderMyPasses(lockedPassesData);
     } else { document.getElementById('pin-error-msg').classList.remove('hidden'); }
 }
+
 function closePinVerify() {
     document.getElementById('pin-verify-modal').classList.add('hidden');
     const listDiv = document.getElementById('my-passes-list');
-    if(listDiv) listDiv.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Passes locked. <button class="btn-primary btn-sm" style="width:auto; padding:4px 10px; margin-left:10px;" onclick="loadMyPasses(true, false)">UNLOCK</button></p>';
+    if(listDiv) listDiv.innerHTML = '<p style="color:var(--text-muted);font-size:13px; margin-top:20px; text-align:center;">Passes locked. <button class="btn-primary btn-sm" style="width:auto; padding:4px 10px; margin-left:10px;" onclick="loadMyPasses(true, false)">UNLOCK</button></p>';
 }
 
 const dict={
-    en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","visit_date":"Visit Date / Validity (From - To)","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC Name / Details","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"Access & Gate History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER","camera_scanner_btn":"📷 CAMERA SCANNER","hardware_gun_btn":"🔌 HARDWARE GUN","hw_scanner_ready":"HARDWARE SCANNER READY","hw_scanner_inst":"Point your handheld gun scanner at the QR code and trigger.","awaiting_scan":"Awaiting hardware scan...","save_qr":"⬇️ SAVE QR CODE","allowed":"ALLOWED","pass_validated":"Pass Validated","denied":"DENIED","admin_select_fac":"Admin: Please select a facility first.","pending":"PENDING","awaiting_admin":"Pass is awaiting Admin approval","not_approved":"Pass not approved by Admin","wrong_facility":"WRONG FACILITY","wrong_fac_msg":"Wrong Facility","invalid_date":"INVALID DATE","not_valid_today":"Pass is not valid for today","expired":"EXPIRED","contractor_expired":"Contractor Pass Expired","check_out":"CHECK OUT","scanning_out":"Scanning Out.<br><span style='color:#000; font-size:14px; font-weight:bold;'>⚠️ TAKE ID CARD FROM LEAD.</span>","select_all_members":"SELECT ALL MEMBERS","lead":"Lead","device_photos_all":"DEVICE & PHOTOS FOR ALL","device_label":"Device","iqama_id":"IQAMA / ID","selfie":"SELFIE","device_screen":"DEVICE SCREEN","vehicle":"VEHICLE"},
-    ar:{"guard":"🛡️ الحارس","visitor_ops":"📋 الزوار/العمليات","admin":"⚙️ الإدارة","name":"الاسم","noon_id":"الرقم الوظيفي (Noon ID)","select_guard_loc":"اختر موقع الحارس...","login_gate":"الدخول للبوابة","your_full_name":"الاسم الكامل","your_email":"البريد الإلكتروني","login_portal":"تسجيل الدخول للبوابة","admin_name":"اسم المشرف","admin_email":"بريد المشرف","admin_password":"كلمة المرور","login_admin":"دخول كمسؤول","system_admin":"إدارة النظام","visitor_portal":"بوابة الزوار","gate_scanner":"ماسح البوابة","admin_dashboard":"لوحة التحكم","logout":"تسجيل خروج","visitor_contractor_portal":"بوابة الزوار والمقاولين","submit_new_request":"تقديم طلب جديد","type":"النوع","visitor":"زائر","contractor":"مقاول","req_email_ph":"البريد الإلكتروني (لتتبع التصريح)","req_vname_ph":"الاسم الكامل للزائر/المقاول","visit_date":"تاريخ الزيارة / الصلاحية (من - إلى)","slp_ticket":"رقم تذكرة SLP","contact_no":"رقم الاتصال","invited_by":"بدعوة من","vehicle_plate":"صورة / لوحة السيارة","live_camera":"📷 كاميرا مباشرة","contract_exp":"صلاحية العقد (من - إلى)","project_name":"اسم المشروع","company_name":"اسم الشركة / المقاول","project_manager":"مدير المشروع","fm_poc":"اسم/تفاصيل مسؤول المرافق (FM POC)","upload_iqama":"رفع صورة الهوية/الإقامة","upload_selfie":"رفع صورة شخصية","submit_approval":"إرسال للموافقة","my_passes":"تصاريحي","refresh":"تحديث","fetching":"جاري جلب التصاريح...","start_camera":"تشغيل ماسح الكاميرا","name_label":"الاسم:","type_label":"النوع:","location_label":"الموقع:","confirm_action":"تأكيد الإجراء","access_approvals":"📋 موافقات الدخول","history":"سجل الدخول والبوابة","guard_approvals":"🛡️ عمليات البوابة","analytics":"📊 الإحصائيات","all_time":"الكل","today":"اليوم","weekly":"أسبوعي","monthly":"شهري","6months":"٦ أشهر","1year":"سنة","custom":"مخصص","to":"إلى","apply":"تطبيق","pending_req":"الطلبات المعلقة","active_req":"الطلبات النشطة","print_selected":"🖨️ طباعة المحدد","val_period":"فترة الصلاحية","name_header":"الاسم","type_header":"النوع","facility_header":"المنشأة","action":"الإجراء","access_history":"سجل الدخول والبوابة","final_status":"الحالة النهائية","check_in":"دخول","check_out":"خروج","scanned_by":"تم المسح بواسطة","live_gate":"عمليات البوابة المباشرة","check_in_time":"وقت الدخول","check_out_time":"وقت الخروج","visitor_name":"اسم الزائر","date_analytics":"📅 إحصائيات التواريخ","type_analytics":"👤 إحصائيات الأنواع","facility_analytics":"🏢 إحصائيات المنشآت","status_analytics":"✅ إحصائيات الحالات","detailed_record":"عرض السجل التفصيلي","extend_pass":"تمديد صلاحية التصريح","new_start_date":"تاريخ الزيارة/البداية الجديد","new_end_date":"تاريخ النهاية الجديد","save_extension":"حفظ التمديد","capture":"📸 التقاط","flip_cam":"🔄 قلب الكاميرا","cancel":"❌ إلغاء","click_to_close":"انقر في أي مكان للإغلاق","btn_approve":"موافقة","btn_reject":"رفض","btn_extend":"📅 تمديد","btn_view":"🔍 عرض البيانات","btn_print":"🖨️ طباعة","btn_checkout":"🚪 خروج","lbl_host_name":"اسم المضيف","lbl_host_email":"بريد المضيف","lbl_validity":"فترة الصلاحية","lbl_iqama":"صورة الهوية/الإقامة","lbl_selfie":"الصورة الشخصية","lbl_vehicle":"لوحة السيارة","status_approved":"مقبول","status_pending":"قيد الانتظار","status_rejected":"مرفوض","status_expired":"منتهي","status_completed":"مكتمل","msg_no_pending":"لا توجد طلبات معلقة في هذه الفترة.","msg_no_active":"لا توجد طلبات نشطة في هذه الفترة.","msg_no_history":"لا يوجد سجل في هذه الفترة.","msg_no_gate":"لا توجد عمليات بوابة في هذه الفترة.","msg_enter_email":"أدخل بريداً إلكترونياً لعرض التصاريح.","msg_loading":"جاري التحميل...","msg_inside":"داخل المنشأة","msg_admin_select_loc":"المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية.","btn_add_team":"➕ إضافة عضو للفريق","camera_scanner_btn":"📷 ماسح الكاميرا","hardware_gun_btn":"🔌 ماسح الباركود اليدوي","hw_scanner_ready":"ماسح الباركود جاهز","hw_scanner_inst":"قم بتوجيه الماسح الضوئي نحو رمز الاستجابة السريعة (QR).","awaiting_scan":"بانتظار المسح...","save_qr":"⬇️ حفظ الرمز","allowed":"مسموح","pass_validated":"تم التحقق من التصريح","denied":"مرفوض","admin_select_fac":"المشرف: يرجى تحديد المنشأة أولاً.","pending":"قيد الانتظار","awaiting_admin":"التصريح بانتظار موافقة المشرف","not_approved":"لم تتم الموافقة على التصريح","wrong_facility":"منشأة خاطئة","wrong_fac_msg":"منشأة خاطئة","invalid_date":"تاريخ غير صالح","not_valid_today":"التصريح غير صالح لهذا اليوم","expired":"منتهي","contractor_expired":"تصريح المقاول منتهي","check_out":"تسجيل خروج","scanning_out":"تسجيل الخروج.<br><span style='color:#000; font-size:14px; font-weight:bold;'>⚠️ خذ بطاقة الهوية من القائد.</span>","select_all_members":"تحديد جميع الأعضاء","lead":"القائد","device_photos_all":"الأجهزة والصور للجميع","device_label":"الجهاز","iqama_id":"الإقامة / الهوية","selfie":"الصورة الشخصية","device_screen":"شاشة الجهاز","vehicle":"المركبة"}
+    en:{"guard":"🛡️ Guard","visitor_ops":"📋 Visitor/Ops","admin":"⚙️ Admin","name":"Name","noon_id":"Noon ID","select_guard_loc":"Select Guard Location...","login_gate":"LOGIN TO GATE","your_full_name":"Your Full Name","your_email":"Your Gmail / Email","login_portal":"LOGIN TO PORTAL","admin_name":"Admin Name","admin_email":"Admin Gmail","admin_password":"Admin Password","login_admin":"LOGIN AS ADMIN","system_admin":"System Admin","visitor_portal":"Visitor Portal","gate_scanner":"Gate Scanner","admin_dashboard":"Admin Dashboard","logout":"LOGOUT","visitor_contractor_portal":"Visitor & Contractor Portal","submit_new_request":"Submit New Request","type":"Type","visitor":"Visitor","contractor":"Contractor","req_email_ph":"Email Address (For Pass Tracking)","req_vname_ph":"Visitor / Contractor Full Name","iqama_id_ph":"Lead Iqama / ID Number","visit_date":"Visit Date / Validity (From - To)","slp_ticket":"SLP Ticket No.","contact_no":"Contact No.","invited_by":"Invited by Whom","vehicle_plate":"Vehicle Plate / Picture","live_camera":"📷 Live Camera","contract_exp":"Contract Expiration (From - To)","project_name":"Project Name","company_name":"Company / Contractor Name","project_manager":"Project Manager","fm_poc":"FM POC Name / Details","upload_iqama":"Upload Iqama/ID Copy","upload_selfie":"Upload Selfie Photo","submit_approval":"Submit for Approval","my_passes":"My Passes","refresh":"Refresh","fetching":"Fetching your passes...","start_camera":"START CAMERA SCANNER","name_label":"Name:","type_label":"Type:","location_label":"Location:","confirm_action":"CONFIRM ACTION","access_approvals":"📋 Access Approvals","history":"Access & Gate History","guard_approvals":"🛡️ Guard Approvals","analytics":"📊 Analytics","all_time":"All Time","today":"Today","weekly":"Weekly","monthly":"Monthly","6months":"6 Months","1year":"1 Year","custom":"Custom","to":"TO","apply":"APPLY","pending_req":"Pending Requests","active_req":"Active Requests","print_selected":"🖨️ PRINT SELECTED","val_period":"Validity Period","name_header":"Name","type_header":"Type","facility_header":"Facility","action":"Action","access_history":"Access & Gate History","final_status":"Final Status","check_in":"Check-In","check_out":"Check-Out","scanned_by":"Scanned By","live_gate":"Live Gate Operations","check_in_time":"Check-In Time","check_out_time":"Check-Out Time","visitor_name":"Visitor Name","date_analytics":"📅 Date Analytics","type_analytics":"👤 Type Analytics","facility_analytics":"🏢 Facility Analytics","status_analytics":"✅ Status Analytics","detailed_record":"Detailed Record View","extend_pass":"Extend Pass Validity","new_start_date":"New Visit / Start Date","new_end_date":"New End Date","save_extension":"SAVE EXTENSION","capture":"📸 CAPTURE","flip_cam":"🔄 FLIP CAM","cancel":"❌ CANCEL","click_to_close":"Click anywhere to close","btn_approve":"Approve","btn_reject":"Reject","btn_extend":"📅 EXTEND","btn_view":"🔍 VIEW DATA","btn_print":"🖨️ PRINT PASS","btn_checkout":"🚪 CHECK OUT","lbl_host_name":"Host Name","lbl_host_email":"Host Email","lbl_validity":"Validity Period","lbl_iqama":"IQAMA/ID COPY","lbl_selfie":"SELFIE PHOTO","lbl_vehicle":"VEHICLE PLATE","status_approved":"Approved","status_pending":"Pending","status_rejected":"Rejected","status_expired":"EXPIRED","status_completed":"COMPLETED","msg_no_pending":"No pending requests found in this timeframe.","msg_no_active":"No active requests found in this timeframe.","msg_no_history":"No history found in this timeframe.","msg_no_gate":"No gate operations found in this timeframe.","msg_enter_email":"Enter an Email Address on the left to view passes.","msg_loading":"Loading requests...","msg_inside":"Inside Facility","msg_admin_select_loc":"Admin: Please select a facility first.","btn_add_team":"➕ ADD TEAM MEMBER","camera_scanner_btn":"📷 CAMERA SCANNER","hardware_gun_btn":"🔌 HARDWARE GUN","hw_scanner_ready":"HARDWARE SCANNER READY","hw_scanner_inst":"Point your handheld gun scanner at the QR code and trigger.","awaiting_scan":"Awaiting hardware scan...","save_qr":"⬇️ SAVE QR CODE","allowed":"ALLOWED","pass_validated":"Pass Validated","denied":"DENIED","admin_select_fac":"Admin: Please select a facility first.","pending":"PENDING","awaiting_admin":"Pass is awaiting Admin approval","not_approved":"Pass not approved by Admin","wrong_facility":"WRONG FACILITY","wrong_fac_msg":"Wrong Facility","invalid_date":"INVALID DATE","not_valid_today":"Pass is not valid for today","expired":"EXPIRED","contractor_expired":"Contractor Pass Expired","check_out":"CHECK OUT","scanning_out":"Scanning Out.<br><span style='color:#000; font-size:14px; font-weight:bold;'>⚠️ TAKE ID CARD FROM LEAD.</span>","select_all_members":"SELECT ALL MEMBERS","lead":"Lead","device_photos_all":"DEVICE & PHOTOS FOR ALL","device_label":"Device","iqama_id":"IQAMA / ID","selfie":"SELFIE","device_screen":"DEVICE SCREEN","vehicle":"VEHICLE","add_more_people":"➕ Add More People","add_more_warning":"⚠️ WARNING: Submitting this will change the pass status back to PENDING. It cannot be used until the Admin approves it again.","device_type_label":"Device Type","no_device":"No Device","upload_device_photo":"Upload Device Photo/Screen","full_name_ph":"Full Name","save_person_list":"✅ SAVE PERSON TO LIST","submit_send_approval":"SUBMIT & SEND FOR APPROVAL","save_add_next":"✅ SAVE & ADD NEXT","lead_device_details":"Lead Device Details & Photo Screen","max_devices_note":"* Note: A maximum of 10 members are allowed to bring devices (Mobile/Laptop).", "total_people":"Total People", "new_members_added":"➕ NEW MEMBERS ADDED", "new_badge":"NEW", "notice_new_people":"NOTICE: New people have been added to this pass!"},
+    ar:{"guard":"🛡️ الحارس","visitor_ops":"📋 الزوار/العمليات","admin":"⚙️ الإدارة","name":"الاسم","noon_id":"الرقم الوظيفي (Noon ID)","select_guard_loc":"اختر موقع الحارس...","login_gate":"الدخول للبوابة","your_full_name":"الاسم الكامل","your_email":"البريد الإلكتروني","login_portal":"تسجيل الدخول للبوابة","admin_name":"اسم المشرف","admin_email":"بريد المشرف","admin_password":"كلمة المرور","login_admin":"دخول كمسؤول","system_admin":"إدارة النظام","visitor_portal":"بوابة الزوار","gate_scanner":"ماسح البوابة","admin_dashboard":"لوحة التحكم","logout":"تسجيل خروج","visitor_contractor_portal":"بوابة الزوار والمقاولين","submit_new_request":"تقديم طلب جديد","type":"النوع","visitor":"زائر","contractor":"مقاول","req_email_ph":"البريد الإلكتروني (لتتبع التصريح)","req_vname_ph":"الاسم الكامل للزائر/المقاول","iqama_id_ph":"رقم الهوية / الإقامة للقائد","visit_date":"تاريخ الزيارة / الصلاحية (من - إلى)","slp_ticket":"رقم تذكرة SLP","contact_no":"رقم الاتصال","invited_by":"بدعوة من","vehicle_plate":"صورة / لوحة السيارة","live_camera":"📷 كاميرا مباشرة","contract_exp":"صلاحية العقد (من - إلى)","project_name":"اسم المشروع","company_name":"اسم الشركة / المقاول","project_manager":"مدير المشروع","fm_poc":"اسم/تفاصيل مسؤول المرافق (FM POC)","upload_iqama":"رفع صورة الهوية/الإقامة","upload_selfie":"رفع صورة شخصية","submit_approval":"إرسال للموافقة","my_passes":"تصاريحي","refresh":"تحديث","fetching":"جاري جلب التصاريح...","start_camera":"تشغيل ماسح الكاميرا","name_label":"الاسم:","type_label":"النوع:","location_label":"الموقع:","confirm_action":"تأكيد الإجراء","access_approvals":"📋 موافقات الدخول","history":"سجل الدخول والبوابة","guard_approvals":"🛡️ عمليات البوابة","analytics":"📊 الإحصائيات","all_time":"الكل","today":"اليوم","weekly":"أسبوعي","monthly":"شهري","6months":"٦ أشهر","1year":"سنة","custom":"مخصص","to":"إلى","apply":"تطبيق","pending_req":"الطلبات المعلقة","active_req":"الطلبات النشطة","print_selected":"🖨️ طباعة المحدد","val_period":"فترة الصلاحية","name_header":"الاسم","type_header":"النوع","facility_header":"المنشأة","action":"الإجراء","access_history":"سجل الدخول والبوابة","final_status":"الحالة النهائية","check_in":"دخول","check_out":"خروج","scanned_by":"تم المسح بواسطة","live_gate":"عمليات البوابة المباشرة","check_in_time":"وقت الدخول","check_out_time":"وقت الخروج","visitor_name":"اسم الزائر","date_analytics":"📅 إحصائيات التواريخ","type_analytics":"👤 إحصائيات الأنواع","facility_analytics":"🏢 إحصائيات المنشآت","status_analytics":"✅ إحصائيات الحالات","detailed_record":"عرض السجل التفصيلي","extend_pass":"تمديد صلاحية التصريح","new_start_date":"تاريخ الزيارة/البداية الجديد","new_end_date":"تاريخ النهاية الجديد","save_extension":"حفظ التمديد","capture":"📸 التقاط","flip_cam":"🔄 قلب الكاميرا","cancel":"❌ إلغاء","click_to_close":"انقر في أي مكان للإغلاق","btn_approve":"موافقة","btn_reject":"رفض","btn_extend":"📅 تمديد","btn_view":"🔍 عرض البيانات","btn_print":"🖨️ طباعة","btn_checkout":"🚪 خروج","lbl_host_name":"اسم المضيف","lbl_host_email":"بريد المضيف","lbl_validity":"فترة الصلاحية","lbl_iqama":"صورة الهوية/الإقامة","lbl_selfie":"الصورة الشخصية","lbl_vehicle":"لوحة السيارة","status_approved":"مقبول","status_pending":"قيد الانتظار","status_rejected":"مرفوض","status_expired":"منتهي","status_completed":"مكتمل","msg_no_pending":"لا توجد طلبات معلقة في هذه الفترة.","msg_no_active":"لا توجد طلبات نشطة في هذه الفترة.","msg_no_history":"لا يوجد سجل في هذه الفترة.","msg_no_gate":"لا توجد عمليات بوابة في هذه الفترة.","msg_enter_email":"أدخل بريداً إلكترونياً لعرض التصاريح.","msg_loading":"جاري التحميل...","msg_inside":"داخل المنشأة","msg_admin_select_loc":"المشرف: يرجى تحديد المنشأة أولاً من القائمة العلوية.","btn_add_team":"➕ إضافة عضو للفريق","camera_scanner_btn":"📷 ماسح الكاميرا","hardware_gun_btn":"🔌 ماسح الباركود اليدوي","hw_scanner_ready":"ماسح الباركود جاهز","hw_scanner_inst":"قم بتوجيه الماسح الضوئي نحو رمز الاستجابة السريعة (QR).","awaiting_scan":"بانتظار المسح...","save_qr":"⬇️ حفظ الرمز","allowed":"مسموح","pass_validated":"تم التحقق من التصريح","denied":"مرفوض","admin_select_fac":"المشرف: يرجى تحديد المنشأة أولاً.","pending":"قيد الانتظار","awaiting_admin":"التصريح بانتظار موافقة المشرف","not_approved":"لم تتم الموافقة على التصريح","wrong_facility":"منشأة خاطئة","wrong_fac_msg":"منشأة خاطئة","invalid_date":"تاريخ غير صالح","not_valid_today":"التصريح غير صالح لهذا اليوم","expired":"منتهي","contractor_expired":"تصريح المقاول منتهي","check_out":"تسجيل خروج","scanning_out":"تسجيل الخروج.<br><span style='color:#000; font-size:14px; font-weight:bold;'>⚠️ خذ بطاقة الهوية من القائد.</span>","select_all_members":"تحديد جميع الأعضاء","lead":"القائد","device_photos_all":"الأجهزة والصور للجميع","device_label":"الجهاز","iqama_id":"الإقامة / الهوية","selfie":"الصورة الشخصية","device_screen":"شاشة الجهاز","vehicle":"المركبة","add_more_people":"➕ إضافة المزيد من الأشخاص","add_more_warning":"⚠️ تحذير: سيؤدي هذا إلى إعادة حالة التصريح إلى قيد الانتظار. لا يمكن استخدامه حتى يوافق عليه المشرف مرة أخرى.","device_type_label":"نوع الجهاز","no_device":"لا يوجد جهاز","upload_device_photo":"رفع صورة الجهاز/الشاشة","full_name_ph":"الاسم الكامل","save_person_list":"✅ حفظ الشخص في القائمة","submit_send_approval":"إرسال وطلب الموافقة","save_add_next":"✅ حفظ وإضافة التالي","lead_device_details":"تفاصيل جهاز القائد وصورة الشاشة","max_devices_note":"* ملاحظة: يُسمح لـ 10 أعضاء كحد أقصى بإحضار أجهزة (هاتف/كمبيوتر محمول).", "total_people":"إجمالي الأشخاص", "new_members_added":"➕ أعضاء جدد مضافون", "new_badge":"جديد", "notice_new_people":"تنبيه: تم إضافة أشخاص جدد إلى هذا التصريح!"}
 };
 
 let currentLang='en';
 function toggleLang(){currentLang=currentLang==='en'?'ar':'en';document.documentElement.dir=currentLang==='ar'?'rtl':'ltr';updateUI()}
-function t(k){
-    if(!dict[currentLang]) return k || '';
-    return dict[currentLang][k] || dict['en'][k] || k || '';
-}
+function t(k){return dict[currentLang]?.[k]||dict['en'][k]||k||'';}
 
 function updateUI(){
     document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t(k))el.innerHTML=t(k)});
@@ -345,22 +366,14 @@ function toggleSidebar(){
 function logout(){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
     localStorage.removeItem(SESSION_KEY);
-    Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('user_pin_')) {
-            localStorage.removeItem(key);
-        }
-    });
+    Object.keys(localStorage).forEach(key => { if (key.startsWith('user_pin_')) localStorage.removeItem(key); });
     try{if(html5QrCode&&html5QrCode.isScanning)html5QrCode.stop();}catch(e){}
     location.reload();
 }
 
 function hardRefreshApp() {
     if(confirm("Perform a Hard Refresh? This will clear all saved cache and fetch the latest data.")) {
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('cached_')) {
-                localStorage.removeItem(key);
-            }
-        });
+        Object.keys(localStorage).forEach(key => { if (key.startsWith('cached_')) localStorage.removeItem(key); });
         sessionStorage.clear();
         window.location.reload(true);
     }
@@ -590,18 +603,12 @@ function getBase64(file) {
                 const MAX_WIDTH = 400; 
                 let width = img.width;
                 let height = img.height;
-                if (width > MAX_WIDTH) {
-                    height = Math.round((height * MAX_WIDTH) / width);
-                    width = MAX_WIDTH;
-                }
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                 resolve(canvas.toDataURL('image/jpeg', 0.4)); 
             };
-            img.onerror = reject;
-            img.src = e.target.result;
+            img.onerror = reject; img.src = e.target.result;
         };
         reader.onerror = reject;
     });
@@ -625,9 +632,7 @@ function startAutoRefresh(r){
     if(autoRefreshTimer)clearInterval(autoRefreshTimer);
     autoRefreshTimer=setInterval(async ()=>{
         if(r==='ops') await loadMyPasses(false,true);
-        else if(r==='admin'){
-            await loadAdminData(true);
-        }
+        else if(r==='admin'){ await loadAdminData(true); }
     },15000);
 }
 
@@ -688,15 +693,8 @@ window.onload=function(){
     const session=localStorage.getItem(SESSION_KEY);
     if(session){
         const p=JSON.parse(session),h=(Date.now()-p.time)/(1000*60*60);
-        if(h<12){
-            currentUser=p.user;
-            initApp();
-            const s=document.getElementById('splash');
-            if(s) s.style.display='none';
-        } else {
-            localStorage.removeItem(SESSION_KEY);
-            setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
-        }
+        if(h<12){ currentUser=p.user; initApp(); const s=document.getElementById('splash'); if(s) s.style.display='none'; } 
+        else { localStorage.removeItem(SESSION_KEY); setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500); }
     } else {
         setTimeout(()=>{const s=document.getElementById('splash');if(s){s.classList.add('fade-out');setTimeout(()=>s.style.display='none',600)}},1500);
     }
@@ -707,15 +705,12 @@ async function performManualSearch() {
     let resDiv = document.getElementById('manual-search-results');
     if(!q) { resDiv.innerHTML = ''; return; }
     resDiv.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Searching...</p>';
-
     try {
         let data = globalAdminData;
         if(!data || data.length === 0) {
             const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
-            data = await res.json();
-            globalAdminData = data;
+            data = await res.json(); globalAdminData = data;
         }
-
         let matches = data.filter(r => {
             if(!r.UniqueID || r.Status === 'Rejected') return false;
             let fullStr = String(r.VisitorName + " " + r.UniqueID + " " + r.SlpTicketNo + " " + r.ContactNo + " " + r.HostEmail).toLowerCase();
@@ -725,23 +720,13 @@ async function performManualSearch() {
         if(matches.length === 0) {
             resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">No passes found.</p>';
         } else {
-            let h = '';
-            const todayStr = formatToDDMMYYYY(new Date());
-            const todayNum = new Date().setHours(0,0,0,0);
-
+            let h = ''; const todayStr = formatToDDMMYYYY(new Date()); const todayNum = new Date().setHours(0,0,0,0);
             matches.forEach(m => {
-                let dType = String(m.Type || '');
-                let dStatus = String(m.Status || 'Pending');
-                let dLoc = String(m.Location || '');
-                let startStr = formatToDDMMYYYY(m.StartDate);
-                let startObj = parseFlexibleDate(m.StartDate);
+                let dType = String(m.Type || ''); let dStatus = String(m.Status || 'Pending'); let dLoc = String(m.Location || '');
+                let startStr = formatToDDMMYYYY(m.StartDate); let startObj = parseFlexibleDate(m.StartDate);
                 let startNum = startObj ? startObj.setHours(0,0,0,0) : todayNum;
-                let endObj = parseFlexibleDate(m.EndDate);
-                let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
-
-                let displayStatus = dStatus;
-                let sc = 'var(--noon-yellow)';
-
+                let endObj = parseFlexibleDate(m.EndDate); let endNum = endObj ? endObj.setHours(0,0,0,0) : startNum;
+                let displayStatus = dStatus; let sc = 'var(--noon-yellow)';
                 if (currentUser && currentUser.role === 'admin' && !currentUser.location) { displayStatus = "NO FACILITY SELECTED"; sc = "var(--danger)"; }
                 else if (dStatus === 'Pending') { displayStatus = "PENDING"; sc = "var(--noon-yellow)"; }
                 else if (dStatus !== 'Approved') { displayStatus = "DENIED"; sc = "var(--danger)"; }
@@ -749,21 +734,11 @@ async function performManualSearch() {
                 else if (dType === 'Visitor' && startStr !== todayStr) { displayStatus = "INVALID DATE"; sc = "var(--danger)"; }
                 else if (dType === 'Contractor' && (todayNum < startNum || todayNum > endNum)) { displayStatus = "EXPIRED"; sc = "var(--danger)"; }
                 else { displayStatus = "APPROVED"; sc = "var(--success)"; }
-
-                h += `<div style="background:var(--input-bg); border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong style="color:white;font-size:13px;">${m.VisitorName}</strong><br>
-                        <span style="font-size:11px;color:var(--text-muted);">${m.UniqueID} | ${m.Type} | ${m.Location}</span>
-                        <br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${displayStatus}</span>
-                    </div>
-                    <button class="btn-primary btn-sm" style="width:auto; padding:6px 15px;" onclick="document.getElementById('manual-search-results').innerHTML=''; onScanSuccess('${m.UniqueID}')">OPEN</button>
-                </div>`;
+                h += `<div style="background:var(--input-bg); border:1px solid var(--border-color); padding:10px; border-radius:6px; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><div><strong style="color:white;font-size:13px;">${m.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${m.UniqueID} | ${m.Type} | ${m.Location}</span><br><span style="font-size:10px;color:${sc};font-weight:bold;text-transform:uppercase;">${displayStatus}</span></div><button class="btn-primary btn-sm" style="width:auto; padding:6px 15px;" onclick="document.getElementById('manual-search-results').innerHTML=''; onScanSuccess('${m.UniqueID}')">OPEN</button></div>`;
             });
             resDiv.innerHTML = h;
         }
-    } catch(e) {
-        resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">Search failed.</p>';
-    }
+    } catch(e) { resDiv.innerHTML = '<p style="color:var(--danger); font-size:12px;">Search failed.</p>'; }
 }
 
 async function submitRequest(){
@@ -771,10 +746,8 @@ async function submitRequest(){
     const type=ti.value,ii=document.getElementById('req-iqama'),si=document.getElementById('req-selfie'),imPho=document.getElementById('req-imeiphoto'),vi=document.getElementById('req-vehicle'),btn=document.getElementById('btn-submit-req');
     if(!btn)return;
     let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',imB64='',imMime='image/jpeg',vB64='',vMime='image/jpeg';
-    
     let leadDevType = document.getElementById('req-lead-device-type').value;
     let leadDevId = document.getElementById('req-lead-device-id').value;
-    
     if(leadDevType !== 'None' && !leadDevId.trim()) return alert("Please provide the Lead device IMEI/Serial number.");
     let leadImeiVal = leadDevType !== 'None' ? `${leadDevType} (${leadDevId.trim()})` : '';
 
@@ -793,186 +766,98 @@ async function submitRequest(){
     if(capturedImages.imeiphoto)imB64=capturedImages.imeiphoto.split(',')[1];
     else if(imPho&&imPho.files.length>0){let f=await getBase64(imPho.files[0]);imB64=f.split(',')[1];imMime=imPho.files[0].type}
 
-    let fB64='',fMime='image/jpeg',cleanTeam=[];
-    let fmPocVal = '';
-    
+    let fB64='',fMime='image/jpeg',cleanTeam=[]; let fmPocVal = '';
     if(type==='Contractor'){
-        const fi=document.getElementById('req-con-fmpoc');
-        fmPocVal = fi ? fi.value.trim() : '';
+        const fi=document.getElementById('req-con-fmpoc'); fmPocVal = fi ? fi.value.trim() : '';
     }else{
         if(capturedImages.vehicle)vB64=capturedImages.vehicle.split(',')[1];
         else if(vi&&vi.files.length>0){let f=await getBase64(vi.files[0]);vB64=f.split(',')[1];vMime=vi.files[0].type}
     }
-    
     teamList.forEach(m=>{
         let devStr = m.deviceType !== 'None' ? `${m.deviceType} (${m.deviceId})` : 'None';
-        cleanTeam.push({
-            iqama:m.rawIqama, 
-            selfie:m.rawSelfie, 
-            devicePhoto: m.rawDevicePhoto,
-            name:m.name, 
-            iqamaText:m.iqamaText,
-            deviceString: devStr 
-        });
+        cleanTeam.push({ iqama:m.rawIqama, selfie:m.rawSelfie, devicePhoto: m.rawDevicePhoto, name:m.name, iqamaText:m.iqamaText, deviceString: devStr });
     });
 
     let hName='',hMail=currentUser.email;
     if(currentUser.role==='admin'){
         hName=currentUser.name;const ei=document.getElementById('req-admin-email');if(ei)hMail=ei.value.toLowerCase().trim();
         if(!hMail)return alert("Please enter Email Address.");
-    } else {
-        hName=currentUser.name || 'Ops';
-    }
+    } else hName=currentUser.name || 'Ops';
 
     const vni=document.getElementById('req-vname'),vNameRaw=vni?vni.value.trim():'';
     if(!vNameRaw)return alert("Full Name is required.");
-    
-    const leadIqamaInp=document.getElementById('req-iqamatext');
-    const leadIqamaVal=leadIqamaInp?leadIqamaInp.value.trim():'';
+    const leadIqamaInp=document.getElementById('req-iqamatext'); const leadIqamaVal=leadIqamaInp?leadIqamaInp.value.trim():'';
     if(!leadIqamaVal)return alert("Lead Iqama / ID Number is required.");
-    
     const vName = vNameRaw + " (ID: " + leadIqamaVal + ")";
-
-    const startDateVal = document.getElementById('req-date-start').value;
-    const endDateVal = document.getElementById('req-date-end').value;
-
+    const startDateVal = document.getElementById('req-date-start').value; const endDateVal = document.getElementById('req-date-end').value;
     if(!startDateVal || !endDateVal) return alert("Visit/Validity dates (From - To) are required.");
 
-    // --- PIN SYSTEM HOOK ---
-    let cachedKey='cached_passes_'+hMail;
-    let existingPasses = [];
+    let cachedKey='cached_passes_'+hMail; let existingPasses = [];
     try{ existingPasses = JSON.parse(localStorage.getItem(cachedKey)) || []; }catch(e){}
     
     let backendPin = null;
     for(let i=existingPasses.length-1; i>=0; i--) {
-        if(existingPasses[i].HostName && existingPasses[i].HostName.includes('||PIN:')) {
-            backendPin = existingPasses[i].HostName.split('||PIN:')[1];
-            break;
-        }
+        if(existingPasses[i].HostName && existingPasses[i].HostName.includes('||PIN:')) { backendPin = existingPasses[i].HostName.split('||PIN:')[1]; break; }
     }
 
-    if (backendPin) {
-        userSecurityPin = backendPin;
-        localStorage.setItem('user_pin_' + hMail, backendPin);
+    if (currentUser && currentUser.role === 'admin') {
+        if (backendPin) hName = hName + "||PIN:" + backendPin;
+    } else {
+        if (backendPin) { userSecurityPin = backendPin; localStorage.setItem('user_pin_' + hMail, backendPin); }
+        if (!userSecurityPin) { pinCreateMode = 'submit'; document.getElementById('pin-create-modal').classList.remove('hidden'); return; }
+        hName = hName + "||PIN:" + userSecurityPin;
     }
-
-    if (!userSecurityPin) {
-        document.getElementById('pin-create-modal').classList.remove('hidden');
-        return;
-    }
-
-    hName = hName + "||PIN:" + userSecurityPin;
-    // --- END PIN HOOK ---
 
     const tempId = 'NOON-' + Math.floor(100000 + Math.random() * 900000);
-
-    let tempPass = {
-        UniqueID: tempId, VisitorName: vName, Type: type, Location: document.getElementById('req-location').value,
-        StartDate: startDateVal, EndDate: endDateVal, Status: 'Pending', HostEmail: hMail
-    };
+    let tempPass = { UniqueID: tempId, VisitorName: vName, Type: type, Location: document.getElementById('req-location').value, StartDate: startDateVal, EndDate: endDateVal, Status: 'Pending', HostEmail: hMail };
     
     if(autoRefreshTimer) clearInterval(autoRefreshTimer);
-
-    existingPasses.push(tempPass);
-    localStorage.setItem(cachedKey, JSON.stringify(existingPasses));
-    renderMyPasses(existingPasses);
+    existingPasses.push(tempPass); localStorage.setItem(cachedKey, JSON.stringify(existingPasses)); renderMyPasses(existingPasses);
 
     if(currentUser.role==='admin'&&vni)vni.value="";
     const lIqamaClear=document.getElementById('req-iqamatext'); if(lIqamaClear) lIqamaClear.value="";
     if(ii)ii.value="";if(si)si.value="";if(imPho)imPho.value="";if(vi)vi.value="";
     const fmPocInput = document.getElementById('req-con-fmpoc'); if(fmPocInput) fmPocInput.value="";
     document.getElementById('req-lead-device-type').value = "None"; toggleLeadDeviceInput();
-    
     clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('vehicle');
     teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
 
     btn.innerText="SUBMITTING...";btn.disabled=true;
-
     try{
-        const payload={
-            action:'create',hostName:hName,hostEmail:hMail,visitorName:vName,type:type,location:document.getElementById('req-location').value,
-            startDate:startDateVal,endDate:endDateVal,
-            iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,
-            vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,
-            slpTicketNo:type==='Visitor'?document.getElementById('req-vis-slp').value:document.getElementById('req-con-slp').value,
-            contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,
-            invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',
-            projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',
-            companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',
-            projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''
-        };
+        const payload={ action:'create',hostName:hName,hostEmail:hMail,visitorName:vName,type:type,location:document.getElementById('req-location').value, startDate:startDateVal,endDate:endDateVal, iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal, vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam, slpTicketNo:type==='Visitor'?document.getElementById('req-vis-slp').value:document.getElementById('req-con-slp').value, contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value, invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'', projectName:type==='Contractor'?document.getElementById('req-con-project').value:'', companyName:type==='Contractor'?document.getElementById('req-con-company').value:'', projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:'' };
         const res = await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
         let responseJson = await res.json();
-        
-        if (responseJson.status === 'success') {
-            btn.innerText=t("submit_approval");btn.disabled=false;
-            loadMyPasses(true, true);
-        } else {
-            throw new Error(responseJson.message || "Server Error");
-        }
+        if (responseJson.status === 'success') { btn.innerText=t("submit_approval");btn.disabled=false; loadMyPasses(true, true); } 
+        else throw new Error(responseJson.message || "Server Error");
     }catch(e){
-        alert("Upload failed. Try reducing team members. Error: " + e.message);
-        existingPasses.pop(); 
-        localStorage.setItem(cachedKey, JSON.stringify(existingPasses));
-        renderMyPasses(existingPasses);
+        alert("Upload failed. Error: " + e.message);
+        existingPasses.pop(); localStorage.setItem(cachedKey, JSON.stringify(existingPasses)); renderMyPasses(existingPasses);
         btn.innerText=t("submit_approval");btn.disabled=false;
-    } finally {
-        startAutoRefresh(currentUser.role);
-    }
+    } finally { startAutoRefresh(currentUser.role); }
 }
 
 function downloadQR(id) {
-    const qrBox = document.getElementById('qr-' + id);
-    if (!qrBox) return;
-
-    let canvas = qrBox.querySelector('canvas');
-    let img = qrBox.querySelector('img');
+    const qrBox = document.getElementById('qr-' + id); if (!qrBox) return;
+    let canvas = qrBox.querySelector('canvas'); let img = qrBox.querySelector('img');
     let sourceImage = canvas && canvas.style.display !== 'none' ? canvas : (img && img.src ? img : null);
-
     if (!sourceImage) return alert("QR Code not ready yet.");
-
-    let size = 150;
-    let padding = 20;
-    let newCanvas = document.createElement('canvas');
-    newCanvas.width = size + (padding * 2);
-    newCanvas.height = size + (padding * 2);
-    let ctx = newCanvas.getContext('2d');
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-
-    if (sourceImage.tagName.toLowerCase() === 'canvas') {
-        ctx.drawImage(sourceImage, padding, padding, size, size);
-    } else {
-        ctx.drawImage(sourceImage, padding, padding, size, size);
-    }
-
-    const dataUrl = newCanvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `Noon_Pass_QR_${id}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    let size = 150; let padding = 20; let newCanvas = document.createElement('canvas');
+    newCanvas.width = size + (padding * 2); newCanvas.height = size + (padding * 2);
+    let ctx = newCanvas.getContext('2d'); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+    ctx.drawImage(sourceImage, padding, padding, size, size);
+    const link = document.createElement('a'); link.href = newCanvas.toDataURL('image/png'); link.download = `Noon_Pass_QR_${id}.png`;
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 
 function renderMyPasses(data){
     const listDiv=document.getElementById('my-passes-list');if(!listDiv)return;
     let h='';
-    if(!Array.isArray(data) || data.length===0){
-        listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_no_history")}</p>`;
-        return;
-    }
-    
+    if(!Array.isArray(data) || data.length===0){ listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("msg_no_history")}</p>`; return; }
     let displayData = [...data].reverse();
 
     displayData.forEach(pass=>{
-        let safeType = String(pass.Type || '');
-        let safeStatus = String(pass.Status || 'Pending');
-        let safeLoc = String(pass.Location || '');
-        
-        const todayNum=new Date().setHours(0,0,0,0);
-        let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
+        let safeType = String(pass.Type || ''); let safeStatus = String(pass.Status || 'Pending'); let safeLoc = String(pass.Location || '');
+        const todayNum=new Date().setHours(0,0,0,0); let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
         let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
         const isDone=safeType==='Visitor'&&!!pass.CheckOutTime,isExp=todayNum>endNum,isComp=isDone||isExp;
         
@@ -982,36 +867,26 @@ function renderMyPasses(data){
         
         const valText=`(${formatToDDMMYYYY(pass.StartDate)} - ${formatToDDMMYYYY(pass.EndDate||pass.StartDate)})`;
         h+=`<div class="pass-item" id="pass-card-${pass.UniqueID}"><div class="pass-header"><div><strong style="color:white;font-size:14px;">${pass.VisitorName}</strong><br><span style="font-size:11px;color:var(--text-muted);">${t(safeType.toLowerCase())} • ${safeLoc}</span><br><span style="font-size:10px;color:var(--noon-yellow);">${valText}</span></div><div style="text-align:right;"><span style="font-size:11px;font-weight:bold;color:${sc};text-transform:uppercase;">${st}</span><br><span style="font-size:10px;color:var(--text-muted);">${pass.UniqueID}</span></div></div>`;
-        if(!isComp) {
-            h+=`<div style="text-align:center;margin-top:10px;">
-                <div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;min-width:140px;min-height:140px;"></div>
-                <div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}">
-                    <button class="btn-primary btn-outline btn-sm" style="margin-bottom:8px;" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button>
-                    <br><button class="btn-primary btn-warning btn-sm" style="color:#000;" onclick="openAddMoreModal('${pass.UniqueID}')">➕ ADD MORE PEOPLE</button>
-                </div>
-            </div>`;
+        
+        if(!isComp && safeStatus !== 'Rejected') {
+            h+=`<div style="text-align:center;margin-top:10px;"><div class="qr-box" id="qr-${pass.UniqueID}" style="background:white;padding:10px;border-radius:6px;display:inline-block;min-width:140px;min-height:140px;"></div><div style="margin-top:15px;" id="save-btn-container-${pass.UniqueID}"><button class="btn-primary btn-outline btn-sm" style="margin-bottom:8px;" onclick="downloadQR('${pass.UniqueID}')" data-i18n="save_qr">${t('save_qr')}</button><br><button class="btn-primary btn-warning btn-sm" style="color:#000;" onclick="openAddMoreModal('${pass.UniqueID}')">➕ ${t('add_more_people')}</button></div></div>`;
+        } else if (safeStatus === 'Rejected') {
+            h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--danger);font-weight:bold;"><em>${t("status_rejected")} - Access Denied</em></div>`;
+        } else {
+            h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
         }
-        else if(isComp)h+=`<div style="text-align:center;margin-top:15px;font-size:12px;color:var(--text-muted);"><em>${isExp?t("status_expired"):t("check_out_time")+': '+formatTime(pass.CheckOutTime)}</em></div>`;
         h+=`</div>`;
     });
     listDiv.innerHTML=h;
     
     displayData.forEach(pass=>{
-        const todayNum=new Date().setHours(0,0,0,0);
-        let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
-        let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;
-        let safeType = String(pass.Type || '');
+        let safeStatus = String(pass.Status || 'Pending');
+        const todayNum=new Date().setHours(0,0,0,0); let endObj=parseFlexibleDate(pass.EndDate)||parseFlexibleDate(pass.StartDate);
+        let endNum=endObj?endObj.setHours(0,0,0,0):todayNum; let safeType = String(pass.Type || '');
         const isDone = safeType==='Visitor'&&!!pass.CheckOutTime, isExp=todayNum>endNum, isComp=isDone||isExp;
-        if(!isComp){
-            setTimeout(() => {
-                const qre=document.getElementById(`qr-${pass.UniqueID}`);
-                if(qre) {
-                    qre.innerHTML = "";
-                    try {
-                        new QRCode(qre, {text: String(pass.UniqueID), width:120, height:120, colorDark:"#000", colorLight:"#fff", correctLevel: QRCode.CorrectLevel.H});
-                    } catch(err) { console.error("QR Error", err); }
-                }
-            }, 200);
+        
+        if(!isComp && safeStatus !== 'Rejected'){ 
+            setTimeout(() => { const qre=document.getElementById(`qr-${pass.UniqueID}`); if(qre) { qre.innerHTML = ""; try { new QRCode(qre, {text: String(pass.UniqueID), width:120, height:120, colorDark:"#000", colorLight:"#fff", correctLevel: QRCode.CorrectLevel.H}); } catch(err) {} } }, 200); 
         }
     });
 }
@@ -1030,11 +905,7 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     }
     else if(!isSilent||forceRefresh)listDiv.innerHTML=`<p style="color:var(--text-muted);font-size:13px;">${t("fetching")}</p>`;
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'get_by_email', email: targetEmail })
-        });
+        const res=await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_by_email', email: targetEmail }) });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
         if(Array.isArray(data)){ localStorage.setItem(cachedKey,JSON.stringify(data)); processAndRenderPasses(data, targetEmail, isSilent); }
@@ -1057,30 +928,19 @@ function setAdminFilter(range,btnElement){
 }
 
 function renderAdminData(data){
-    if(!Array.isArray(data)){ data = []; }
-    globalAdminData=data;
+    if(!Array.isArray(data)){ data = []; } globalAdminData=data;
     const tPending=document.getElementById('admin-table-pending'),tActive=document.getElementById('admin-table-active'),tHistory=document.getElementById('admin-table-history'),tGuard=document.getElementById('admin-table-guard-approvals');
     let hPending='',hActive='',hHistory='',hGuard='';
-    const today=new Date();today.setHours(0,0,0,0);
-    const tomorrow=new Date(today.getTime());tomorrow.setDate(tomorrow.getDate()+1);
-    const si=document.getElementById('filter-start'),ei=document.getElementById('filter-end');
-    const fStart=si?si.value:'',fEnd=ei?ei.value:'';
-    let pendingCount=0,activeCount=0,historyCount=0,guardCount=0;
-    let aDate={},aType={},aFacility={},aStatus={};
+    const today=new Date();today.setHours(0,0,0,0); const tomorrow=new Date(today.getTime());tomorrow.setDate(tomorrow.getDate()+1);
+    const si=document.getElementById('filter-start'),ei=document.getElementById('filter-end'); const fStart=si?si.value:'',fEnd=ei?ei.value:'';
+    let pendingCount=0,activeCount=0,historyCount=0,guardCount=0; let aDate={},aType={},aFacility={},aStatus={};
 
     data.forEach(row=>{
         if(!row||!row.UniqueID)return;
-        
-        let rType = String(row.Type || '');
-        let rLocation = String(row.Location || '');
-        let rStatus = String(row.Status || 'Pending');
-        let rVisitorName = String(row.VisitorName || '');
-        let rHostEmail = String(row.HostEmail || '');
-        
-        let endDateObj=new Date((parseFlexibleDate(row.EndDate)||parseFlexibleDate(row.StartDate)||new Date()).getTime());
-        endDateObj.setHours(23,59,59,999);
-        const isVisitorDone=rType==='Visitor'&&!!row.CheckOutTime;
-        const isExpired=endDateObj<today;
+        let rType = String(row.Type || ''); let rLocation = String(row.Location || ''); let rStatus = String(row.Status || 'Pending');
+        let rVisitorName = String(row.VisitorName || ''); let rHostEmail = String(row.HostEmail || '');
+        let endDateObj=new Date((parseFlexibleDate(row.EndDate)||parseFlexibleDate(row.StartDate)||new Date()).getTime()); endDateObj.setHours(23,59,59,999);
+        const isVisitorDone=rType==='Visitor'&&!!row.CheckOutTime; const isExpired=endDateObj<today;
         const isHistory = isExpired || rStatus==='Rejected' || isVisitorDone || rStatus==='Completed';
         const inRange=isDateInRange(row.StartDate,currentAdminFilter,fStart,fEnd);
         const dateStr=rType==='Visitor'?formatToDDMMYYYY(row.StartDate):`${formatToDDMMYYYY(row.StartDate)} - ${formatToDDMMYYYY(row.EndDate||row.StartDate)}`;
@@ -1092,13 +952,8 @@ function renderAdminData(data){
 
         let startD=parseFlexibleDate(row.StartDate);if(startD){startD=new Date(startD.getTime());startD.setHours(0,0,0,0)}
         let rowStyle='',dateBadge='';
-        if(startD&&startD.getTime()===today.getTime()&&!isHistory){
-            rowStyle='style="background: rgba(16, 185, 129, 0.1);"';
-            dateBadge=`<br><span style="display:inline-block;margin-top:4px;background:var(--success);color:#000;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">TODAY</span>`;
-        }else if(startD&&startD.getTime()===tomorrow.getTime()&&!isHistory){
-            rowStyle='style="background: rgba(59, 130, 246, 0.1);"';
-            dateBadge=`<br><span style="display:inline-block;margin-top:4px;background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">TOMORROW</span>`;
-        }
+        if(startD&&startD.getTime()===today.getTime()&&!isHistory){ rowStyle='style="background: rgba(16, 185, 129, 0.1);"'; dateBadge=`<br><span style="display:inline-block;margin-top:4px;background:var(--success);color:#000;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">TODAY</span>`; }
+        else if(startD&&startD.getTime()===tomorrow.getTime()&&!isHistory){ rowStyle='style="background: rgba(59, 130, 246, 0.1);"'; dateBadge=`<br><span style="display:inline-block;margin-top:4px;background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:bold;">TOMORROW</span>`; }
         const finalDateStr=dateStr+dateBadge;
 
         if(isHistory){
@@ -1108,7 +963,6 @@ function renderAdminData(data){
                 else if(isExpired){finalStatus=t('status_expired');sColor='var(--danger)'}
                 else if(isVisitorDone||rStatus==='Completed'){finalStatus=t('status_completed');sColor='var(--success)'}
                 else{finalStatus=t('status_approved');sColor='var(--success)'}
-
                 let historyActionBtns=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:250px;"><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openExtendPass('${row.UniqueID}','${rType}')">${t('btn_extend')}</button><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button></div>`;
                 hHistory+=`<tr><td style="color:var(--text-muted);">${dateStr}</td><td><strong>${rVisitorName}</strong><br><span style="font-size:10px;color:var(--text-muted);">Email: ${rHostEmail}</span></td><td>${t(rType.toLowerCase())}</td><td>${rLocation}</td><td style="font-weight:600;color:${sColor}">${finalStatus}</td><td style="color:var(--text-muted);font-size:11px;">${row.CheckInTime?formatTime(row.CheckInTime):'-'}</td><td style="color:var(--text-muted);font-size:11px;">${row.CheckOutTime?formatTime(row.CheckOutTime):'-'}</td><td style="color:var(--noon-yellow);font-size:11px;">${String(row.ScannedByGuard||'-')}</td><td>${historyActionBtns}</td></tr>`;
                 historyCount++;
@@ -1128,19 +982,15 @@ function renderAdminData(data){
                 }
             }
         }
-
         if(inRange){
-            let logFound=false;
-            let gLogs = String(row.GateLogs || "");
+            let logFound=false; let gLogs = String(row.GateLogs || "");
             if(gLogs.trim()!==""){
                 if(gLogs.startsWith("[")){
                     try{
                         let logs=JSON.parse(gLogs);
                         if(Array.isArray(logs)){
                             logs.forEach(l=>{
-                                let hc=l.count?`<strong style="color:var(--noon-yellow)">${l.count} Present</strong>`:'-';
-                                let ac=l.action==='IN'?'var(--success)':'var(--danger)';
-                                let guardVal = String(l.guard || row.ScannedByGuard || '-');
+                                let hc=l.count?`<strong style="color:var(--noon-yellow)">${l.count} Present</strong>`:'-'; let ac=l.action==='IN'?'var(--success)':'var(--danger)'; let guardVal = String(l.guard || row.ScannedByGuard || '-');
                                 hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(l.time)}</td><td style="color:${ac};font-weight:bold;">${l.action}</td><td><strong>${rVisitorName}</strong></td><td>${t(rType.toLowerCase())}</td><td>${rLocation}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
                                 guardCount++;logFound=true;
                             });
@@ -1151,10 +1001,7 @@ function renderAdminData(data){
                     lines.forEach(line=>{
                         let m=line.match(/(IN|OUT)\s*\((\d+)\)\s*at\s*(.+?)\s*by\s*(.*)/);
                         if(m){
-                            let action=m[1],count=m[2],time=new Date(m[3]),guard=m[4];
-                            let hc=`<strong style="color:var(--noon-yellow)">${count} Present</strong>`;
-                            let ac=action==='IN'?'var(--success)':'var(--danger)';
-                            let guardVal = String(guard || row.ScannedByGuard || '-');
+                            let action=m[1],count=m[2],time=new Date(m[3]),guard=m[4]; let hc=`<strong style="color:var(--noon-yellow)">${count} Present</strong>`; let ac=action==='IN'?'var(--success)':'var(--danger)'; let guardVal = String(guard || row.ScannedByGuard || '-');
                             hGuard+=`<tr><td style="color:var(--text-muted);">${formatTime(time)}</td><td style="color:${ac};font-weight:bold;">${action}</td><td><strong>${rVisitorName}</strong></td><td>${t(rType.toLowerCase())}</td><td>${rLocation}</td><td>${hc}</td><td style="color:var(--noon-yellow);font-weight:600;">${guardVal}</td></tr>`;
                             guardCount++;logFound=true;
                         }
@@ -1180,7 +1027,6 @@ function renderAdminData(data){
     if(aStatus['Pending'])sHtml+=`<div class="stat-row"><span style="color:var(--noon-yellow)">${t('status_pending')}</span><span class="stat-val">${aStatus['Pending']}</span></div>`;
     if(aStatus['Rejected'])sHtml+=`<div class="stat-row"><span style="color:var(--danger)">${t('status_rejected')}</span><span class="stat-val">${aStatus['Rejected']}</span></div>`;
     const ss=document.getElementById('stat-status');if(ss)ss.innerHTML=sHtml||'<div class="stat-row"><span>-</span></div>';
-
     let topDates=Object.entries(aDate).sort((a,b)=>b[1]-a[1]).slice(0,5);
     const sd=document.getElementById('stat-date');if(sd)sd.innerHTML=topDates.map(([k,v])=>`<div class="stat-row"><span>${k}</span><span class="stat-val" style="color:var(--noon-yellow);">${v}</span></div>`).join('')||'<div class="stat-row"><span>-</span></div>';
 }
@@ -1195,85 +1041,46 @@ async function loadAdminData(isSilent=false){
         catch(e){ localStorage.removeItem('cached_admin_data'); }
     }
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'get_all' })
-        });
+        const res=await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
         if(!res.ok)throw new Error("HTTP error");
         const data=await res.json();
-        if(Array.isArray(data)){ 
-            localStorage.setItem('cached_admin_data',JSON.stringify(data)); 
-            renderAdminData(data.reverse()); 
-        } else {
-            renderAdminData([]);
-        }
-    }catch(e){
-        renderAdminData(globalAdminData || []);
-        if(!isSilent&&!cached)console.error(e);
-    }
+        if(Array.isArray(data)){ localStorage.setItem('cached_admin_data',JSON.stringify(data)); renderAdminData(data.reverse()); } else { renderAdminData([]); }
+    }catch(e){ renderAdminData(globalAdminData || []); if(!isSilent&&!cached)console.error(e); }
 }
 
 async function updateStatus(id,newStatus){
     if(autoRefreshTimer) clearInterval(autoRefreshTimer);
-    if(!confirm(`Mark ${id} as ${newStatus}?`)){
-        startAutoRefresh(currentUser.role);
-        return;
-    }
-    
+    if(!confirm(`Mark ${id} as ${newStatus}?`)){ startAutoRefresh(currentUser.role); return; }
     if(Array.isArray(globalAdminData)){
         let item = globalAdminData.find(x => String(x.UniqueID) === String(id));
         if(item) {
-            item.Status = newStatus;
-            localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData));
-            renderAdminData(globalAdminData);
-            if(item.HostEmail) {
-                localStorage.removeItem('cached_passes_' + String(item.HostEmail).toLowerCase().trim());
-            }
+            item.Status = newStatus; localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData)); renderAdminData(globalAdminData);
+            if(item.HostEmail) { localStorage.removeItem('cached_passes_' + String(item.HostEmail).toLowerCase().trim()); }
         }
     }
-
     try{
         const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_status',id:id,newStatus:newStatus})});
         if(!res.ok)throw new Error("HTTP error");
-        loadAdminData(true);
-        if(currentUser && currentUser.role==='ops') loadMyPasses(true, true);
-    }catch(e){
-    }finally {
-        startAutoRefresh(currentUser.role);
-    }
+        loadAdminData(true); if(currentUser && currentUser.role==='ops') loadMyPasses(true, true);
+    }catch(e){}finally { startAutoRefresh(currentUser.role); }
 }
 
 async function adminCheckOut(id){
     if(autoRefreshTimer) clearInterval(autoRefreshTimer);
-    if(!confirm(`Force check-out for pass ${id}?`)){
-        startAutoRefresh(currentUser.role);
-        return;
-    }
-    
+    if(!confirm(`Force check-out for pass ${id}?`)){ startAutoRefresh(currentUser.role); return; }
     if(Array.isArray(globalAdminData)){
         let item = globalAdminData.find(x => String(x.UniqueID) === String(id));
         if(item) {
-            item.Status = 'Completed';
-            item.CheckOutTime = new Date().toISOString();
-            localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData));
-            renderAdminData(globalAdminData);
-            if(item.HostEmail) {
-                localStorage.removeItem('cached_passes_' + String(item.HostEmail).toLowerCase().trim());
-            }
+            item.Status = 'Completed'; item.CheckOutTime = new Date().toISOString(); localStorage.setItem('cached_admin_data', JSON.stringify(globalAdminData)); renderAdminData(globalAdminData);
+            if(item.HostEmail) { localStorage.removeItem('cached_passes_' + String(item.HostEmail).toLowerCase().trim()); }
         }
     }
-
     try{
         const adminInfo=`Admin: ${currentUser.name} (${currentUser.email})`;
         const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'})});
         if(!res.ok)throw new Error("HTTP error");
-        localStorage.removeItem('cached_admin_data');
-        setTimeout(()=>{loadAdminData(true)},1000);
-    }catch(e){
-    }finally{
-        startAutoRefresh(currentUser.role);
-    }
+        localStorage.removeItem('cached_admin_data'); setTimeout(()=>{loadAdminData(true)},1000);
+    }catch(e){}finally{ startAutoRefresh(currentUser.role); }
 }
 
 function openExtendPass(id,type){
@@ -1297,15 +1104,22 @@ async function submitExtendPass(){
     }catch(e){alert('Error.')}finally{btn.innerText=t("save_extension");btn.disabled=false}
 }
 
+async function adminResetPin(email) {
+    if(!confirm(`Reset PIN for ${email}? They will be prompted to create a new one next time.`)) return;
+    try {
+        const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'reset_pin', email: email }) });
+        localStorage.removeItem('cached_admin_data'); localStorage.removeItem('cached_passes_' + email);
+        alert("PIN Reset Successful."); closeViewRecord(); loadAdminData(true);
+    } catch(e) { alert("Error resetting PIN"); }
+}
+
 function openViewRecord(id){
     const r=globalAdminData.find(x=>String(x.UniqueID)===String(id));if(!r)return;
-    let rType = String(r.Type || '');
-    let displayHostName = (r.HostName || '-').split('||PIN:')[0];
-    let actualPin = (r.HostName || '').includes('||PIN:') ? (r.HostName || '').split('||PIN:')[1] : null;
-
+    let rType = String(r.Type || ''); let displayHostName = (r.HostName || '-').split('||PIN:')[0]; let actualPin = (r.HostName || '').includes('||PIN:') ? (r.HostName || '').split('||PIN:')[1] : null;
     let h=`<div><strong>${t('lbl_host_name')}</strong>${displayHostName}</div>`;
+    
     if (currentUser && currentUser.role === 'admin' && actualPin) {
-        h += `<div><strong>ACCOUNT PIN</strong><span style="color:var(--danger); font-weight:bold; font-size:14px;">${actualPin}</span></div>`;
+        h += `<div style="margin-bottom:10px;"><strong>ACCOUNT PIN</strong><div style="display:flex; gap:10px; align-items:center; margin-top:5px;"><span id="admin-view-pin" style="color:var(--danger); font-weight:bold; font-size:16px; letter-spacing: 2px; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:4px;">****</span><button onclick="document.getElementById('admin-view-pin').innerText='${actualPin}'; this.style.display='none';" class="btn-primary btn-outline btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">👁️ SHOW</button><button onclick="adminResetPin('${r.HostEmail}')" class="btn-primary btn-danger btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">🔄 RESET</button></div></div>`;
     }
     
     h+=`<div><strong>${t('lbl_host_email')}</strong>${r.HostEmail||'-'}</div><div><strong>${t('visitor_name')}</strong>${r.VisitorName||'-'}</div><div><strong>${t('type_header')}</strong>${t(rType.toLowerCase())||'-'}</div><div><strong>${t('location_label')}</strong>${r.Location||'-'}</div><div><strong>${t('lbl_validity')}</strong>${rType==='Visitor'?formatToDDMMYYYY(r.StartDate):formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate)}</div><div><strong>${t('slp_ticket')}</strong>${r.SlpTicketNo||'-'}</div><div><strong>${t('contact_no')}</strong>${r.ContactNo||'-'}</div><div><strong>IMEI NUMBER</strong>${r.ImeiNumber||'-'}</div>`;
@@ -1313,45 +1127,24 @@ function openViewRecord(id){
     else h+=`<div><strong>${t('project_name')}</strong>${r.ProjectName||'-'}</div><div><strong>${t('company_name')}</strong>${r.CompanyName||'-'}</div><div><strong>${t('project_manager')}</strong>${r.ProjectManager||'-'}</div><div><strong>${t('fm_poc')}</strong>${r.FmPoc||'-'}</div>`;
 
     h+=`<div class="record-img-box" style="margin-top:15px;"><div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_iqama')} (Lead)</strong><img src="${r.IqamaURL||''}" onclick="openFullscreenImage(this.src)"></div><div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_selfie')} (Lead)</strong><img src="${r.SelfieURL||''}" onclick="openFullscreenImage(this.src)"></div>`;
-    if(r.ImeiPhotoURL && r.ImeiPhotoURL !== "No File") {
-        h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>IMEI PHOTO (Lead)</strong><img src="${r.ImeiPhotoURL}" onclick="openFullscreenImage(this.src)"></div>`;
-    }
+    if(r.ImeiPhotoURL && r.ImeiPhotoURL !== "No File") h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>IMEI PHOTO (Lead)</strong><img src="${r.ImeiPhotoURL}" onclick="openFullscreenImage(this.src)"></div>`;
     let fmpocStr = String(r.FmPoc || '');
-    if(rType==='Contractor' && fmpocStr && (fmpocStr.startsWith('http')||fmpocStr.startsWith('data:image'))){
-        h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('fm_poc')} (Legacy Image)</strong><img src="${fmpocStr}" onclick="openFullscreenImage(this.src)"></div>`;
-    }
-    
+    if(rType==='Contractor' && fmpocStr && (fmpocStr.startsWith('http')||fmpocStr.startsWith('data:image'))) h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('fm_poc')} (Legacy Image)</strong><img src="${fmpocStr}" onclick="openFullscreenImage(this.src)"></div>`;
     let vehStr = String(r.VehiclePlateNo || '');
     if(vehStr){
-        if(vehStr.startsWith('http')||vehStr.startsWith('data:image')){
-            h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${vehStr}" onclick="openFullscreenImage(this.src)"></div>`;
-        } else {
-            h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px;color:var(--text-muted);">${vehStr}</div></div>`;
-        }
+        if(vehStr.startsWith('http')||vehStr.startsWith('data:image')) h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><img src="${vehStr}" onclick="openFullscreenImage(this.src)"></div>`;
+        else h+=`<div style="flex:1;background:transparent;border:none;padding:0;"><strong>${t('lbl_vehicle')}</strong><div style="margin-top:5px;color:var(--text-muted);">${vehStr}</div></div>`;
     }
-    
     h+=`</div>`;
 
     let tMembers = String(r.TeamMembers || '');
     if(tMembers.trim()!==""){
-        let td=[];
-        let lines = tMembers.split('\n\n');
+        let td=[]; let lines = tMembers.split('\n\n');
         lines.forEach((block, idx)=>{
-            let nameMatch = block.match(/Name:\s*(.*?)\s*\|/);
-            let iqamaMatch = block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/);
-            let deviceMatch = block.match(/Device:\s*(.*?)(?:\n|$)/);
-            let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
-            
+            let nameMatch = block.match(/Name:\s*(.*?)\s*\|/); let iqamaMatch = block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/); let deviceMatch = block.match(/Device:\s*(.*?)(?:\n|$)/); let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             if(extractedUrls.length >= 2){
-                td.push({
-                    person: idx+1,
-                    name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
-                    iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
-                    device: deviceMatch ? deviceMatch[1].trim() : 'None',
-                    iqama: extractedUrls[0],
-                    selfie: extractedUrls[1],
-                    devicePhoto: extractedUrls.length > 2 ? extractedUrls[2] : 'No File'
-                });
+                let nameRaw = nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1); let isNew = nameRaw.includes('[NEW]'); let cleanName = nameRaw.replace('[NEW]', '').trim();
+                td.push({ person: idx+1, name: cleanName, isNew: isNew, iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A', device: deviceMatch ? deviceMatch[1].trim() : 'None', iqama: extractedUrls[0], selfie: extractedUrls[1], devicePhoto: extractedUrls.length > 2 ? extractedUrls[2] : 'No File' });
             }
         });
 
@@ -1359,14 +1152,11 @@ function openViewRecord(id){
             h+=`<div style="grid-column:span 2;background:transparent;border-top:1px solid var(--border-color);padding-top:15px;margin-top:10px;"><strong style="font-size:14px;margin-bottom:15px;">TEAM MEMBERS (${td.length})</strong><div style="display:flex;flex-direction:column;gap:10px;">`;
             td.forEach(m=>{
                 let devHtml = m.device !== 'None' ? `<span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:bold;">${m.device}</span>` : '';
-                
+                let newBadge = m.isNew ? `<span style="background:var(--success);color:white;font-size:10px;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:bold;">${t('new_badge')}</span>` : '';
                 let imgsHtml = `<img src="${m.iqama}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Iqama">`;
                 imgsHtml += `<img src="${m.selfie}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Selfie">`;
-                if(m.devicePhoto && m.devicePhoto !== 'No File' && m.devicePhoto.startsWith('http')) {
-                    imgsHtml += `<img src="${m.devicePhoto}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Device Screen">`;
-                }
-
-                h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><div><span style="color:var(--noon-yellow);font-weight:bold;">${m.name}</span>${devHtml}<br><span style="font-size:11px;color:var(--text-muted);">ID: ${m.iqamaText}</span></div><div style="display:flex;gap:10px;">${imgsHtml}</div></div>`;
+                if(m.devicePhoto && m.devicePhoto !== 'No File' && m.devicePhoto.startsWith('http')) imgsHtml += `<img src="${m.devicePhoto}" style="width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:zoom-in;border:1px solid #444;" onclick="openFullscreenImage(this.src)" title="Device Screen">`;
+                h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px;"><div><span style="color:var(--noon-yellow);font-weight:bold;">${m.name}</span>${newBadge}${devHtml}<br><span style="font-size:11px;color:var(--text-muted);">ID: ${m.iqamaText}</span></div><div style="display:flex;gap:10px;">${imgsHtml}</div></div>`;
             });
             h+=`</div></div>`;
         }
@@ -1386,15 +1176,12 @@ function printSelected(){
         const id=cb.value,name=cb.getAttribute('data-name'),type=cb.getAttribute('data-type'),loc=cb.getAttribute('data-location'),st=cb.getAttribute('data-status'),date=cb.getAttribute('data-date');
         let tempDiv = document.createElement("div");
         new QRCode(tempDiv, {text: id, width: 110, height: 110, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.H});
-        let canvas = tempDiv.querySelector("canvas");
-        let qrDataUrl = canvas ? canvas.toDataURL() : '';
+        let canvas = tempDiv.querySelector("canvas"); let qrDataUrl = canvas ? canvas.toDataURL() : '';
         cardsHtml+=`<div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${loc}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${st}</p><p class="id">${id}</p></div></div><div class="qr-box"><img src="${qrDataUrl}"></div></div>`;
     });
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}`;
     pw.document.write(`<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body>${cardsHtml}</body></html>`);
-    pw.document.close();
-    pw.focus();
-    setTimeout(()=>{pw.print();pw.close();},250);
+    pw.document.close(); pw.focus(); setTimeout(()=>{pw.print();pw.close();},250);
 }
 
 function printQR(name,type,location,id,status,date){
@@ -1402,97 +1189,53 @@ function printQR(name,type,location,id,status,date){
     const pw=window.open('','','width=800,height=600');
     let tempDiv = document.createElement("div");
     new QRCode(tempDiv, {text: id, width: 110, height: 110, colorDark: "#000", colorLight: "#fff", correctLevel: QRCode.CorrectLevel.H});
-    let canvas = tempDiv.querySelector("canvas");
-    let qrDataUrl = canvas ? canvas.toDataURL() : '';
+    let canvas = tempDiv.querySelector("canvas"); let qrDataUrl = canvas ? canvas.toDataURL() : '';
     let ps=pm?`@media print{@page{margin:10mm}body{display:flex;align-items:flex-start;justify-content:flex-start}.card{border:1px solid #ccc !important}}`:`@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-inside:avoid;box-sizing:border-box}}`;
     pw.document.write(`<html><head><title>Print QR Pass</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:'Inter',sans-serif;display:flex;justify-content:center}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}${ps}</style></head><body><div class="card"><div class="top-row"><div><p class="name">${name}</p><p class="sub">${type} &bull; ${location}</p><p class="date">Valid: ${date}</p></div><div><p class="status">${status}</p><p class="id">${id}</p></div></div><div class="qr-box"><img src="${qrDataUrl}"></div></div></body></html>`);
-    pw.document.close();
-    pw.focus();
-    setTimeout(()=>{pw.print();pw.close();},250);
+    pw.document.close(); pw.focus(); setTimeout(()=>{pw.print();pw.close();},250);
 }
 
 function switchScanMode(mode) {
-    const btnCam = document.getElementById('btn-mode-camera');
-    const btnGun = document.getElementById('btn-mode-gun');
-    const gunContainer = document.getElementById('gun-scanner-container');
-    const camWrapper = document.getElementById('camera-mode-wrapper');
+    const btnCam = document.getElementById('btn-mode-camera'); const btnGun = document.getElementById('btn-mode-gun');
+    const gunContainer = document.getElementById('gun-scanner-container'); const camWrapper = document.getElementById('camera-mode-wrapper');
     const gunInput = document.getElementById('gun-scan-input');
-
     if (mode === 'gun') {
-        if(btnCam) btnCam.className = "btn-primary btn-outline";
-        if(btnGun) btnGun.className = "btn-primary";
-        if(camWrapper) camWrapper.classList.add('hidden');
-        if(gunContainer) gunContainer.classList.remove('hidden');
-        stopScanner();
-        if(gunInput) { gunInput.focus(); gunInput.value = ""; }
+        if(btnCam) btnCam.className = "btn-primary btn-outline"; if(btnGun) btnGun.className = "btn-primary";
+        if(camWrapper) camWrapper.classList.add('hidden'); if(gunContainer) gunContainer.classList.remove('hidden');
+        stopScanner(); if(gunInput) { gunInput.focus(); gunInput.value = ""; }
     } else {
-        if(btnCam) btnCam.className = "btn-primary";
-        if(btnGun) btnGun.className = "btn-primary btn-outline";
-        if(gunContainer) gunContainer.classList.add('hidden');
-        if(camWrapper) camWrapper.classList.remove('hidden');
+        if(btnCam) btnCam.className = "btn-primary"; if(btnGun) btnGun.className = "btn-primary btn-outline";
+        if(gunContainer) gunContainer.classList.add('hidden'); if(camWrapper) camWrapper.classList.remove('hidden');
     }
 }
 
 function handleGunScan(event) {
     if (event.key === 'Enter') {
-        event.preventDefault();
-        const code = event.target.value.replace(/\s+/g, '').trim().toUpperCase();
-        if (code) {
-            event.target.value = "";
-            onScanSuccess(code);
-        }
+        event.preventDefault(); const code = event.target.value.replace(/\s+/g, '').trim().toUpperCase();
+        if (code) { event.target.value = ""; onScanSuccess(code); }
     }
 }
 
 function startScanner() {
-    const btn = document.getElementById('btn-start-scan');
-    const readerCont = document.getElementById('reader-container');
-    const scanResult = document.getElementById('scan-result');
-    if(btn) btn.classList.add('hidden');
-    if(scanResult) scanResult.classList.add('hidden');
-    if(readerCont) readerCont.classList.remove('hidden');
-
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-    }
+    const btn = document.getElementById('btn-start-scan'); const readerCont = document.getElementById('reader-container'); const scanResult = document.getElementById('scan-result');
+    if(btn) btn.classList.add('hidden'); if(scanResult) scanResult.classList.add('hidden'); if(readerCont) readerCont.classList.remove('hidden');
+    if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
     startQrCodeStream();
 }
 
 function startQrCodeStream() {
-    if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-            playQrCodeStream();
-        }).catch(e => { playQrCodeStream(); });
-    } else {
-        playQrCodeStream();
-    }
+    if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop().then(() => { playQrCodeStream(); }).catch(e => { playQrCodeStream(); }); } 
+    else { playQrCodeStream(); }
 }
 
 function playQrCodeStream() {
-    html5QrCode.start(
-        { facingMode: scannerFacingMode },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        onScanSuccess,
-        (errorMessage) => { }
-    ).catch((err) => {
-        alert("Camera access error. Please check permissions.");
-        hideScannerUI();
-    });
+    html5QrCode.start( { facingMode: scannerFacingMode }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess, (errorMessage) => { } ).catch((err) => { alert("Camera access error. Please check permissions."); hideScannerUI(); });
 }
 
-function switchScannerCamera() {
-    scannerFacingMode = scannerFacingMode === "environment" ? "user" : "environment";
-    startQrCodeStream();
-}
-
+function switchScannerCamera() { scannerFacingMode = scannerFacingMode === "environment" ? "user" : "environment"; startQrCodeStream(); }
 function stopScanner() {
-    if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().then(() => {
-            hideScannerUI();
-        }).catch(e => { hideScannerUI(); });
-    } else {
-        hideScannerUI();
-    }
+    if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop().then(() => { hideScannerUI(); }).catch(e => { hideScannerUI(); }); } 
+    else { hideScannerUI(); }
 }
 
 function hideScannerUI() {
@@ -1502,23 +1245,14 @@ function hideScannerUI() {
 
 function showScanResult(d,rHtml,cClass,isContractor=false){
     const sr=document.getElementById('scan-result');
-    
     sr.className = '';
-    
     document.getElementById('r-decision').innerText=d;
     document.getElementById('r-reason').innerHTML=rHtml;
     
-    setTimeout(() => {
-        sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`;
-    }, 10);
-    
+    setTimeout(() => { sr.className=`scan-result-card ${cClass} ${isContractor?'fullscreen-scan':''}`; }, 10);
     if(cClass==="bg-red"){
         setTimeout(()=>{
-            if (document.getElementById('r-decision').innerText === d) {
-                sr.className = 'scan-result-card hidden';
-                isProcessingScan = false;
-                try{if(html5QrCode)html5QrCode.resume();}catch(e){}
-            }
+            if (document.getElementById('r-decision').innerText === d) { sr.className = 'scan-result-card hidden'; isProcessingScan = false; try{if(html5QrCode)html5QrCode.resume();}catch(e){} }
         },3500);
     }
 }
@@ -1529,39 +1263,20 @@ window.closeScanResult = function() {
     if(sr) sr.className = 'scan-result-card hidden';
     try{if(html5QrCode) html5QrCode.resume();}catch(e){}
     const gunInput = document.getElementById('gun-scan-input');
-    if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) {
-        gunInput.focus();
-        gunInput.value = "";
-    }
+    if(gunInput && !document.getElementById('gun-scanner-container').classList.contains('hidden')) { gunInput.focus(); gunInput.value = ""; }
 }
 
 function filterTeamMembers(query) {
     let q = query.toLowerCase();
-    
     let rows = document.querySelectorAll('.team-member-scan-row');
-    rows.forEach(row => {
-        if(row.innerText.toLowerCase().includes(q)) {
-            row.style.display = 'flex';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-
+    rows.forEach(row => { if(row.innerText.toLowerCase().includes(q)) { row.style.display = 'flex'; } else { row.style.display = 'none'; } });
     let deviceCards = document.querySelectorAll('.device-photo-card');
-    deviceCards.forEach(card => {
-        if(card.getAttribute('data-search').includes(q)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+    deviceCards.forEach(card => { if(card.getAttribute('data-search').includes(q)) { card.style.display = 'block'; } else { card.style.display = 'none'; } });
 }
 
-// BULLETPROOF SCAN PROCESSOR WITH POST FALLBACK
 async function onScanSuccess(decodedText){
     if (isProcessingScan) return;
     isProcessingScan = true;
-
     try{if(html5QrCode && html5QrCode.isScanning)html5QrCode.pause();}catch(e){}
     
     let rawText = String(decodedText).toUpperCase();
@@ -1572,66 +1287,32 @@ async function onScanSuccess(decodedText){
 
     const resultCard=document.getElementById('scan-result'),selfieImg=document.getElementById('r-selfie'),confirmBtn=document.getElementById('btn-confirm-action'),teamSec=document.getElementById('guard-team-section'),detailsPrev=document.getElementById('guard-details-preview'),topInfoBox=document.getElementById('scan-result-top-info');
     
-    if(resultCard){
-        resultCard.className = 'scan-result-card hidden'; 
-        void resultCard.offsetWidth; 
-        resultCard.classList.remove('hidden');
-        resultCard.classList.add('bg-blue'); 
-        if(decodedText) resultCard.classList.add('fullscreen-scan');
-    }
-    
+    if(resultCard){ resultCard.className = 'scan-result-card hidden'; void resultCard.offsetWidth; resultCard.classList.remove('hidden'); resultCard.classList.add('bg-blue'); if(decodedText) resultCard.classList.add('fullscreen-scan'); }
     if(confirmBtn)confirmBtn.classList.add('hidden');if(teamSec)teamSec.classList.add('hidden');
     const rDecision=document.getElementById('r-decision'),rReason=document.getElementById('r-reason');
     if(rDecision)rDecision.innerText=t("fetching");if(rReason)rReason.innerHTML="";
     if(selfieImg){selfieImg.style.display='none';selfieImg.src=""}
-    if(teamSec) teamSec.innerHTML = "";
-    if(detailsPrev) detailsPrev.innerHTML = "";
-    if(topInfoBox) topInfoBox.innerHTML = "";
+    if(teamSec) teamSec.innerHTML = ""; if(detailsPrev) detailsPrev.innerHTML = ""; if(topInfoBox) topInfoBox.innerHTML = "";
     
     const searchFilterBox=document.getElementById('guard-search-filter-container'); 
-    if(searchFilterBox) {
-        searchFilterBox.classList.add('hidden');
-        document.getElementById('team-search-filter').value = "";
-    }
-
-    currentScannedID=decodedText;
-
-    let data = null;
+    if(searchFilterBox) { searchFilterBox.classList.add('hidden'); document.getElementById('team-search-filter').value = ""; }
+    currentScannedID=decodedText; let data = null;
 
     try{
-        const res=await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'get_single', id: decodedText })
-        });
-        if(res.ok) {
-            let resData = await res.json();
-            if(resData && !resData.error) data = resData;
-        }
+        const res=await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_single', id: decodedText }) });
+        if(res.ok) { let resData = await res.json(); if(resData && !resData.error) data = resData; }
     } catch(err) {}
 
-    if(!data && Array.isArray(globalAdminData)){
-        let cachedMatch = globalAdminData.find(x => String(x.UniqueID).toUpperCase() === String(decodedText).toUpperCase());
-        if(cachedMatch) data = cachedMatch;
-    }
+    if(!data && Array.isArray(globalAdminData)){ let cachedMatch = globalAdminData.find(x => String(x.UniqueID).toUpperCase() === String(decodedText).toUpperCase()); if(cachedMatch) data = cachedMatch; }
+    if(!data || data.error) { showScanResult(t("denied"),t("invalid_date"),"bg-red", false); return; }
 
-    if(!data || data.error) {
-        showScanResult(t("denied"),t("invalid_date"),"bg-red", false);
-        return;
-    }
-
-    let dType = String(data.Type || '');
-    let dStatus = String(data.Status || '');
-    let dLoc = String(data.Location || '');
-
+    let dType = String(data.Type || ''); let dStatus = String(data.Status || ''); let dLoc = String(data.Location || '');
     const todayStr=formatToDDMMYYYY(new Date()),startStr=formatToDDMMYYYY(data.StartDate),todayNum=new Date().setHours(0,0,0,0);
     let startObj=parseFlexibleDate(data.StartDate),startNum=startObj?startObj.setHours(0,0,0,0):todayNum;
     let endObj=parseFlexibleDate(data.EndDate),endNum=endObj?endObj.setHours(0,0,0,0):startNum;
     const isCheckedOut=!!data.CheckOutTime,isInside=!!data.CheckInTime&&!data.CheckOutTime;
 
-    let scanState = t("allowed"), scanMsg = t("pass_validated"), scanColor = "bg-green";
-    let allowAction = true;
-
+    let scanState = t("allowed"), scanMsg = t("pass_validated"), scanColor = "bg-green"; let allowAction = true;
     if(currentUser.role==='admin'&&!currentUser.location) { scanState=t("denied"); scanMsg=t("admin_select_fac"); scanColor="bg-red"; allowAction=false; }
     else if(dStatus === 'Pending') { scanState=t("pending"); scanMsg=t("awaiting_admin"); scanColor="bg-yellow"; allowAction=false; }
     else if(dStatus !== 'Approved') { scanState=t("denied"); scanMsg=t("not_approved"); scanColor="bg-red"; allowAction=false; }
@@ -1642,96 +1323,81 @@ async function onScanSuccess(decodedText){
     let isFullscreen = (dType === 'Contractor' || dType === 'Visitor');
 
     if(allowAction) {
-        if(isInside) {
-            currentScanAction = 'check_out';
-            scanState = t("check_out");
-            scanMsg = t("scanning_out");
-            scanColor = "bg-blue";
-        } else {
-            currentScanAction = 'check_in';
-        }
+        if(isInside) { currentScanAction = 'check_out'; scanState = t("check_out"); scanMsg = t("scanning_out"); scanColor = "bg-blue"; } 
+        else { currentScanAction = 'check_in'; }
     }
 
-    if(topInfoBox){
-        let topInfo = `<div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.8; margin-bottom:15px; border: 1px solid rgba(255,255,255,0.1);">`;
-        if(dType === 'Contractor') {
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('project_name')}:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectName || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('project_manager')}:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.ProjectManager || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('location_label')}</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('fm_poc')}:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.FmPoc || 'N/A'}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('type_label')}</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${t('contractor')}</span></p>`;
-        } else {
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('name_label')}</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${data.VisitorName}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('type_label')}</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${t('visitor')}</span></p>`;
-            topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('location_label')}</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${dLoc}</span></p>`;
-        }
-        topInfo += `</div>`;
-        topInfoBox.innerHTML = topInfo;
-    }
-
-    let teamData=[],maxWorkers=1;
-    let tMembers = String(data.TeamMembers || '');
+    let teamData=[],maxWorkers=1; let tMembers = String(data.TeamMembers || '');
     if(tMembers.trim()!==""){
         let lines = tMembers.split('\n\n');
         lines.forEach((block, idx)=>{
-            let nameMatch = block.match(/Name:\s*(.*?)\s*\|/);
-            let iqamaMatch = block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/);
-            let deviceMatch = block.match(/Device:\s*(.*?)(?:\n|$)/);
-            let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
-            
+            let nameMatch = block.match(/Name:\s*(.*?)\s*\|/); let iqamaMatch = block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/); let deviceMatch = block.match(/Device:\s*(.*?)(?:\n|$)/); let extractedUrls = block.match(/https?:\/\/[^\s\|]+/g) || [];
             if(extractedUrls.length >= 2){
-                teamData.push({
-                    person: idx+1,
-                    name: nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1),
-                    iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A',
-                    device: deviceMatch ? deviceMatch[1].trim() : 'None',
-                    iqama: extractedUrls[0],
-                    selfie: extractedUrls[1],
-                    devicePhoto: extractedUrls.length > 2 ? extractedUrls[2] : 'No File'
-                });
+                let nameRaw = nameMatch ? nameMatch[1].trim() : 'Team Member ' + (idx+1); let isNew = nameRaw.includes('[NEW]'); let cleanName = nameRaw.replace('[NEW]', '').trim();
+                teamData.push({ person: idx+1, name: cleanName, isNew: isNew, iqamaText: iqamaMatch ? iqamaMatch[1].trim() : 'N/A', device: deviceMatch ? deviceMatch[1].trim() : 'None', iqama: extractedUrls[0], selfie: extractedUrls[1], devicePhoto: extractedUrls.length > 2 ? extractedUrls[2] : 'No File' });
             }
         });
         maxWorkers = teamData.length + 1;
+    }
+
+    if(topInfoBox){
+        const row = (lbl, val) => `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${lbl}:</strong> <span style="color:#fff; font-weight:bold; font-size:15px;">${val}</span></p>`;
+        let topInfo = `<div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; text-align: start; font-size: 14px; line-height: 1.8; margin-bottom:15px; border: 1px solid rgba(255,255,255,0.1);">`;
+        topInfo += `<p><strong style="color:rgba(255,255,255,0.8); display:inline-block; width:130px;">${t('total_people')}:</strong> <span style="color:var(--noon-yellow); font-weight:bold; font-size:16px;">${maxWorkers}</span></p>`;
+        if(dType === 'Contractor') {
+            topInfo += row(t('project_name'), data.ProjectName || 'N/A'); topInfo += row(t('project_manager'), data.ProjectManager || 'N/A');
+            topInfo += row(t('location_label').replace(':',''), dLoc); topInfo += row(t('fm_poc'), data.FmPoc || 'N/A');
+            topInfo += row(t('type_label').replace(':',''), `<span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${t('contractor')}</span>`);
+        } else {
+            topInfo += row(t('name_label').replace(':',''), data.VisitorName); topInfo += row(t('type_label').replace(':',''), `<span style="color:var(--noon-yellow); font-weight:bold; font-size:15px;">${t('visitor')}</span>`);
+            topInfo += row(t('location_label').replace(':',''), dLoc);
+        }
+        topInfo += `</div>`;
+        topInfoBox.innerHTML = topInfo;
     }
 
     if(dType === 'Contractor' || dType === 'Visitor'){
         if(searchFilterBox) searchFilterBox.classList.remove('hidden');
         if(teamSec) {
             teamSec.classList.remove('hidden');
-            let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">`;
-            attHtml += `<label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> ${t('select_all_members')}</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
-            
+            let attHtml = `<div style="text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);"><label style="display:flex; align-items:center; gap:10px; color:var(--noon-yellow); font-weight:bold; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px; cursor:pointer;"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)" onchange="document.querySelectorAll('.att-chk').forEach(c=>c.checked=this.checked)"> ${t('select_all_members')}</label><div id="team-members-list-container" style="display:flex; flex-direction:column; gap:12px;">`;
             let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
             let leadDevStr = safeImei && safeImei !== 'None' && safeImei !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${safeImei}</span>` : '';
-            
             let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
-
             attHtml += `<label class="team-member-scan-row" data-search="${leadSearchStr}" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${data.IqamaURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${data.SelfieBase64||data.SelfieURL}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${t('lead')} (${data.VisitorName})</span>${leadDevStr}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
             
-            teamData.forEach(m => {
+            let origTeam = teamData.filter(m => !m.isNew); let addedTeam = teamData.filter(m => m.isNew);
+            origTeam.forEach(m => {
                 let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
                 let devHtml = m.device && m.device !== 'None' && m.device.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
                 attHtml += `<label class="team-member-scan-row" data-search="${mSearchStr}" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${m.name}</span><br><span style="font-size:10px;color:rgba(255,255,255,0.6);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
             });
-            attHtml += `</div></div>`;
-            teamSec.innerHTML = attHtml;
+            if (addedTeam.length > 0) {
+                attHtml += `<div style="margin-top:10px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;"><strong style="color:var(--success); text-transform:uppercase;">${t('new_members_added')}</strong></div>`;
+                addedTeam.forEach(m => {
+                    let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
+                    let devHtml = m.device && m.device !== 'None' && m.device.trim() !== '' ? `<br><span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;font-weight:bold;">${m.device}</span>` : '';
+                    let newBadge = `<span style="background:var(--success); color:white; font-size:10px; padding:2px 5px; border-radius:4px; margin-left:5px; font-weight:bold;">${t('new_badge')}</span>`;
+                    attHtml += `<label class="team-member-scan-row" data-search="${mSearchStr}" style="display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(255,255,255,0.08); padding:12px; border-radius:8px; cursor:pointer; border: 1px solid rgba(255,255,255,0.05);"><div style="display:flex; align-items:center; gap:10px;"><img src="${m.iqama}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"><img src="${m.selfie}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;cursor:zoom-in;" onclick="openFullscreenImage(this.src); event.preventDefault();"> <div><span style="font-size:13px;font-weight:600;">${m.name}${newBadge}</span><br><span style="font-size:10px;color:rgba(255,255,255,0.6);">ID: ${m.iqamaText}</span>${devHtml}</div></div><input type="checkbox" class="att-chk" checked style="width:20px;height:20px;accent-color:var(--noon-yellow)"></label>`;
+                });
+            }
+            attHtml += `</div></div>`; teamSec.innerHTML = attHtml;
         }
 
         if(detailsPrev){
             let cardsHtml = '';
-            
             let safeImei = data.ImeiNumber ? String(data.ImeiNumber).trim() : '';
             let hasLeadDevice = safeImei && safeImei !== 'None' && safeImei !== '';
             
+            const makeImg = (lbl, url) => `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${lbl}</strong><img src="${url}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+
             if (hasLeadDevice) {
                 let leadSearchStr = String(data.VisitorName + " " + safeImei + " lead " + data.UniqueID).toLowerCase();
-                cardsHtml += `<div class="device-photo-card" data-search="${leadSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
-                cardsHtml += `<strong style="display:block; color:white; margin-bottom:8px;">${t('lead')} (${data.VisitorName}) - ${t('device_label')}: <span style="color:var(--noon-yellow)">${safeImei}</span></strong>`;
-                cardsHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-                if(data.IqamaURL && data.IqamaURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('iqama_id')}</strong><img src="${data.IqamaURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                if(data.SelfieURL && data.SelfieURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('selfie')}</strong><img src="${data.SelfieURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('device_screen')}</strong><img src="${data.ImeiPhotoURL}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('vehicle')}</strong><img src="${data.VehiclePlateNo}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                cardsHtml += `<div class="device-photo-card" data-search="${leadSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"><strong style="display:block; color:white; margin-bottom:8px;">${t('lead')} (${data.VisitorName}) - ${t('device_label')}: <span style="color:var(--noon-yellow)">${safeImei}</span></strong><div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                if(data.IqamaURL && data.IqamaURL !== 'No File') cardsHtml += makeImg(t('iqama_id'), data.IqamaURL);
+                if(data.SelfieURL && data.SelfieURL !== 'No File') cardsHtml += makeImg(t('selfie'), data.SelfieURL);
+                if(data.ImeiPhotoURL && data.ImeiPhotoURL !== 'No File') cardsHtml += makeImg(t('device_screen'), data.ImeiPhotoURL);
+                if(data.VehiclePlateNo && (data.VehiclePlateNo.startsWith('http')||data.VehiclePlateNo.startsWith('data:image'))) cardsHtml += makeImg(t('vehicle'), data.VehiclePlateNo);
                 cardsHtml += `</div></div>`;
             }
 
@@ -1739,32 +1405,28 @@ async function onScanSuccess(decodedText){
                 let mDevStr = m.device && m.device !== 'None' && m.device.trim() !== '' ? m.device : 'None';
                 if (mDevStr !== 'None') {
                     let mSearchStr = String(m.name + " " + m.iqamaText + " " + m.device).toLowerCase();
-                    cardsHtml += `<div class="device-photo-card" data-search="${mSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);">`;
-                    cardsHtml += `<strong style="display:block; color:white; margin-bottom:8px;">${m.name} - ${t('device_label')}: <span style="color:var(--noon-yellow)">${mDevStr}</span></strong>`;
-                    cardsHtml += `<div style="display:flex; gap:10px; flex-wrap:wrap;">`;
-                    if(m.iqama && m.iqama !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('iqama_id')}</strong><img src="${m.iqama}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                    if(m.selfie && m.selfie !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('selfie')}</strong><img src="${m.selfie}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
-                    if(m.devicePhoto && m.devicePhoto !== 'No File') cardsHtml += `<div><strong style="font-size:10px; display:block; color:rgba(255,255,255,0.7); margin-bottom:4px;">${t('device_screen')}</strong><img src="${m.devicePhoto}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; cursor:zoom-in; border:2px solid rgba(255,255,255,0.2);" onclick="openFullscreenImage(this.src)"></div>`;
+                    cardsHtml += `<div class="device-photo-card" data-search="${mSearchStr}" style="margin-bottom:15px; text-align:left; padding:10px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.1);"><strong style="display:block; color:white; margin-bottom:8px;">${m.name} ${m.isNew ? `<span style="color:var(--success)">[${t('new_badge')}]</span>` : ''} - ${t('device_label')}: <span style="color:var(--noon-yellow)">${mDevStr}</span></strong><div style="display:flex; gap:10px; flex-wrap:wrap;">`;
+                    if(m.iqama && m.iqama !== 'No File') cardsHtml += makeImg(t('iqama_id'), m.iqama);
+                    if(m.selfie && m.selfie !== 'No File') cardsHtml += makeImg(t('selfie'), m.selfie);
+                    if(m.devicePhoto && m.devicePhoto !== 'No File') cardsHtml += makeImg(t('device_screen'), m.devicePhoto);
                     cardsHtml += `</div></div>`;
                 }
             });
 
             if (cardsHtml !== '') {
-                let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px; margin-top:20px;">`;
-                previewHtml += `<div style="margin-bottom:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">${t('device_photos_all')}</strong></div>`;
-                previewHtml += cardsHtml;
-                previewHtml += `</div>`;
-                detailsPrev.innerHTML = previewHtml;
-                detailsPrev.classList.remove('hidden');
-            } else {
-                detailsPrev.innerHTML = "";
-                detailsPrev.classList.add('hidden');
-            }
+                let previewHtml = `<div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 13px; font-weight: normal; margin-bottom: 15px; margin-top:20px;"><div style="margin-bottom:8px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;"><strong style="color:var(--noon-yellow); text-transform:uppercase;">${t('device_photos_all')}</strong></div>${cardsHtml}</div>`;
+                detailsPrev.innerHTML = previewHtml; detailsPrev.classList.remove('hidden');
+            } else { detailsPrev.innerHTML = ""; detailsPrev.classList.add('hidden'); }
         }
 
         const hcSec = document.getElementById('guard-headcount-section');
         if(hcSec) hcSec.classList.add('hidden');
         if(selfieImg) selfieImg.style.display='none';
+        
+        let addedTeam = teamData.filter(m => m.isNew);
+        if(addedTeam.length > 0 && allowAction) {
+            setTimeout(() => { alert(t('notice_new_people')); }, 300);
+        }
     }
 
     const hcSec = document.getElementById('guard-headcount-section');
@@ -1773,26 +1435,20 @@ async function onScanSuccess(decodedText){
         if(confirmBtn) {
             confirmBtn.classList.remove('hidden');
             if (isInside) {
-                confirmBtn.innerText = t("btn_checkout");
-                confirmBtn.className = "btn-primary btn-warning";
-                confirmBtn.style.color = "#000";
+                confirmBtn.innerText = t("btn_checkout"); confirmBtn.className = "btn-primary btn-warning"; confirmBtn.style.color = "#000";
             } else {
-                confirmBtn.innerText = t("confirm_action");
-                confirmBtn.className = "btn-primary btn-success";
-                confirmBtn.style.color = "#fff";
+                confirmBtn.innerText = t("confirm_action"); confirmBtn.className = "btn-primary btn-success"; confirmBtn.style.color = "#fff";
             }
         }
     } else {
-        if(confirmBtn) confirmBtn.classList.add('hidden');
-        if(hcSec) hcSec.classList.add('hidden');
+        if(confirmBtn) confirmBtn.classList.add('hidden'); if(hcSec) hcSec.classList.add('hidden');
     }
 
     showScanResult(scanState, scanMsg, scanColor, isFullscreen);
 }
 
 async function confirmAction(){
-    const btn=document.getElementById('btn-confirm-action');
-    let hcVal=1;
+    const btn=document.getElementById('btn-confirm-action'); let hcVal=1;
     const teamSec = document.getElementById('guard-team-section');
     if(teamSec && !teamSec.classList.contains('hidden')) {
         const chks = document.querySelectorAll('.att-chk');
@@ -1801,72 +1457,40 @@ async function confirmAction(){
             if(hcVal === 0) return alert("Please select at least one person.");
         } else {
             const hcInput = document.getElementById('guard-headcount');
-            if(hcInput && !hcInput.parentElement.classList.contains('hidden')){
-                hcVal = hcInput.value;
-                if(!hcVal||hcVal<1) return alert("Please enter the number of workers present.");
-            }
+            if(hcInput && !hcInput.parentElement.classList.contains('hidden')){ hcVal = hcInput.value; if(!hcVal||hcVal<1) return alert("Please enter the number of workers present."); }
         }
     }
     
-    btn.innerText="SAVING & REFRESHING...";
-    btn.disabled=true;
-
+    btn.innerText="SAVING & REFRESHING..."; btn.disabled=true;
     const gInfo = `${currentUser.name} (${currentUser.location})`;
     const payload = JSON.stringify({ action: currentScanAction, id: currentScannedID, guardInfo: gInfo, headCount: hcVal });
     
     try {
-        const res = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: payload
-        });
-        if(res.ok) {
-            window.location.reload();
-        } else {
-            alert("Sync failed. Please try again.");
-            btn.innerText = t("confirm_action");
-            btn.disabled = false;
-            isProcessingScan = false;
+        const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: payload });
+        if(res.ok) { window.location.reload(); } else {
+            alert("Sync failed. Please try again."); btn.innerText = t("confirm_action"); btn.disabled = false; isProcessingScan = false;
         }
     } catch(e) {
-        alert("Network error. Please try again.");
-        btn.innerText = t("confirm_action");
-        btn.disabled = false;
-        isProcessingScan = false;
+        alert("Network error. Please try again."); btn.innerText = t("confirm_action"); btn.disabled = false; isProcessingScan = false;
     }
 }
 
 let addMorePassId = null;
 let addMoreTeamList = [];
 
-function openAddMoreModal(passId) {
-    addMorePassId = passId;
-    addMoreTeamList = [];
-    renderAddTeamRoster();
-    document.getElementById('add-more-modal').classList.remove('hidden');
-}
-
+function openAddMoreModal(passId) { addMorePassId = passId; addMoreTeamList = []; renderAddTeamRoster(); document.getElementById('add-more-modal').classList.remove('hidden'); }
 function closeAddMoreModal() { document.getElementById('add-more-modal').classList.add('hidden'); }
 
 function toggleAddTeamDeviceInput() {
-    let type = document.getElementById('req-add-team-device-type').value;
-    let group = document.getElementById('req-add-team-device-id-group');
-    let input = document.getElementById('req-add-team-device-id');
-    let tDev = document.getElementById('req-add-team-imeiphoto');
-    if(type === 'None') {
-        group.classList.add('hidden'); input.value = ''; if(tDev) tDev.value = '';
-        clearCapturedData('add_team_imeiphoto');
-    } else { group.classList.remove('hidden'); input.placeholder = type === 'Mobile' ? 'IMEI Number' : 'Serial Number'; }
+    let type = document.getElementById('req-add-team-device-type').value; let group = document.getElementById('req-add-team-device-id-group'); let input = document.getElementById('req-add-team-device-id'); let tDev = document.getElementById('req-add-team-imeiphoto');
+    if(type === 'None') { group.classList.add('hidden'); input.value = ''; if(tDev) tDev.value = ''; clearCapturedData('add_team_imeiphoto'); } 
+    else { group.classList.remove('hidden'); input.placeholder = type === 'Mobile' ? 'IMEI Number' : 'Serial Number'; }
 }
 
 async function saveAddTeamMember() {
     let iB64='',sB64='',tDevB64='',ii=document.getElementById('req-add-team-iqama'),si=document.getElementById('req-add-team-selfie'),tName=document.getElementById('req-add-team-name'),tIqama=document.getElementById('req-add-team-iqamatext');
-    let devType=document.getElementById('req-add-team-device-type').value, devId=document.getElementById('req-add-team-device-id').value;
-    let tDev=document.getElementById('req-add-team-imeiphoto');
-
-    if(!tName || !tName.value.trim()) return alert("Provide Name.");
-    if(!tIqama || !tIqama.value.trim()) return alert("Provide Iqama/ID.");
-
+    let devType=document.getElementById('req-add-team-device-type').value, devId=document.getElementById('req-add-team-device-id').value; let tDev=document.getElementById('req-add-team-imeiphoto');
+    if(!tName || !tName.value.trim()) return alert("Provide Name."); if(!tIqama || !tIqama.value.trim()) return alert("Provide Iqama/ID.");
     if(devType !== 'None') {
         if(!devId.trim()) return alert("Provide IMEI/Serial number.");
         if(capturedImages.add_team_imeiphoto) tDevB64=capturedImages.add_team_imeiphoto.split(',')[1];
@@ -1874,20 +1498,16 @@ async function saveAddTeamMember() {
         else return alert("Provide Device Screen photo.");
     }
     if(capturedImages.add_team_iqama)iB64=capturedImages.add_team_iqama.split(',')[1];
-    else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1]}
-    else return alert("Provide Iqama photo.");
+    else if(ii&&ii.files.length>0){let f=await getBase64(ii.files[0]);iB64=f.split(',')[1]} else return alert("Provide Iqama photo.");
 
     if(capturedImages.add_team_selfie)sB64=capturedImages.add_team_selfie.split(',')[1];
-    else if(si&&si.files.length>0){let f=await getBase64(si.files[0]);sB64=f.split(',')[1]}
-    else return alert("Provide Selfie photo.");
+    else if(si&&si.files.length>0){let f=await getBase64(si.files[0]);sB64=f.split(',')[1]} else return alert("Provide Selfie photo.");
 
-    addMoreTeamList.push({ iqama:"data:image/jpeg;base64,"+iB64, selfie:"data:image/jpeg;base64,"+sB64, rawIqama:iB64, rawSelfie:sB64, rawDevicePhoto:tDevB64, name: tName.value.trim(), iqamaText: tIqama.value.trim(), deviceType: devType, deviceId: devId.trim() });
-    
+    addMoreTeamList.push({ iqama:"data:image/jpeg;base64,"+iB64, selfie:"data:image/jpeg;base64,"+sB64, rawIqama:iB64, rawSelfie:sB64, rawDevicePhoto:tDevB64, name: tName.value.trim() + " [NEW]", iqamaText: tIqama.value.trim(), deviceType: devType, deviceId: devId.trim() });
     renderAddTeamRoster();
     if(ii)ii.value="";if(si)si.value="";if(tName)tName.value="";if(tIqama)tIqama.value="";
     document.getElementById('req-add-team-device-type').value = "None"; document.getElementById('req-add-team-device-id').value = ""; 
-    toggleAddTeamDeviceInput();
-    clearCapturedData('add_team_iqama');clearCapturedData('add_team_selfie');clearCapturedData('add_team_imeiphoto');
+    toggleAddTeamDeviceInput(); clearCapturedData('add_team_iqama');clearCapturedData('add_team_selfie');clearCapturedData('add_team_imeiphoto');
 }
 
 function renderAddTeamRoster(){
@@ -1895,9 +1515,10 @@ function renderAddTeamRoster(){
     if(addMoreTeamList.length>0){
         div.classList.remove('hidden');let h='';
         addMoreTeamList.forEach((m,idx)=>{
+            let cleanName = m.name.replace('[NEW]', '').trim();
             let devHtml = m.deviceType !== 'None' ? `<span style="background:var(--noon-yellow);color:#000;font-size:10px;padding:2px 5px;border-radius:4px;margin-left:5px;font-weight:bold;">${m.deviceType}</span>` : '';
             let imgsHtml = `<img src="${m.iqama}" class="team-member-img" onclick="openFullscreenImage(this.src)"><img src="${m.selfie}" class="team-member-img" onclick="openFullscreenImage(this.src)">`;
-            h+=`<div class="team-member-row"><span style="color:white;font-size:13px;font-weight:bold;">${m.name} ${devHtml}</span><div style="display:flex;gap:10px;">${imgsHtml}<button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;" onclick="addMoreTeamList.splice(${idx},1);renderAddTeamRoster();">❌</button></div></div>`;
+            h+=`<div class="team-member-row"><span style="color:white;font-size:13px;font-weight:bold;">${cleanName} ${devHtml}</span><div style="display:flex;gap:10px;">${imgsHtml}<button type="button" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:16px;" onclick="addMoreTeamList.splice(${idx},1);renderAddTeamRoster();">❌</button></div></div>`;
         });
         div.innerHTML=h;
     }else div.classList.add('hidden');
@@ -1906,27 +1527,17 @@ function renderAddTeamRoster(){
 async function submitAddMorePeople() {
     if(addMoreTeamList.length === 0) return alert("Please add at least one person to the list first.");
     if(!confirm("WARNING: This will reset the pass status back to PENDING. Do you want to proceed?")) return;
-
-    let btn = document.getElementById('btn-submit-add-more');
-    btn.innerText = "SUBMITTING..."; btn.disabled = true;
-
+    let btn = document.getElementById('btn-submit-add-more'); btn.innerText = "SUBMITTING..."; btn.disabled = true;
     let cleanTeam = [];
-    addMoreTeamList.forEach(m => {
-        let devStr = m.deviceType !== 'None' ? `${m.deviceType} (${m.deviceId})` : 'None';
-        cleanTeam.push({ iqama: m.rawIqama, selfie: m.rawSelfie, devicePhoto: m.rawDevicePhoto, name: m.name, iqamaText: m.iqamaText, deviceString: devStr });
-    });
-
+    addMoreTeamList.forEach(m => { let devStr = m.deviceType !== 'None' ? `${m.deviceType} (${m.deviceId})` : 'None'; cleanTeam.push({ iqama: m.rawIqama, selfie: m.rawSelfie, devicePhoto: m.rawDevicePhoto, name: m.name, iqamaText: m.iqamaText, deviceString: devStr }); });
     try {
         const payload = { action: 'add_team_members', id: addMorePassId, team: cleanTeam };
         const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
         let json = await res.json();
-        
-        if (json.status === 'success') {
-            closeAddMoreModal(); loadMyPasses(true, true);
-            alert("People added successfully! The pass is now PENDING approval.");
-        } else throw new Error(json.message);
-    } catch(e) { alert("Upload failed. Try again. Error: " + e.message);
-    } finally { btn.innerText = "SUBMIT & SEND FOR APPROVAL"; btn.disabled = false; }
+        if (json.status === 'success') { closeAddMoreModal(); loadMyPasses(true, true); alert("People added successfully! The pass is now PENDING approval."); } 
+        else throw new Error(json.message);
+    } catch(e) { alert("Upload failed. Try again. Error: " + e.message); } 
+    finally { btn.innerText = "SUBMIT & SEND FOR APPROVAL"; btn.disabled = false; }
 }
 </script>
 </body>
