@@ -326,6 +326,16 @@ const currentRoleParam = urlParams.get('role') || 'default';
 const SESSION_KEY = 'noon_session_' + currentRoleParam;
 let html5QrCode=null; let scannerFacingMode='environment'; let currentUser=null; let currentScannedID=null; let currentScanAction='check_in'; let currentAdminFilter='all'; let autoRefreshTimer=null; let globalAdminData=[]; let checkedPrintIds=new Set(); let liveStream=null; let currentFacingMode='environment'; let targetPhotoType=''; let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null}; let teamList=[]; let currentTeamCounter=1; let isProcessingScan = false; let userSecurityPin = null; let lockedPassesData = null; let pinCreateMode = 'submit';
 
+// ==========================================
+// FIX: Convert old Drive URLs to raw image thumbnail URLs dynamically
+// ==========================================
+function convertDriveUrls(dataObj) {
+    let str = JSON.stringify(dataObj);
+    str = str.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view[^\s"'\\]*/g, "https://drive.google.com/thumbnail?id=$1&sz=w1000");
+    str = str.replace(/https:\/\/drive\.google\.com\/uc\?[^\s"'\\]*id=([a-zA-Z0-9_-]+)[^\s"'\\]*/g, "https://drive.google.com/thumbnail?id=$1&sz=w1000");
+    return JSON.parse(str);
+}
+
 async function confirmPinCreate(){let pin=document.getElementById('new-pin-input').value.trim();if(pin.length!==4)return alert("Please enter a valid 4-digit PIN.");userSecurityPin=pin;let email=currentUser.email;if(currentUser.role==='admin'){const ei=document.getElementById('req-admin-email');if(ei&&ei.value)email=ei.value.toLowerCase().trim();}localStorage.setItem('user_pin_'+email,pin);document.getElementById('pin-create-modal').classList.add('hidden');if(pinCreateMode==='reset'){try{await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_pin',email:email,pin:pin})});}catch(e){}setTimeout(()=>loadMyPasses(true,true),1000);renderMyPasses(lockedPassesData);}else{submitRequest();}}
 function closePinCreate(){document.getElementById('pin-create-modal').classList.add('hidden');}
 function processAndRenderPasses(data,email,isSilent){if(currentUser&&currentUser.role==='admin'){renderMyPasses(data);return;}let hasActive=false;const todayNum=new Date().setHours(0,0,0,0);if(Array.isArray(data)){data.forEach(p=>{let safeType=String(p.Type||'');let safeStatus=String(p.Status||'Pending');let endObj=parseFlexibleDate(p.EndDate)||parseFlexibleDate(p.StartDate);let endNum=endObj?endObj.setHours(0,0,0,0):todayNum;let isComp=(todayNum>endNum)||safeStatus==='Rejected'||safeStatus==='Completed';if(!isComp)hasActive=true;});}let backendPin=null;if(Array.isArray(data)){for(let i=data.length-1;i>=0;i--){if(data[i].HostName&&data[i].HostName.includes('||PIN:')){backendPin=data[i].HostName.split('||PIN:')[1];break;}}}let localPin=localStorage.getItem('user_pin_'+email);if(!hasActive&&data.length>0){localStorage.removeItem('user_pin_'+email);userSecurityPin=null;if(backendPin){fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'reset_pin',email:email})}).catch(e=>{});}renderMyPasses(data);return;}if(!hasActive&&data.length===0){renderMyPasses(data);return;}if(!backendPin&&localPin){backendPin=localPin;fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_pin',email:email,pin:localPin})}).catch(e=>{});}if(backendPin&&backendPin!==localPin){lockedPassesData=data;const verifyModal=document.getElementById('pin-verify-modal');if(!isSilent&&verifyModal){verifyModal.classList.remove('hidden');document.getElementById('pin-error-msg').classList.add('hidden');document.getElementById('verify-pin-input').value='';}const listDiv=document.getElementById('my-passes-list');if(listDiv)listDiv.innerHTML='<p style="color:var(--text-muted);font-size:13px;margin-top:20px;text-align:center;">Passes locked. <button class="btn-primary btn-sm" style="width:auto;padding:4px 10px;margin-left:10px;" onclick="loadMyPasses(true,false)">UNLOCK</button></p>';return;}if(!backendPin&&!localPin&&Array.isArray(data)&&data.length>0){lockedPassesData=data;const createModal=document.getElementById('pin-create-modal');if(!isSilent&&createModal){pinCreateMode='reset';createModal.classList.remove('hidden');document.getElementById('new-pin-input').value='';}const listDiv=document.getElementById('my-passes-list');if(listDiv)listDiv.innerHTML='<p style="color:var(--text-muted);font-size:13px;margin-top:20px;text-align:center;">Passes locked. Awaiting new PIN.</p>';return;}userSecurityPin=backendPin||localPin;renderMyPasses(data);}
@@ -422,7 +432,7 @@ async function performManualSearch() {
         let data = globalAdminData;
         if(!data || data.length === 0) {
             const res = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
-            data = await res.json(); globalAdminData = data;
+            data = convertDriveUrls(await res.json()); globalAdminData = data;
         }
         let matches = data.filter(r => {
             if(!r.UniqueID || r.Status === 'Rejected') return false;
@@ -629,7 +639,7 @@ async function loadMyPasses(forceRefresh=false,isSilent=false){
     try{
         const res=await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_by_email', email: targetEmail }) });
         if(!res.ok)throw new Error("HTTP error");
-        const data=await res.json();
+        const data=convertDriveUrls(await res.json());
         if(Array.isArray(data)){ 
             const newDataStr = JSON.stringify(data);
             if (isSilent && cached === newDataStr) return; 
@@ -749,7 +759,7 @@ function renderAdminData(data){
         if(dateBadge !== '') dateBadge = '<br>' + dateBadge;
         const finalDateStr=dateStr+dateBadge;
 
-        // HISTORY TAB LOGIC (Reverted to use GateLogs)
+        // HISTORY TAB LOGIC
         if (inRange) {
             let visits = parseLogs(row);
             let dailyCounts = {};
@@ -830,11 +840,14 @@ function renderAdminData(data){
 
         if (!isPassExpiredOrFinished) {
             if(inRange){
+                // PENDING TAB LOGIC
                 if(rStatus==='Pending'){
                     let actionBtns=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:250px;"><button class="btn-primary btn-success btn-sm" style="width:auto;white-space:nowrap;" onclick="updateStatus('${row.UniqueID}','Approved')">${t('btn_approve')}</button><button class="btn-primary btn-danger btn-sm" style="width:auto;white-space:nowrap;" onclick="updateStatus('${row.UniqueID}','Rejected')">${t('btn_reject')}</button><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openExtendPass('${row.UniqueID}','${rType}')">${t('btn_extend')}</button><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button></div>`;
                     hPending+=`<tr ${rowStyle}><td style="color:var(--text-muted);">${finalDateStr}</td><td><strong>${rVisitorName}</strong><br><span style="font-size:10px;color:var(--text-muted);">Email: ${rHostEmail}</span></td><td>${t(rType.toLowerCase())}</td><td>${rLocation}</td><td>${actionBtns}</td></tr>`;
                     pendingCount++;
-                }else if(rStatus==='Approved'){
+                }
+                // ACTIVE TAB LOGIC
+                else if(rStatus==='Approved'){
                     const isChecked=checkedPrintIds.has(row.UniqueID)?'checked':'';
                     let cbHtml=`<input type="checkbox" class="print-checkbox row-checkbox" value="${row.UniqueID}" data-name="${rVisitorName}" data-type="${rType}" data-location="${rLocation}" data-status="${rStatus}" data-date="${dateStr}" ${isChecked} onchange="handlePrintCheckbox(this)">`;
                     let actionBtns=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:250px;"><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openViewRecord('${row.UniqueID}')">${t('btn_view')}</button><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="printQR('${rVisitorName}','${rType}','${rLocation}','${row.UniqueID}','${rStatus}','${dateStr}')">${t('btn_print')}</button><button class="btn-primary btn-warning btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;color:#000;" onclick="openAdminGateModal('${row.UniqueID}')">🚪 GATE ACTION</button><button class="btn-primary btn-danger btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="adminRevokePass('${row.UniqueID}')">🚫 REVOKE PASS</button><button class="btn-primary btn-outline btn-sm" style="padding:6px 10px;font-size:10px;width:auto;white-space:nowrap;" onclick="openExtendPass('${row.UniqueID}','${rType}')">${t('btn_extend')}</button></div>`;
@@ -903,7 +916,7 @@ async function loadAdminData(isSilent=false){
         const resMain = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_all' }) });
         if(!resMain.ok) throw new Error("HTTP error");
         
-        const dataMain = await resMain.json();
+        const dataMain = convertDriveUrls(await resMain.json());
         
         if(Array.isArray(dataMain)){ 
             const newMStr = JSON.stringify(dataMain);
@@ -1228,7 +1241,7 @@ async function onScanSuccess(decodedText){
 
     try{
         const res=await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'get_single', id: decodedText }) });
-        if(res.ok) { let resData = await res.json(); if(resData && !resData.error) data = resData; }
+        if(res.ok) { let resData = await res.json(); if(resData && !resData.error) data = convertDriveUrls(resData); }
     } catch(err) {}
 
     if(!data && Array.isArray(globalAdminData)){ let cachedMatch = globalAdminData.find(x => String(x.UniqueID).toUpperCase() === String(decodedText).toUpperCase()); if(cachedMatch) data = cachedMatch; }
@@ -1498,5 +1511,4 @@ async function submitAddMorePeople() {
     finally { btn.innerText = "SUBMIT & SEND FOR APPROVAL"; btn.disabled = false; }
 }
 </script>
-</body>
-</html>
+</body></html>
