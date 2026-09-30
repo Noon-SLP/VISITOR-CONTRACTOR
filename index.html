@@ -467,27 +467,17 @@
     </div>
   </div>
   <script>
-    async function adminApproveLeadDeviceAdd(passId,button){if(!confirm('Approve the lead additional device?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'approve_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');await refreshMemberView(passId,'device-add');showActionToast('Done — device request approved.');}catch(error){alert('Lead device approval failed: '+error.message);if(button)button.disabled=false;}}
-    async function adminRejectLeadDeviceAdd(passId,button){if(!confirm('Reject the lead additional device request?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'reject_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');await refreshMemberView(passId,'device-add');showActionToast('Done — device request rejected.');}catch(error){alert('Lead device rejection failed: '+error.message);if(button)button.disabled=false;}}
-  const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxINw_mj3132rcSP8RwNDusXvB3vdSr8P2KY_FCGqEN6f7nXTItc3CLJZsw9DYxInX1qg/exec';
+    async function adminApproveLeadDeviceAdd(passId,button){if(!confirm('Approve the lead additional device?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'approve_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');await refreshMemberView(passId,'device-add');}catch(error){alert('Lead device approval failed: '+error.message);if(button)button.disabled=false;}}
+    async function adminRejectLeadDeviceAdd(passId,button){if(!confirm('Reject the lead additional device request?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'reject_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');await refreshMemberView(passId,'device-add');}catch(error){alert('Lead device rejection failed: '+error.message);if(button)button.disabled=false;}}
+  const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxyQ4kGKgsNS076UvKCk0ezCVSzp2DlqYobiprd8Qrvt5oJBWrVlszD7-jm2mOYtsTUvg/exec';
   function freshScriptUrl(){return SCRIPT_URL+'?cacheBust='+Date.now()+'-'+Math.random().toString(36).slice(2);}
-  (function enableLowEndMotionMode(){
-    var cores=navigator.hardwareConcurrency||0;
-    var memory=navigator.deviceMemory||0;
-    if((cores>0&&cores<=4)||(memory>0&&memory<=4)){
-      document.documentElement.classList.add('low-motion');
-      var style=document.createElement('style');
-      style.textContent='html.low-motion *,html.low-motion *::before,html.low-motion *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}';
-      document.head.appendChild(style);
-    }
-  })();
   function appsScriptAction(params){
     return appsScriptJsonp(params).then(function(result){
       if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The server did not confirm the action.');
       return result;
     });
   }
-  function appsScriptJsonp(params,signal,timeoutMs){
+  function appsScriptJsonp(params,signal){
     return new Promise(function(resolve,reject){
       var callback='noonApiCallback_'+Date.now()+'_'+Math.random().toString(36).slice(2);
       var query=Object.keys(params).map(function(key){
@@ -497,7 +487,7 @@
       if(query.length>1800)return reject(new Error('This request is too large for the cross-origin API. Please retry with fewer items.'));
       var script=document.createElement('script');
       var settled=false;
-      var timeout=setTimeout(function(){finish(new Error('The Apps Script API did not respond within '+Math.round((timeoutMs||60000)/1000)+' seconds. Check the connection and try again.'));},timeoutMs||60000);
+      var timeout=setTimeout(function(){finish(new Error('The Apps Script API did not respond after 60 seconds. Check the connection and try again.'));},60000);
       function finish(error,result){
         if(settled)return;
         settled=true;
@@ -838,22 +828,6 @@
     if(txt)txt.textContent=message||'PLEASE WAIT...';
     if(w)w.style.display='flex';
   }
-  let actionToastTimer=null;
-  function showActionToast(message){
-    let toast=document.getElementById('action-complete-toast');
-    if(!toast){
-      toast=document.createElement('div');
-      toast.id='action-complete-toast';
-      toast.setAttribute('role','status');
-      toast.setAttribute('aria-live','polite');
-      toast.style.cssText='position:fixed;top:16px;right:16px;z-index:10000001;max-width:min(420px,calc(100vw - 32px));padding:14px 18px;border:1px solid var(--success);border-radius:8px;background:var(--card-bg);color:var(--text-main);box-shadow:0 8px 24px rgba(0,0,0,.45);font-weight:700;font-size:14px;';
-      document.body.appendChild(toast);
-    }
-    toast.textContent=message;
-    toast.style.display='block';
-    if(actionToastTimer)clearTimeout(actionToastTimer);
-    actionToastTimer=setTimeout(function(){toast.style.display='none';},5000);
-  }
   let pleaseWaitLocked=false;
   let pleaseWaitRequestCount=0;
   function hidePleaseWait(){if(pleaseWaitLocked||pleaseWaitRequestCount>0)return;const w=document.getElementById('please-wait-overlay');if(w)w.style.display='none';}
@@ -1120,7 +1094,7 @@
   });
 
   function saveSession(){try{localStorage.setItem(SESSION_KEY,JSON.stringify({user:currentUser,time:Date.now()}));}catch(e){}}
-  function startAutoRefresh(r){if(autoRefreshTimer)clearInterval(autoRefreshTimer);autoRefreshTimer=setInterval(function(){if(document.hidden)return;if(r==='ops')loadMyPasses(false,true);else if(r==='admin')loadAdminData(true);},r==='admin'?45000:30000);}
+  function startAutoRefresh(r){if(autoRefreshTimer)clearInterval(autoRefreshTimer);autoRefreshTimer=setInterval(function(){if(r==='ops')loadMyPasses(false,true);else if(r==='admin')loadAdminData(true);},r==='admin'?8000:15000);}
   function toggleFullScreen(){const d=document,de=d.documentElement;const req=de.requestFullscreen||de.mozRequestFullScreen||de.webkitRequestFullScreen||de.msRequestFullscreen;const exit=d.exitFullscreen||d.mozCancelFullScreen||d.webkitExitFullscreen||d.msExitFullscreen;try{if(!d.fullscreenElement&&!d.mozFullScreenElement&&!d.webkitFullscreenElement&&!d.msFullscreenElement){if(req)Promise.resolve(req.call(de)).catch(function(e){console.warn('Fullscreen request failed:',e);});else alert("Fullscreen not supported");}else if(exit)Promise.resolve(exit.call(d)).catch(function(e){console.warn('Exiting fullscreen failed:',e);});}catch(e){console.warn('Fullscreen operation failed:',e);alert("Fullscreen is unavailable in this browser.");}}
   function toggleSidebar(){const sb=document.getElementById('sidebar');if(sb)sb.classList.toggle('minimized');document.body.classList.toggle('sidebar-minimized');}
   function logout(){
@@ -2041,69 +2015,53 @@
     button.textContent='SUBMITTING...';
     beginPleaseWait('SUBMITTING DEVICE REQUEST...');
     var pleaseWaitEnded=false;
-    var progressTimer=null;
     try{
       var imageData=await getBase64(file);
       var requestId='device-request-'+Date.now()+'-'+Math.random().toString(36).slice(2);
       var payload={action:context.isLead?'request_lead_device_add':'request_member_device_add',id:context.passId,memberIqama:context.memberIqama,deviceType:type,deviceId:deviceId,devicePhotoBase64:imageData,requestId:requestId};
-      var deadline=Date.now()+60000,operationResult=null,pollDelay=1500,postError=null;
-      var postWaitTimer=null;
-      progressTimer=setTimeout(function(){showPleaseWait('STILL SAVING — WAITING FOR SERVER CONFIRMATION...');},12000);
-      await Promise.race([
-        nativeFetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors',cache:'no-store'}).catch(function(error){postError=error;}),
-        new Promise(function(resolve){postWaitTimer=setTimeout(resolve,15000);})
-      ]);
-      if(postWaitTimer)clearTimeout(postWaitTimer);
+      await nativeFetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors',cache:'no-store'});
+      var deadline=Date.now()+60000,operationResult=null,pollDelay=500;
       while(Date.now()<deadline){
-        try{
-          operationResult=await appsScriptJsonp({action:'get_operation_result',requestId:requestId},null,5000);
-          if(operationResult)break;
-        }catch(pollError){
-          if(Date.now()+pollDelay>=deadline)throw pollError;
-        }
+        operationResult=await appsScriptJsonp({action:'get_operation_result',requestId:requestId});
+        if(operationResult)break;
         await new Promise(function(resolve){setTimeout(resolve,pollDelay);});
-        pollDelay=Math.min(pollDelay+500,4000);
+        pollDelay=Math.min(pollDelay*2,3000);
       }
       if(!operationResult){
-        throw new Error(postError&&postError.message
-          ? 'The server did not confirm the request. '+postError.message
-          : 'The server did not confirm the request within 60 seconds. Refresh the pass before trying again.');
+        throw new Error('The request was sent, but the server did not confirm it. Refresh the pass before trying again.');
       }
       if(operationResult.status!=='success')throw new Error(operationResult.message||'The server could not save the device request.');
       closeExistingDeviceRequest();
       localStorage.removeItem('cached_passes_'+currentUser.email);
       endPleaseWait();pleaseWaitEnded=true;
       await refreshMemberView(context.passId);
-      showActionToast('Done — device request submitted for Admin approval.');
+      alert('Device request submitted. The pass is now pending Admin approval.');
     }catch(error){
       alert('Device request failed: '+(error&&error.message?error.message:'Unknown error'));
     }finally{
-      if(progressTimer)clearTimeout(progressTimer);
       if(!pleaseWaitEnded)endPleaseWait();
       if(button){button.disabled=false;button.textContent='SUBMIT DEVICE REQUEST';}
     }
   }
-  async function adminApproveMemberDeviceAdd(passId,memberIqama,memberIndex,button){
+  async function adminApproveMemberDeviceAdd(passId,memberIqama,button){
     if(!confirm('Approve this additional device?'))return;
     if(button)button.disabled=true;
     try{
-      await appsScriptAction({action:memberIqama==='__LEAD__'?'approve_lead_device_add':'approve_member_device_add',id:passId,memberIqama:memberIqama,memberIndex:memberIndex});
+      await appsScriptAction({action:memberIqama==='__LEAD__'?'approve_lead_device_add':'approve_member_device_add',id:passId,memberIqama:memberIqama});
       localStorage.removeItem('cached_admin_data');
       await refreshMemberView(passId,'device-add');
-      showActionToast('Done — device request approved.');
     }catch(error){
       alert('Device approval failed: '+error.message);
       if(button)button.disabled=false;
     }
   }
-  async function adminRejectMemberDeviceAdd(passId,memberIqama,memberIndex,button){
+  async function adminRejectMemberDeviceAdd(passId,memberIqama,button){
     if(!confirm('Reject this additional device request?'))return;
     if(button)button.disabled=true;
     try{
-      await appsScriptAction({action:memberIqama==='__LEAD__'?'reject_lead_device_add':'reject_member_device_add',id:passId,memberIqama:memberIqama,memberIndex:memberIndex});
+      await appsScriptAction({action:memberIqama==='__LEAD__'?'reject_lead_device_add':'reject_member_device_add',id:passId,memberIqama:memberIqama});
       localStorage.removeItem('cached_admin_data');
       await refreshMemberView(passId,'device-add');
-      showActionToast('Done — device request rejected.');
     }catch(error){
       alert('Device rejection failed: '+error.message);
       if(button)button.disabled=false;
@@ -2224,7 +2182,7 @@
           let imgsHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;min-width:170px;max-width:100%;">'+(m.iqama?'<img src="'+m.iqama+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Iqama Photo" alt="Iqama Photo">':'')+(m.selfie?'<img src="'+m.selfie+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Selfie Photo" alt="Selfie Photo">':'')+m.devicePhotos.map(function(photo){return '<img src="'+photo+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Device Photo" alt="Device Photo">';}).join('')+'</div>';
           let removeReqHtml='',removeBtnHtml='',revokeDevHtml='',cancelReqHtml='',newMemberActionsHtml='';
           if(currentUser&&currentUser.role==='admin'){
-            if(m.isDeviceAddReq){newMemberActionsHtml='<button onclick="adminApproveMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', '+m.originalIndex+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">APPROVE DEVICE</button><button onclick="adminRejectMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', '+m.originalIndex+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';}
+            if(m.isDeviceAddReq){newMemberActionsHtml='<button onclick="adminApproveMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">APPROVE DEVICE</button><button onclick="adminRejectMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';}
             else if(m.isNew){newMemberActionsHtml='<button onclick="adminApproveTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">ACCEPT</button><button onclick="adminRejectTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';removeBtnHtml='';}
             else if(!m.isLead){removeBtnHtml='<button onclick="adminRemoveTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REMOVE</button>';}
             if(m.isRemoveRequested){
@@ -3112,3 +3070,4 @@
   })();
   </script>
   </body></html>
+  
