@@ -2022,8 +2022,12 @@
       await nativeFetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors',cache:'no-store'});
       var deadline=Date.now()+60000,operationResult=null,pollDelay=500;
       while(Date.now()<deadline){
-        operationResult=await appsScriptJsonp({action:'get_operation_result',requestId:requestId});
-        if(operationResult)break;
+        try{
+          operationResult=await appsScriptJsonp({action:'get_operation_result',requestId:requestId});
+          if(operationResult)break;
+        }catch(pollError){
+          if(Date.now()+pollDelay>=deadline)throw pollError;
+        }
         await new Promise(function(resolve){setTimeout(resolve,pollDelay);});
         pollDelay=Math.min(pollDelay*2,3000);
       }
@@ -3070,3 +3074,4 @@
   })();
   </script>
   </body></html>
+  
