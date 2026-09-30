@@ -2047,11 +2047,11 @@
       if(button){button.disabled=false;button.textContent='SUBMIT DEVICE REQUEST';}
     }
   }
-  async function adminApproveMemberDeviceAdd(passId,memberIqama,button){
+  async function adminApproveMemberDeviceAdd(passId,memberIqama,memberIndex,button){
     if(!confirm('Approve this additional device?'))return;
     if(button)button.disabled=true;
     try{
-      await appsScriptAction({action:memberIqama==='__LEAD__'?'approve_lead_device_add':'approve_member_device_add',id:passId,memberIqama:memberIqama});
+      await appsScriptAction({action:memberIqama==='__LEAD__'?'approve_lead_device_add':'approve_member_device_add',id:passId,memberIqama:memberIqama,memberIndex:memberIndex});
       localStorage.removeItem('cached_admin_data');
       await refreshMemberView(passId,'device-add');
     }catch(error){
@@ -2059,11 +2059,11 @@
       if(button)button.disabled=false;
     }
   }
-  async function adminRejectMemberDeviceAdd(passId,memberIqama,button){
+  async function adminRejectMemberDeviceAdd(passId,memberIqama,memberIndex,button){
     if(!confirm('Reject this additional device request?'))return;
     if(button)button.disabled=true;
     try{
-      await appsScriptAction({action:memberIqama==='__LEAD__'?'reject_lead_device_add':'reject_member_device_add',id:passId,memberIqama:memberIqama});
+      await appsScriptAction({action:memberIqama==='__LEAD__'?'reject_lead_device_add':'reject_member_device_add',id:passId,memberIqama:memberIqama,memberIndex:memberIndex});
       localStorage.removeItem('cached_admin_data');
       await refreshMemberView(passId,'device-add');
     }catch(error){
@@ -2186,7 +2186,7 @@
           let imgsHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;min-width:170px;max-width:100%;">'+(m.iqama?'<img src="'+m.iqama+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Iqama Photo" alt="Iqama Photo">':'')+(m.selfie?'<img src="'+m.selfie+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Selfie Photo" alt="Selfie Photo">':'')+m.devicePhotos.map(function(photo){return '<img src="'+photo+'" style="'+thumbStyle+'" onclick="openFullscreenImage(this.src)" title="Device Photo" alt="Device Photo">';}).join('')+'</div>';
           let removeReqHtml='',removeBtnHtml='',revokeDevHtml='',cancelReqHtml='',newMemberActionsHtml='';
           if(currentUser&&currentUser.role==='admin'){
-            if(m.isDeviceAddReq){newMemberActionsHtml='<button onclick="adminApproveMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">APPROVE DEVICE</button><button onclick="adminRejectMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';}
+            if(m.isDeviceAddReq){newMemberActionsHtml='<button onclick="adminApproveMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', '+m.originalIndex+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">APPROVE DEVICE</button><button onclick="adminRejectMemberDeviceAdd(\''+r.UniqueID+'\', '+(m.isLead?'\'__LEAD__\'':memberIqamaArg)+', '+m.originalIndex+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';}
             else if(m.isNew){newMemberActionsHtml='<button onclick="adminApproveTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--success);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">ACCEPT</button><button onclick="adminRejectTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REJECT</button>';removeBtnHtml='';}
             else if(!m.isLead){removeBtnHtml='<button onclick="adminRemoveTeamMember(\''+r.UniqueID+'\', '+m.originalIndex+', '+memberIqamaArg+', this)" style="background:var(--danger);border:none;color:white;padding:6px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;margin-left:5px;">REMOVE</button>';}
             if(m.isRemoveRequested){
