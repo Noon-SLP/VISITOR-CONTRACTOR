@@ -472,9 +472,59 @@
   const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxINw_mj3132rcSP8RwNDusXvB3vdSr8P2KY_FCGqEN6f7nXTItc3CLJZsw9DYxInX1qg/exec';
   function freshScriptUrl(){return SCRIPT_URL+'?cacheBust='+Date.now()+'-'+Math.random().toString(36).slice(2);}
   function appsScriptAction(params){
-    return appsScriptJsonp(params).then(function(result){
+    return appsScriptFetch(params).then(function(result){
       if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The server did not confirm the action.');
       return result;
+    }, function(fetchError){
+      return appsScriptJsonp(params).then(function(result){
+        if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The server did not confirm the action.');
+        return result;
+      }).catch(function(jsonpError){
+        if(fetchError && fetchError.message) return Promise.reject(fetchError);
+        return Promise.reject(jsonpError);
+      });
+    });
+  }
+  function appsScriptFetch(params){
+    return new Promise(function(resolve,reject){
+      var payload=params||{};
+      var hasLargePayload=false;
+      Object.keys(payload).forEach(function(key){
+        var value=payload[key];
+        if(typeof value==='string' && value.length > 200000){hasLargePayload=true;}
+      });
+      if(hasLargePayload){
+        var body=JSON.stringify(payload);
+        fetch(freshScriptUrl(),{
+          method:'POST',
+          headers:{'Content-Type':'application/json;charset=utf-8'},
+          body:body,
+          mode:'cors',
+          cache:'no-store'
+        }).then(function(response){
+          if(!response.ok){throw new Error('The Apps Script API request failed with HTTP '+response.status+'.');}
+          return response.text();
+        }).then(function(text){
+          if(!text||text.trim()==='')return resolve({status:'success'});
+          try{return resolve(JSON.parse(text));}
+          catch(err){throw new Error('The Apps Script API returned an invalid JSON response.');}
+        }).catch(reject);
+        return;
+      }
+      fetch(freshScriptUrl(),{
+        method:'POST',
+        headers:{'Content-Type':'application/json;charset=utf-8'},
+        body:JSON.stringify(payload),
+        mode:'cors',
+        cache:'no-store'
+      }).then(function(response){
+        if(!response.ok){throw new Error('The Apps Script API request failed with HTTP '+response.status+'.');}
+        return response.text();
+      }).then(function(text){
+        if(!text||text.trim()==='')return resolve({status:'success'});
+        try{return resolve(JSON.parse(text));}
+        catch(err){throw new Error('The Apps Script API returned an invalid JSON response.');}
+      }).catch(reject);
     });
   }
   function appsScriptJsonp(params,signal){
@@ -3074,4 +3124,3 @@
   })();
   </script>
   </body></html>
-  
