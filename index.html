@@ -906,6 +906,8 @@
   let guardPassCache=new Map();
   let guardCacheLoaded=false;
   let guardCacheTimer=null;
+  let guardCacheRefreshController=null;
+  let gateStatusVerificationInProgress=false;
 
   function loadGuardCacheFromStorage(){
     try{
@@ -921,8 +923,11 @@
   }
 
   async function preloadGuardCache(){
+    if(gateStatusVerificationInProgress||guardCacheRefreshController)return;
+    const controller=new AbortController();
+    guardCacheRefreshController=controller;
     try{
-      const res=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_all'}),redirect:'follow',cache:'no-store'});
+      const res=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_all'}),redirect:'follow',cache:'no-store',signal:controller.signal});
       if(!res.ok){console.warn('[Guard Cache] HTTP',res.status);return;}
       const data=convertDriveUrls(await res.json());
       const passes=Array.isArray(data)?data:(data&&data.passes?data.passes:[]);
@@ -933,8 +938,10 @@
       try{localStorage.setItem('cached_guard_passes',JSON.stringify(passes));}catch(e){}
       if(currentUser&&currentUser.role==='guard')updateControlRoomStats();
       console.log('[Guard Cache]',guardPassCache.size,'passes loaded');
-    }catch(e){console.warn('[Guard Cache] preload failed',e);}
+    }catch(e){if(!controller.signal.aborted)console.warn('[Guard Cache] preload failed',e);}
+    finally{if(guardCacheRefreshController===controller)guardCacheRefreshController=null;}
   }
+  function cancelGuardCacheRefresh(){if(guardCacheRefreshController)guardCacheRefreshController.abort();}
   function startGuardCacheRefresh(){
     if(guardCacheTimer)clearInterval(guardCacheTimer);
     guardCacheTimer=setInterval(preloadGuardCache,60000);
@@ -2536,6 +2543,8 @@
 
     let data=null;
     let networkFailed=false;
+    gateStatusVerificationInProgress=true;
+    cancelGuardCacheRefresh();
     try{
       const verifyRequest=cachedData
         ?{action:'get_gate_verification',id:decodedText,passType:cachedData.Type}
@@ -2550,7 +2559,7 @@
       networkFailed=true;
       data=cachedData;
       if(data)console.warn('[Gate scanner] Server lookup failed; using the cached pass record.',err);
-    }
+    }finally{gateStatusVerificationInProgress=false;}
 
     if(networkFailed){
       if(cachedData)renderScannedPass(cachedData,false,true);
@@ -3282,5 +3291,5 @@
     guardLogin.insertBefore(group,guardLogin.querySelector('button'));
   })();
   </script>
-  </body></html>+
+  </body></html>
   
