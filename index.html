@@ -2459,6 +2459,7 @@
     const r=globalAdminData.find(function(x){return String(x.UniqueID)===String(id);})||myPassesData.find(function(x){return String(x.UniqueID)===String(id);})||(guardPassCache&&guardPassCache.get(String(id).toUpperCase()));
     if(!r)return;
     let rType=String(r.Type||'');
+    const validityPeriod=formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate);
     let displayHostName=(r.HostName||'-').split('||PIN:')[0];
     let actualPin=(r.HostName||'').includes('||PIN:')?(r.HostName||'').split('||PIN:')[1]:null;
     let h='<div><strong>'+t('lbl_host_name')+'</strong>'+displayHostName+'</div>';
@@ -2467,7 +2468,7 @@
       let actionBtn=actualPin?'<button onclick="adminResetPin(\''+r.HostEmail+'\')" class="btn-primary btn-danger btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">🔄 RESET</button>':'';
       h+='<div style="margin-bottom:10px;"><strong>ACCOUNT PIN</strong><div style="display:flex; gap:10px; align-items:center; margin-top:5px;"><span id="admin-view-pin" style="color:'+(actualPin?'var(--danger)':'var(--text-muted)')+'; font-weight:bold; font-size:16px; letter-spacing: 2px; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:4px;">****</span><button onclick="document.getElementById(\'admin-view-pin\').innerText=\''+pinDisplay+'\'; this.style.display=\'none\';" class="btn-primary btn-outline btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">👁️ SHOW</button>'+actionBtn+'</div></div>';
     }
-    h+='<div><strong>'+t('lbl_host_email')+'</strong>'+(r.HostEmail||'-')+'</div><div><strong>'+t('visitor_name')+'</strong>'+(r.VisitorName||'-')+'</div><div><strong>'+t('type_header')+'</strong>'+(t(rType.toLowerCase())||'-')+'</div><div><strong>'+t('location_label')+'</strong>'+(r.Location||'-')+'</div><div><strong>'+t('lbl_validity')+'</strong>'+(rType==='Visitor'?formatToDDMMYYYY(r.StartDate):formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate))+'</div><div><strong>'+t('slp_ticket')+'</strong>'+(r.SlpTicketNo||'-')+'</div><div><strong>'+t('contact_no')+'</strong>'+(r.ContactNo||'-')+'</div><div><strong>IMEI NUMBER</strong>'+(r.ImeiNumber||'-')+'</div>';
+    h+='<div><strong>'+t('lbl_host_email')+'</strong>'+(r.HostEmail||'-')+'</div><div><strong>'+t('visitor_name')+'</strong>'+(r.VisitorName||'-')+'</div><div><strong>'+t('type_header')+'</strong>'+(t(rType.toLowerCase())||'-')+'</div><div><strong>'+t('location_label')+'</strong>'+(r.Location||'-')+'</div><div><strong>'+t('lbl_validity')+'</strong>'+validityPeriod+'</div><div><strong>'+t('slp_ticket')+'</strong>'+(r.SlpTicketNo||'-')+'</div><div><strong>'+t('contact_no')+'</strong>'+(r.ContactNo||'-')+'</div><div><strong>IMEI NUMBER</strong>'+(r.ImeiNumber||'-')+'</div>';
     if(rType==='Visitor')h+='<div><strong>'+t('invited_by')+'</strong>'+(r.InvitedBy||'-')+'</div>';
     else h+='<div><strong>'+t('project_name')+'</strong>'+(r.ProjectName||'-')+'</div><div><strong>'+t('company_name')+'</strong>'+(r.CompanyName||'-')+'</div><div><strong>'+t('project_manager')+'</strong>'+(r.ProjectManager||'-')+'</div><div><strong>'+t('fm_poc')+'</strong>'+(r.FmPoc||'-')+'</div>';
     let fmpocStr=String(r.FmPoc||'');
