@@ -562,7 +562,7 @@
     position:relative!important;
     z-index:auto!important;
     width:min(1320px,100%)!important;
-    grid-template-columns:minmax(0,1fr) minmax(340px,420px)!important;
+    grid-template-columns:minmax(0,1fr) minmax(360px,460px)!important;
     align-items:center!important;
     justify-items:stretch;
     gap:clamp(64px,10vw,160px)!important;
@@ -579,6 +579,7 @@
     align-self:center;
     justify-self:center;
     width:100%;
+    max-width:460px!important;
     margin:0!important;
   }
   #main-content::before,html.low-performance #main-content::before{
@@ -696,14 +697,62 @@
     async function adminRejectLeadDeviceAdd(passId,button){if(!confirm('Reject the lead additional device request?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'reject_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');refreshMemberView(passId,'device-add');}catch(error){alert('Lead device rejection failed: '+error.message);if(button)button.disabled=false;}}
   const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxyQ4kGKgsNS076UvKCk0ezCVSzp2DlqYobiprd8Qrvt5oJBWrVlszD7-jm2mOYtsTUvg/exec';
   function freshScriptUrl(){return SCRIPT_URL+'?cacheBust='+Date.now()+'-'+Math.random().toString(36).slice(2);}
-  function appsScriptAction(params){
-    return appsScriptJsonp(params).then(function(result){
+  function showRequestEmailFailure(result){
+    if(result&&result.notificationSent===true)return;
+    if(result&&result.notificationSent===false){
+      alert('Your request was saved, but the notification email could not be sent: '+String(result.notificationError||'No error details were returned.')+'\n\nPlease ask an administrator to authorize MailApp in Apps Script and deploy the latest backend version.');
+      return;
+    }
+  }
+  function notifyRequestAsync(action,params){
+    var requestActions=['create','add_team_members','request_lead_device_add','request_member_device_add','request_revoke_device','request_lead_revoke_device','request_remove_member','request_lead_remove_member'];
+    if(requestActions.indexOf(action)===-1)return;
+    var notificationParams={
+      action:'send_request_notification',
+      requestAction:action,
+      id:params.id||params.UniqueID,
+      requestId:params.requestId||(action==='create'?(params.UniqueID||''):'')
+    };
+    ['type','hostEmail','location','visitorName','imeiNumber','memberIqama','deviceType','deviceId'].forEach(function(key){
+      if(params[key]!==undefined)notificationParams[key]=params[key];
+    });
+    if(params.team){
+      try{
+        var members=typeof params.team==='string'?JSON.parse(params.team):params.team;
+        notificationParams.team=JSON.stringify((Array.isArray(members)?members:[]).map(function(member){
+          return {name:member&&member.name||'',iqamaText:member&&member.iqamaText||''};
+        }));
+      }catch(error){
+        console.error('[Request email] Unable to prepare member details for notification.',error);
+      }
+    }
+    appsScriptJsonp(notificationParams,null,60000).then(function(result){
+      if(!result||result.status!=='success'){
+        throw new Error(result&&result.message?result.message:'The notification request was not accepted.');
+      }
+      showRequestEmailFailure(result);
+    }).catch(function(error){
+      console.error('[Request email] Notification delivery failed after the request was saved.',error);
+      alert('Your request was saved, but the notification email could not be confirmed: '+(error&&error.message?error.message:'Unknown error'));
+    });
+  }
+  function appsScriptAction(params,timeoutMs){
+    return appsScriptJsonp(params,null,timeoutMs).then(function(result){
       if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The server did not confirm the action.');
+      notifyRequestAsync(params.action,params);
       return result;
     });
   }
   function appsScriptJsonp(params,signal,timeoutMs){
     return appsScriptJsonpAttempt(params,signal,0,timeoutMs);
+  }
+  function appsScriptReadOnly(params,timeoutMs){
+    return appsScriptJsonp(params,null,timeoutMs).catch(function(error){
+      if(!error||!/^The Apps Script API did not respond after /.test(error.message||''))throw error;
+      console.warn('[Apps Script] Read-only request timed out; retrying once.',error);
+      return new Promise(function(resolve){setTimeout(resolve,400);})
+        .then(function(){return appsScriptJsonp(params,null,timeoutMs);});
+    });
   }
   function appsScriptJsonpAttempt(params,signal,attempt,timeoutMs){
     return new Promise(function(resolve,reject){
@@ -715,7 +764,8 @@
       if(query.length>1800)return reject(new Error('This request is too large for the cross-origin API. Please retry with fewer items.'));
       var script=document.createElement('script');
       var settled=false;
-      var requestTimeout=Number(timeoutMs)||60000;
+      var notificationActions=['create','add_team_members','request_lead_device_add','request_member_device_add','request_revoke_device','request_lead_revoke_device','request_remove_member','request_lead_remove_member'];
+      var requestTimeout=Number(timeoutMs)||(notificationActions.indexOf(params.action)!==-1?60000:15000);
       var timeout=setTimeout(function(){finish(new Error('The Apps Script API did not respond after '+Math.round(requestTimeout/1000)+' seconds. Check the connection and try again.'));},requestTimeout);
       function finish(error,result){
         if(settled)return;
@@ -724,7 +774,7 @@
         script.remove();
         if(error){
           window[callback]=function(){};
-          setTimeout(function(){delete window[callback];},60000);
+          setTimeout(function(){delete window[callback];},300000);
         }else delete window[callback];
         if(signal)signal.removeEventListener('abort',onAbort);
         if(error)reject(error);else resolve(result);
@@ -1149,7 +1199,8 @@
       return Array.isArray(a)&&a.length>0;
     }catch(e){return false;}
   }
-  function getPinUnlockKey(email){return 'pin_unlock_until_'+String(email||'').toLowerCase().trim();}
+  function normalizeEmailKey(email){return String(email||'').toLowerCase().trim();}
+  function getPinUnlockKey(email){return 'pin_unlock_until_'+normalizeEmailKey(email);}
   function clearPinUnlock(email){
     const key=getPinUnlockKey(email);
     localStorage.removeItem(key);
@@ -1165,7 +1216,7 @@
     return false;
   }
   function clearStoredPin(email){
-    const key=String(email||'').toLowerCase().trim();
+    const key=normalizeEmailKey(email);
     localStorage.removeItem('user_pin_'+key);
     sessionStorage.removeItem('user_pin_'+key);
     clearPinUnlock(key);
@@ -1175,6 +1226,24 @@
     localStorage.setItem(key,until);
     sessionStorage.setItem(key,until);
   }
+  function storeCurrentUserPin(email,pin){
+    const normalized=normalizeEmailKey(email),value=String(pin||'').trim();
+    if(!normalized||!/\d{4}/.test(value))return false;
+    localStorage.setItem('user_pin_'+normalized,value);
+    sessionStorage.setItem('user_pin_'+normalized,value);
+    return true;
+  }
+  function sanitizeCachedPassPins(passes){
+    if(!Array.isArray(passes))return passes;
+    passes.forEach(function(pass){
+      if(!pass||typeof pass.HostName!=='string')return;
+      const legacy=pass.HostName.match(/^(.*?)\|\|PIN:\d{4}$/);
+      if(!legacy)return;
+      pass.HostName=legacy[1];
+      pass.HasAccountPIN=true;
+    });
+    return passes;
+  }
 
   async function confirmPinCreate(){
     let p=document.getElementById('new-pin-input').value.trim();
@@ -1182,38 +1251,48 @@
     userSecurityPin=p;
     let e=currentUser.email;
     if(currentUser.role==='admin'){const ei=document.getElementById('req-admin-email');if(ei&&ei.value)e=ei.value.toLowerCase().trim();}
-    localStorage.setItem('user_pin_'+e,p);
-    rememberPinUnlock(e);
+    const normalizedEmail=normalizeEmailKey(e);
+    storeCurrentUserPin(normalizedEmail,p);
+    rememberPinUnlock(normalizedEmail);
     document.getElementById('pin-create-modal').classList.add('hidden');
     if(pinCreateMode==='reset'){
-      try{await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_pin',email:e,pin:p}),mode:'no-cors'});}catch(er){}
+      try{await appsScriptAction({action:'update_pin',email:normalizedEmail,pin:p});}catch(er){clearPinUnlock(normalizedEmail);clearStoredPin(normalizedEmail);alert('PIN could not be saved: '+(er&&er.message?er.message:'Please try again.'));document.getElementById('pin-create-modal').classList.remove('hidden');return;}
       let data=lockedPassesData;
-      try{const c=localStorage.getItem('cached_passes_'+e);if(c){const a=JSON.parse(c);if(Array.isArray(a))data=a;}}catch(err){}
+      try{const c=localStorage.getItem('cached_passes_'+normalizedEmail);if(c){const a=JSON.parse(c);if(Array.isArray(a))data=a;}}catch(err){}
       renderMyPasses(Array.isArray(data)?data:[]);
       setTimeout(function(){loadMyPasses(true,true);},1000);
     }else{submitRequest();}
   }
   function closePinCreate(){document.getElementById('pin-create-modal').classList.add('hidden');}
-  function confirmPinVerify(){
+  async function confirmPinVerify(){
     let p=document.getElementById('verify-pin-input').value.trim();
     let e=currentUser.email;
     if(currentUser.role==='admin'){const ei=document.getElementById('req-admin-email');if(ei&&ei.value)e=ei.value.toLowerCase().trim();}
-    let bp=null;
-    if(Array.isArray(lockedPassesData)){for(let i=lockedPassesData.length-1;i>=0;i--){if(lockedPassesData[i].HostName&&lockedPassesData[i].HostName.includes('||PIN:')){bp=lockedPassesData[i].HostName.split('||PIN:')[1];break;}}}
-    const cachedPin=localStorage.getItem('user_pin_'+e);
-    if(p===bp||(cachedPin&&p===cachedPin)){
-      userSecurityPin=p;localStorage.setItem('user_pin_'+e,p);rememberPinUnlock(e);
-      document.getElementById('pin-verify-modal').classList.add('hidden');
-      let data=lockedPassesData;
-      try{const c=localStorage.getItem('cached_passes_'+e);if(c){const a=JSON.parse(c);if(Array.isArray(a))data=a;}}catch(err){}
-      renderMyPasses(Array.isArray(data)?data:[]);
-    }else{
-      document.getElementById('pin-error-msg').classList.remove('hidden');
+    const normalizedEmail=normalizeEmailKey(e);
+    if(!/^\d{4}$/.test(p)){document.getElementById('pin-error-msg').classList.remove('hidden');return;}
+    const button=document.querySelector('#pin-verify-modal button[onclick="confirmPinVerify()"]');
+    if(button)button.disabled=true;
+    try{
+      const result=await appsScriptReadOnly({action:'verify_account_pin',email:normalizedEmail,pin:p},12000);
+      if(result&&result.configured&&result.valid){
+        userSecurityPin=p;storeCurrentUserPin(normalizedEmail,p);rememberPinUnlock(normalizedEmail);
+        document.getElementById('pin-verify-modal').classList.add('hidden');
+        let data=lockedPassesData;
+        try{const c=localStorage.getItem('cached_passes_'+normalizedEmail);if(c){const a=JSON.parse(c);if(Array.isArray(a))data=a;}}catch(err){}
+        renderMyPasses(Array.isArray(data)?data:[]);
+      }else{
+        document.getElementById('pin-error-msg').classList.remove('hidden');
+      }
+    }catch(error){
+      console.error('[PIN verification] Server verification failed.',error);
+      alert('Could not verify your PIN because the server is unavailable. Please try again.');
+    }finally{
+      if(button)button.disabled=false;
     }
   }
   function closePinVerify(){document.getElementById('pin-verify-modal').classList.add('hidden');const ld=document.getElementById('my-passes-list');if(ld)ld.innerHTML='';}
 
-  function processAndRenderPasses(d,e,s){
+  async function processAndRenderPasses(d,e,s){
     try{
       if(currentUser&&currentUser.role==='admin'){renderMyPasses(d);return;}
       let ha=false;
@@ -1225,28 +1304,30 @@
         let ic=(tn>en)||ss==='Rejected'||ss==='Completed';
         if(!ic)ha=true;
       });}
-      let bp=null;
-      if(Array.isArray(d)){for(let i=d.length-1;i>=0;i--){if(d[i].HostName&&d[i].HostName.includes('||PIN:')){bp=d[i].HostName.split('||PIN:')[1];break;}}}
+      let hasAccountPin=Array.isArray(d)&&d.some(function(pass){return !!pass.HasAccountPIN||!!(pass.HostName&&String(pass.HostName).includes('||PIN:'));});
       let lp=localStorage.getItem('user_pin_'+e);
-      if(!ha&&d.length>0){renderMyPasses(d);return;}
       if(!ha&&d.length===0){renderMyPasses(d);return;}
-      if(!bp&&lp){bp=lp;fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update_pin',email:e,pin:lp}),mode:'no-cors'}).catch(function(er){});}
-      if(bp&&!isPinUnlocked(e)){
+      if(hasAccountPin&&!isPinUnlocked(e)){
         lockedPassesData=d;
         const vm=document.getElementById('pin-verify-modal');
         if(!s&&vm){vm.classList.remove('hidden');document.getElementById('pin-error-msg').classList.add('hidden');document.getElementById('verify-pin-input').value='';}
         const ld=document.getElementById('my-passes-list');if(ld)ld.innerHTML='';
         return;
       }
-      if(!bp&&lp&&Array.isArray(d)&&d.length>0){userSecurityPin=lp;renderMyPasses(d);return;}
-      if(!bp&&!lp&&Array.isArray(d)&&d.length>0){
+      if(!ha){renderMyPasses(d);return;}
+      if(!hasAccountPin&&lp&&Array.isArray(d)&&d.length>0){
+        await appsScriptAction({action:'update_pin',email:e,pin:lp});
+        localStorage.removeItem('user_pin_'+e);sessionStorage.removeItem('user_pin_'+e);
+        userSecurityPin=lp;renderMyPasses(d);return;
+      }
+      if(!hasAccountPin&&!lp&&Array.isArray(d)&&d.length>0){
         lockedPassesData=d;
         const cm=document.getElementById('pin-create-modal');
         if(!s&&cm){pinCreateMode='reset';cm.classList.remove('hidden');document.getElementById('new-pin-input').value='';}
         const ld=document.getElementById('my-passes-list');if(ld)ld.innerHTML='';
         return;
       }
-      userSecurityPin=bp||lp;renderMyPasses(d);
+      userSecurityPin=lp;renderMyPasses(d);
     }finally{
       endPleaseWait();
     }
@@ -1296,8 +1377,8 @@
           const c=localStorage.getItem('cached_admin_data');
           if(c){
             const parsed=JSON.parse(c);
-            if(Array.isArray(parsed)){globalAdminHistory=[];renderAdminData(parsed.slice().reverse());}
-            else if(parsed&&Array.isArray(parsed.passes)){globalAdminHistory=Array.isArray(parsed.history)?parsed.history:[];renderAdminData(parsed.passes.slice().reverse());}
+            if(Array.isArray(parsed)){sanitizeCachedPassPins(parsed);localStorage.setItem('cached_admin_data',JSON.stringify(parsed));globalAdminHistory=[];renderAdminData(parsed.slice().reverse());}
+            else if(parsed&&Array.isArray(parsed.passes)){sanitizeCachedPassPins(parsed.passes);localStorage.setItem('cached_admin_data',JSON.stringify(parsed));globalAdminHistory=Array.isArray(parsed.history)?parsed.history:[];renderAdminData(parsed.passes.slice().reverse());}
           }
         }catch(e){}
 
@@ -1315,13 +1396,13 @@
           switchMainView('ops');
           const hasCache=hasCachedPasses(currentUser.email);
           if(!hasCache)beginPleaseWait('PLEASE WAIT...');
-          try{const c=localStorage.getItem('cached_passes_'+currentUser.email);if(c){const a=JSON.parse(c);if(Array.isArray(a))lockedPassesData=a;}}catch(e){}
+          try{const c=localStorage.getItem('cached_passes_'+currentUser.email);if(c){const a=sanitizeCachedPassPins(JSON.parse(c));if(Array.isArray(a)){lockedPassesData=a;localStorage.setItem('cached_passes_'+currentUser.email,JSON.stringify(a));}}}catch(e){}
 
           let hasPinInCachedPasses=false;
           if(Array.isArray(lockedPassesData)){
             for(let i=0;i<lockedPassesData.length;i++){
               const p=lockedPassesData[i];
-              if(p && p.HostName && String(p.HostName).includes('||PIN:')){hasPinInCachedPasses=true;break;}
+              if(p && (p.HasAccountPIN || (p.HostName && String(p.HostName).includes('||PIN:')))){hasPinInCachedPasses=true;break;}
             }
           }
 
@@ -1511,11 +1592,30 @@
 
   let manualPassSearchSequence=0;
   function findManualPassMatches(passes,query){
+    if(!Array.isArray(passes)||!passes.length)return [];
     return passes.filter(function(pass){
       if(!pass||!pass.UniqueID||String(pass.Status||'')==='Rejected')return false;
-      let fields=String((pass.VisitorName||'')+" "+(pass.UniqueID||'')+" "+(pass.SlpTicketNo||'')+" "+(pass.ContactNo||'')+" "+(pass.HostEmail||'')).toLowerCase();
+      let fields=String((pass.VisitorName||'')+" "+(pass.UniqueID||'')+" "+(pass.SlpTicketNo||'')+" "+(pass.ContactNo||'')+" "+(pass.HostEmail||'')+" "+(pass.HostName||'')).toLowerCase();
       return fields.indexOf(query)!==-1;
     }).slice(0,5);
+  }
+  function getManualSearchPool(){
+    let pool=[];
+    try{
+      if(guardPassCache&&guardPassCache.size){pool=pool.concat(Array.from(guardPassCache.values()));}
+    }catch(e){}
+    try{
+      const cachedGuard=localStorage.getItem('cached_guard_passes');
+      if(cachedGuard){const parsed=JSON.parse(cachedGuard);if(Array.isArray(parsed))pool=pool.concat(parsed);}
+    }catch(e){}
+    try{
+      const cachedAdmin=localStorage.getItem('cached_admin_data');
+      if(cachedAdmin){const parsed=JSON.parse(cachedAdmin);const list=Array.isArray(parsed)?parsed:Array.isArray(parsed&&parsed.passes)?parsed.passes:[];if(Array.isArray(list))pool=pool.concat(list);}
+    }catch(e){}
+    return pool.filter(function(item,idx,array){
+      if(!item||!item.UniqueID)return false;
+      return array.findIndex(function(candidate){return candidate&&candidate.UniqueID===item.UniqueID;})===idx;
+    });
   }
   async function performManualSearch(){
     let q=document.getElementById('guard-search-input').value.toLowerCase().trim();
@@ -1524,22 +1624,19 @@
     if(!q){rd.innerHTML='';return;}
     rd.innerHTML='<p style="color:var(--text-muted); font-size:12px;">Searching...</p>';
     try{
-      let d=Array.from(guardPassCache.values());
+      let d=getManualSearchPool();
       let ms=findManualPassMatches(d,q);
+      if(searchSequence!==manualPassSearchSequence)return;
       if(ms.length===0){
-        const res=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_all'}),redirect:'follow',cache:'no-store'});
-        if(!res.ok)throw new Error('Pass search failed (HTTP '+res.status+').');
-        const raw=convertDriveUrls(await res.json());
-        const arr=Array.isArray(raw)?raw:(raw&&Array.isArray(raw.passes)?raw.passes:null);
-        if(!arr)throw new Error('The server returned an invalid pass-search response.');
-        if(searchSequence!==manualPassSearchSequence)return;
-        guardPassCache.clear();
-        arr.forEach(function(pass){if(pass&&pass.UniqueID)guardPassCache.set(String(pass.UniqueID).toUpperCase(),pass);});
-        guardCacheLoaded=true;
-        try{localStorage.setItem('cached_guard_passes',JSON.stringify(arr));}catch(storageError){console.warn('[Manual pass search] Could not save refreshed pass cache.',storageError);}
-        if(currentUser&&currentUser.role==='guard')updateControlRoomStats();
-        d=arr;
-        ms=findManualPassMatches(d,q);
+        try{
+          const arr=await appsScriptReadOnly({action:'search_passes',query:q},30000);
+          if(Array.isArray(arr)){
+            d=arr;
+            ms=findManualPassMatches(d,q);
+          }
+        }catch(error){
+          console.warn('[Manual search] Apps Script search timed out; falling back to cached guard data only.', error);
+        }
       }
       if(searchSequence!==manualPassSearchSequence)return;
       if(ms.length===0){rd.innerHTML='<p style="color:var(--danger); font-size:12px;">No passes found.</p>';return;}
@@ -1604,11 +1701,12 @@
     let existingPasses=[];
     try{existingPasses=JSON.parse(localStorage.getItem(cachedKey))||[];}catch(e){}
     let localPin=localStorage.getItem('user_pin_'+hMail);
+    let accountPin='';
     if(currentUser&&currentUser.role==='admin'){
-      if(userSecurityPin||localPin){hName=hName+"||PIN:"+(userSecurityPin||localPin);}
+      accountPin=userSecurityPin||localPin||'';
     }else{
       if(!localPin&&!userSecurityPin){pinCreateMode='submit';document.getElementById('pin-create-modal').classList.remove('hidden');return;}
-      let activePin=userSecurityPin||localPin;hName=hName+"||PIN:"+activePin;
+      accountPin=userSecurityPin||localPin;
     }
     const tempId='NOON-'+Math.floor(100000+Math.random()*900000);
     let tempPass={UniqueID:tempId,VisitorName:vName,Type:type,Location:document.getElementById('req-location').value,StartDate:startDateVal,EndDate:endDateVal,Status:'Pending',HostEmail:hMail};
@@ -1621,13 +1719,14 @@
     document.getElementById('req-lead-device-type').value="None";toggleLeadDeviceInput();
     clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('vehicle');
     teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
-    const payload={action:'create',UniqueID:tempId,hostName:hName,hostEmail:hMail,visitorName:vName,type:type,location:document.getElementById('req-location').value,startDate:startDateVal,endDate:endDateVal,iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,slpTicketNo:type==='Visitor'?document.getElementById('req-vis-slp').value:document.getElementById('req-con-slp').value,contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''};
+    const payload={action:'create',UniqueID:tempId,requestId:tempId,hostName:hName,hostEmail:hMail,accountPin:accountPin,visitorName:vName,type:type,location:document.getElementById('req-location').value,startDate:startDateVal,endDate:endDateVal,iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,slpTicketNo:type==='Visitor'?document.getElementById('req-vis-slp').value:document.getElementById('req-con-slp').value,contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''};
     if(ka){
       btn.innerText="SUBMITTING...";btn.disabled=true;
       beginPleaseWait('PLEASE WAIT...');
       try{
         await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});
-        await loadMyPasses(true,true);
+        notifyRequestAsync(payload.action,payload);
+        loadMyPasses(true,true);
         openAddMoreModal(tempId);
       }catch(e){
         console.error(e);
@@ -1639,7 +1738,7 @@
     }else{
       btn.innerText="SUBMITTING...";btn.disabled=true;
       beginPleaseWait('PLEASE WAIT...');
-      try{await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});await loadMyPasses(true,true);}
+      try{await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});notifyRequestAsync(payload.action,payload);loadMyPasses(true,true);}
       catch(e){existingPasses.pop();localStorage.setItem(cachedKey,JSON.stringify(existingPasses));renderMyPasses(existingPasses);endPleaseWait();alert("Upload failed. Error: "+e.message);}
       finally{endPleaseWait();btn.innerText=t("submit_approval");btn.disabled=false;startAutoRefresh(currentUser.role);}
     }
@@ -1700,7 +1799,7 @@
     }
     const cachedKey='cached_passes_'+targetEmail,cached=localStorage.getItem(cachedKey);
     let hasCached=false;
-    if(cached){try{const parsed=JSON.parse(cached);if(Array.isArray(parsed)){hasCached=true;if(!isSilent)processAndRenderPasses(parsed,targetEmail,false);}else localStorage.removeItem(cachedKey);}catch(e){localStorage.removeItem(cachedKey);}}
+    if(cached){try{const parsed=sanitizeCachedPassPins(JSON.parse(cached));if(Array.isArray(parsed)){hasCached=true;localStorage.setItem(cachedKey,JSON.stringify(parsed));if(!isSilent)await processAndRenderPasses(parsed,targetEmail,false);}else localStorage.removeItem(cachedKey);}catch(e){localStorage.removeItem(cachedKey);}}
     if(!hasCached&&!isSilent)listDiv.innerHTML='<p style="color:var(--text-muted);font-size:13px;">'+t("fetching")+'</p>';
     try{
       const controller=new AbortController();
@@ -1713,21 +1812,14 @@
         localStorage.setItem(cachedKey,JSON.stringify(data));
         lockedPassesData=data;
         if(!isSilent){
-          processAndRenderPasses(data,targetEmail,false);
+          await processAndRenderPasses(data,targetEmail,false);
         }else{
           const vm=document.getElementById('pin-verify-modal');
           const cm=document.getElementById('pin-create-modal');
           const pinOpen=(vm&&!vm.classList.contains('hidden'))||(cm&&!cm.classList.contains('hidden'));
           if(!pinOpen){
-            let bp=null;
-            for(let i=data.length-1;i>=0;i--){
-              if(data[i]&&data[i].HostName&&String(data[i].HostName).includes('||PIN:')){
-                bp=String(data[i].HostName).split('||PIN:')[1];
-                break;
-              }
-            }
-            const lp=localStorage.getItem('user_pin_'+targetEmail);
-            if(bp&&!isPinUnlocked(targetEmail)){
+            const hasAccountPin=data.some(function(pass){return !!pass.HasAccountPIN||!!(pass.HostName&&String(pass.HostName).includes('||PIN:'));});
+            if(hasAccountPin&&!isPinUnlocked(targetEmail)){
               lockedPassesData=data;
               if(vm){
                 vm.classList.remove('hidden');
@@ -1737,7 +1829,7 @@
               }
               listDiv.innerHTML='';
             }else{
-              if(bp)userSecurityPin=bp||lp;
+              userSecurityPin=localStorage.getItem('user_pin_'+targetEmail);
               renderMyPasses(data);myPassesData=[].concat(data).reverse();
             }
           }
@@ -2157,11 +2249,13 @@
           }
           if(rStatus==='Approved'&&(!hasActionPending||newCount>0||deviceAddCount>0)){
             const isChecked=checkedPrintIds.has(row.UniqueID)?'checked':'';
-            let cbHtml='<input type="checkbox" class="print-checkbox row-checkbox" value="'+row.UniqueID+'" data-name="'+rVisitorName+'" data-type="'+rType+'" data-location="'+rLocation+'" data-status="'+rStatus+'" data-date="'+dateStr+'" '+isChecked+' onchange="handlePrintCheckbox(this)">';
+            const printNameForRow=String(rType).trim().toLowerCase()==='contractor' ? String(rVisitorName||'Lead') : rVisitorName;
+            const companyNameForRow=String(row.CompanyName||row.Company||row['Company / Contractor Name']||row['Company / Contractor']||row.ProjectName||row['Project Name']||'').trim();
+            let cbHtml='<input type="checkbox" class="print-checkbox row-checkbox" value="'+row.UniqueID+'" data-name="'+String(printNameForRow).replace(/'/g,"\\'")+'" data-type="'+rType+'" data-location="'+rLocation+'" data-status="'+rStatus+'" data-date="'+dateStr+'" data-company="'+companyNameForRow.replace(/"/g,'&quot;').replace(/'/g,'&apos;')+'" '+isChecked+' onchange="handlePrintCheckbox(this)">';
             let actionBtns='<div class="active-actions-grid">'
               +'<button class="btn-primary btn-outline" onclick="openViewRecord(\''+row.UniqueID+'\')">'+t('btn_view')+'</button>'
-              +'<button class="btn-primary btn-success" onclick="openQRView(\''+row.UniqueID+'\',\''+String(rVisitorName).replace(/'/g,"\\'")+'\',\''+rType+'\',\''+rLocation+'\',\''+rStatus+'\',\''+dateStr+'\')">'+t('btn_show_qr')+'</button>'
-              +'<button class="btn-primary btn-outline" onclick="printQR(\''+rVisitorName+'\',\''+rType+'\',\''+rLocation+'\',\''+row.UniqueID+'\',\''+rStatus+'\',\''+dateStr+'\')">'+t('btn_print')+'</button>'
+              + '<button class="btn-primary btn-success" onclick="openQRView(\''+row.UniqueID+'\',\''+(String(rType).trim().toLowerCase()==='contractor' ? String(rVisitorName||'Lead') : String(rVisitorName||'Lead')).replace(/'/g,"\\'")+'\',\''+rType+'\',\''+rLocation+'\',\''+rStatus+'\',\''+dateStr+'\')">'+t('btn_show_qr')+'</button>'
+              + '<button class="btn-primary btn-outline" onclick="printQR(\''+(String(rType).trim().toLowerCase()==='contractor' ? String(rVisitorName||'Lead').replace(/'/g, "\\'") : String(rVisitorName||'Lead').replace(/'/g, "\\'"))+'\',\''+rType+'\',\''+rLocation+'\',\''+row.UniqueID+'\',\''+rStatus+'\',\''+dateStr+'\',\''+companyNameForRow.replace(/'/g, "\\'").replace(/\\"/g,'&quot;')+'\')">'+t('btn_print')+'</button>'
               +'<button class="btn-primary btn-warning" style="color:#000;" onclick="openAdminGateModal(\''+row.UniqueID+'\')">🚪 GATE ACTION</button>'
               +'<button class="btn-primary btn-danger" onclick="adminRevokePass(\''+row.UniqueID+'\')">🚫 REVOKE PASS</button>'
               +'<button class="btn-primary btn-outline" onclick="openExtendPass(\''+row.UniqueID+'\',\''+rType+'\')">'+t('btn_extend')+'</button>'
@@ -2249,6 +2343,13 @@
               return identity&&ids[identity[1].trim()]&&!/\[REMOVE_REQUESTED\]/i.test(line)?line+' [REMOVE_REQUESTED]':line;
             });
           });
+        }else if(action==='request_revoke'){
+          blocks=blocks.map(function(block){
+            return block.replace(/^(Device:.*)$/m,function(line){
+              var identity=block.split(/\r?\n/,1)[0].match(/^Name:\s*.*?\|\s*Iqama:\s*(.*?)\s*$/i);
+              return identity&&ids[identity[1].trim()]&&!/\[DEVICE_REVOKE_REQUESTED\]/i.test(line)?line+' [DEVICE_REVOKE_REQUESTED]':line;
+            });
+          });
         }
         pass.TeamMembers=blocks.join('\n\n');
         if(action==='remove'&&pass.Status==='Pending'&&!blocks.some(function(block){return /\*NEW_MEMBER\*|\[NEW\]|\[DEVICE_ADD_REQUESTED\]/i.test(block);}))pass.Status='Approved';
@@ -2262,14 +2363,95 @@
     openViewRecord(passId,targetCategory);
   }
 
+  function updateCachedLeadRequest(passId,field,marker){
+    var updated=[];
+    [globalAdminData,myPassesData].forEach(function(list){
+      if(!Array.isArray(list))return;
+      list.forEach(function(pass){
+        if(String(pass.UniqueID)!==String(passId)||updated.indexOf(pass)!==-1)return;
+        var value=String(pass[field]||'');
+        if(value.indexOf(marker)===-1)pass[field]=value+' '+marker;
+        updated.push(pass);
+      });
+    });
+    if(updated.length){
+      if(Array.isArray(globalAdminData)&&globalAdminData.some(function(pass){return String(pass.UniqueID)===String(passId);}))localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));
+      if(Array.isArray(myPassesData)&&myPassesData.some(function(pass){return String(pass.UniqueID)===String(passId);})&&currentUser)localStorage.setItem('cached_passes_'+currentUser.email,JSON.stringify(myPassesData));
+    }
+    openViewRecord(passId,field==='VisitorName'?'remove':'revoke');
+  }
+
   async function updateStatus(id,newStatus){if(autoRefreshTimer)clearInterval(autoRefreshTimer);if(!confirm('Mark '+id+' as '+newStatus+'?')){startAutoRefresh(currentUser.role);return;}beginPleaseWait('PLEASE WAIT...');if(Array.isArray(globalAdminData)){let item=globalAdminData.find(function(x){return String(x.UniqueID)===String(id);});if(item){item.Status=newStatus;if(newStatus==='Approved'&&item.TeamMembers){item.TeamMembers=String(item.TeamMembers).replace(/\*NEW_MEMBER\*/gi,'').replace(/\[NEW\]/gi,'').replace(/\*\[REMOVE_REQUESTED\]\*/gi,'').replace(/\[REMOVE_REQUESTED\]/gi,'').replace(/\*\[DEVICE_REVOKE_REQUESTED\]\*/gi,'').replace(/\[DEVICE_REVOKE_REQUESTED\]/gi,'');}localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));renderAdminData(globalAdminData);if(item.HostEmail)localStorage.removeItem('cached_passes_'+String(item.HostEmail).toLowerCase().trim());}}try{const payload={action:newStatus==='Approved'?'approve_pass':'update_status',id:id,newStatus:newStatus};await appsScriptAction(payload);localStorage.removeItem("cached_admin_data");await loadAdminData(true);}catch(e){alert("Update failed: "+e.message);await loadAdminData(true);}finally{endPleaseWait();startAutoRefresh(currentUser.role);}}
 
   function openAdminGateModal(id){const gi=document.getElementById('admin-gate-id'),gd=document.getElementById('admin-gate-id-display'),gm=document.getElementById('admin-gate-modal');if(gi)gi.value=id;if(gd)gd.innerText=id;if(gm)gm.classList.remove('hidden');}
   function closeAdminGateModal(){const gm=document.getElementById('admin-gate-modal');if(gm)gm.classList.add('hidden');}
 
-  async function submitAdminGateAction(actionType){const id=document.getElementById('admin-gate-id').value;if(!id)return;let item=globalAdminData.find(function(x){return String(x.UniqueID)===String(id);});if(item){const isInside=!!item.CheckInTime&&!item.CheckOutTime;const actor=item.ScannedByGuard||'Unknown';if(actionType==='check_in'&&isInside)return alert("This pass is already checked IN by:\n"+actor);if(actionType==='check_out'&&!isInside)return alert("This pass is already checked OUT by:\n"+actor);}if(!confirm('Proceed to '+(actionType==='check_in'?'Check In':'Check Out')+' pass '+id+'?'))return;if(autoRefreshTimer)clearInterval(autoRefreshTimer);try{const adminInfo=currentUser.role==='admin'?'Admin: '+currentUser.name:currentUser.name+' ('+currentUser.location+')';await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:actionType,id:id,guardInfo:adminInfo,headCount:1}),mode:'no-cors'});localStorage.removeItem('cached_admin_data');closeAdminGateModal();loadAdminData(true).catch(function(){});}catch(e){alert("Action failed.");}finally{startAutoRefresh(currentUser.role);}}
+  async function submitAdminGateAction(actionType){
+    const id=document.getElementById('admin-gate-id').value;
+    if(!id)return;
+    const item=globalAdminData.find(function(pass){return String(pass.UniqueID)===String(id);});
+    if(item){
+      const isInside=!!item.CheckInTime&&!item.CheckOutTime;
+      const actor=item.ScannedByGuard||'Unknown';
+      if(actionType==='check_in'&&isInside)return alert("This pass is already checked IN by:\n"+actor);
+      if(actionType==='check_out'&&!isInside)return alert("This pass is already checked OUT by:\n"+actor);
+    }
+    if(!confirm('Proceed to '+(actionType==='check_in'?'Check In':'Check Out')+' pass '+id+'?'))return;
+    if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+    try{
+      const adminInfo=currentUser.role==='admin'?'Admin: '+currentUser.name:currentUser.name+' ('+currentUser.location+')';
+      const result=await appsScriptAction({action:actionType,id:id,guardInfo:adminInfo,headCount:1},60000);
+      if(!result.time)throw new Error('The server confirmed the gate action without returning its recorded time.');
+      const confirmedAction=String(result.action||'').toUpperCase();
+      if(confirmedAction!==(actionType==='check_in'?'IN':'OUT'))throw new Error('The server response did not match the requested gate action.');
+      if(item){
+        if(confirmedAction==='IN'){
+          item.CheckInTime=result.time;
+          item.CheckOutTime='';
+        }else{
+          item.CheckOutTime=result.time;
+        }
+        item.ScannedByGuard=adminInfo;
+        localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));
+        renderAdminData(globalAdminData);
+      }
+      closeAdminGateModal();
+      if(!item)await loadAdminData(true);
+    }catch(error){
+      alert('Action failed: '+(error&&error.message?error.message:'The server did not confirm the gate action.'));
+    }finally{
+      startAutoRefresh(currentUser.role);
+    }
+  }
 
-  async function adminRevokePass(id){if(autoRefreshTimer)clearInterval(autoRefreshTimer);if(!confirm('Revoke pass '+id+' completely? This will kill the QR code permanently.')){startAutoRefresh(currentUser.role);return;}if(Array.isArray(globalAdminData)){let item=globalAdminData.find(function(x){return String(x.UniqueID)===String(id);});if(item){item.Status='Completed';item.CheckOutTime=new Date().toISOString();localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));renderAdminData(globalAdminData);if(item.HostEmail)localStorage.removeItem('cached_passes_'+String(item.HostEmail).toLowerCase().trim());}}try{const adminInfo=currentUser.role==='admin'?'Admin: '+currentUser.name:currentUser.name+' ('+currentUser.location+')';await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'}),mode:'no-cors'});localStorage.removeItem('cached_admin_data');setTimeout(function(){loadAdminData(true);},1000);}catch(e){}finally{startAutoRefresh(currentUser.role);}}
+  async function adminRevokePass(id){
+    if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+    if(!confirm('Revoke pass '+id+' completely? This will kill the QR code permanently.')){
+      startAutoRefresh(currentUser.role);
+      return;
+    }
+    try{
+      const adminInfo=currentUser.role==='admin'?'Admin: '+currentUser.name:currentUser.name+' ('+currentUser.location+')';
+      const result=await appsScriptAction({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'},60000);
+      if(!result.time)throw new Error('The server confirmed the gate action without returning its recorded time.');
+      if(String(result.action||'').toUpperCase()!=='OUT')throw new Error('The server response did not confirm that the pass was checked out.');
+      const item=globalAdminData.find(function(pass){return String(pass.UniqueID)===String(id);});
+      if(item){
+        item.Status='Completed';
+        item.CheckOutTime=result.time;
+        item.ScannedByGuard=adminInfo;
+        localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));
+        renderAdminData(globalAdminData);
+        if(item.HostEmail)localStorage.removeItem('cached_passes_'+String(item.HostEmail).toLowerCase().trim());
+      }else{
+        await loadAdminData(true);
+      }
+    }catch(error){
+      alert('Revoke failed: '+(error&&error.message?error.message:'The server did not confirm the gate action.'));
+    }finally{
+      startAutoRefresh(currentUser.role);
+    }
+  }
 
   function openExtendPass(id,type){const ei=document.getElementById('extend-id'),et=document.getElementById('extend-type'),eg=document.getElementById('extend-end-group'),em=document.getElementById('extend-pass-modal');if(ei)ei.value=id;if(et)et.value=type;if(eg)eg.classList.remove('hidden');if(em)em.classList.remove('hidden');}
   function closeExtendPass(){const em=document.getElementById('extend-pass-modal');if(em)em.classList.add('hidden');}
@@ -2302,14 +2484,18 @@
   async function adminResetPin(email){if(!confirm('Reset PIN for '+email+'? They will be prompted to create a new one next time.'))return;try{const response=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'reset_pin',email:email}),redirect:'follow'});const result=await response.json();if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The reset was not confirmed.');clearStoredPin(email);localStorage.removeItem('cached_admin_data');localStorage.removeItem('cached_passes_'+email);alert("PIN Reset Successful.");closeViewRecord();loadAdminData(true);}catch(e){alert('Error resetting PIN: '+(e&&e.message?e.message:'Unknown error'));}}
 
   async function runTeamMemberAction(action,passId,memberIndex,memberIqama){
-    return appsScriptAction({action:action,id:passId,memberIndex:memberIndex,memberIqama:memberIqama});
+    var payload={action:action,id:passId,memberIndex:memberIndex,memberIqama:memberIqama};
+    if(action==='request_revoke_device'||action==='request_remove_member'){
+      payload.requestId='request-'+action+'-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+    }
+    return appsScriptAction(payload,action==='request_revoke_device'||action==='request_remove_member'?60000:undefined);
   }
 
-  async function requestRevokeDevice(passId,memberIndex,memberIqama,btn){if(!confirm('Request admin to revoke device access for this member?'))return;btn.innerText="REQUESTING...";btn.disabled=true;try{await runTeamMemberAction('request_revoke_device',passId,memberIndex,memberIqama);localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId);}catch(e){alert("Failed to request: "+e.message);btn.disabled=false;}}
+  async function requestRevokeDevice(passId,memberIndex,memberIqama,btn){if(!confirm('Request admin to revoke device access for this member?'))return;btn.innerText="REQUESTING...";btn.disabled=true;updateCachedTeamMemberAction(passId,[memberIqama],'request_revoke','revoke');try{await runTeamMemberAction('request_revoke_device',passId,memberIndex,memberIqama);localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId,'revoke');}catch(e){refreshMemberView(passId,'revoke');alert("The request is still being confirmed by the server: "+e.message);btn.disabled=false;}}
 
-  async function requestRemoveTeamMember(passId,memberIndex,memberIqama,btn){if(!confirm('Request admin to permanently remove this team member?'))return;btn.innerText="REQUESTING...";btn.disabled=true;try{await runTeamMemberAction('request_remove_member',passId,memberIndex,memberIqama);updateCachedTeamMemberAction(passId,[memberIqama],'request_remove','remove');}catch(e){alert("Failed to request removal: "+e.message);btn.disabled=false;}}
-  async function requestRemoveLead(passId,btn){if(!confirm('Request admin to permanently remove the lead?'))return;btn.innerText="REQUESTING...";btn.disabled=true;try{await appsScriptAction({action:'request_lead_remove_member',id:passId});localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId);}catch(e){alert("Failed to request lead removal: "+e.message);btn.disabled=false;}}
-  async function requestRevokeLeadDevice(passId,btn){if(!confirm('Request admin to revoke device access for the lead?'))return;btn.innerText="REQUESTING...";btn.disabled=true;try{await appsScriptAction({action:'request_lead_revoke_device',id:passId});localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId);}catch(e){alert("Failed to request lead device revoke: "+e.message);btn.disabled=false;}}
+  async function requestRemoveTeamMember(passId,memberIndex,memberIqama,btn){if(!confirm('Request admin to permanently remove this team member?'))return;btn.innerText="REQUESTING...";btn.disabled=true;updateCachedTeamMemberAction(passId,[memberIqama],'request_remove','remove');try{await runTeamMemberAction('request_remove_member',passId,memberIndex,memberIqama);localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId,'remove');}catch(e){refreshMemberView(passId,'remove');alert("The removal request is still being confirmed by the server: "+e.message);btn.disabled=false;}}
+  async function requestRemoveLead(passId,btn){if(!confirm('Request admin to permanently remove the lead?'))return;btn.innerText="REQUESTING...";btn.disabled=true;updateCachedLeadRequest(passId,'VisitorName','[LEAD_REMOVE_REQUESTED]');try{await appsScriptAction({action:'request_lead_remove_member',id:passId,requestId:'request-lead-remove-'+Date.now()+'-'+Math.random().toString(36).slice(2)},60000);localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId,'remove');}catch(e){refreshMemberView(passId,'remove');alert("The lead removal request is still being confirmed by the server: "+e.message);btn.disabled=false;}}
+  async function requestRevokeLeadDevice(passId,btn){if(!confirm('Request admin to revoke device access for the lead?'))return;btn.innerText="REQUESTING...";btn.disabled=true;updateCachedLeadRequest(passId,'ImeiNumber','[DEVICE_REVOKE_REQUESTED]');try{await appsScriptAction({action:'request_lead_revoke_device',id:passId,requestId:'request-lead-device-revoke-'+Date.now()+'-'+Math.random().toString(36).slice(2)},60000);localStorage.removeItem('cached_passes_'+currentUser.email);refreshMemberView(passId,'revoke');}catch(e){refreshMemberView(passId,'revoke');alert("The lead device request is still being confirmed by the server: "+e.message);btn.disabled=false;}}
 
   async function cancelRemoveRequest(passId,memberIndex,memberIqama,btn){if(!confirm('Cancel this removal request?'))return;btn.innerText="CANCELLING...";btn.disabled=true;try{await runTeamMemberAction('cancel_remove_request',passId,memberIndex,memberIqama);localStorage.removeItem('cached_admin_data');refreshMemberView(passId);}catch(e){alert("Failed to cancel: "+e.message);btn.disabled=false;}}
 
@@ -2380,6 +2566,7 @@
         throw new Error('The request was sent, but the server did not confirm it. Refresh the pass before trying again.');
       }
       if(operationResult.status!=='success')throw new Error(operationResult.message||'The server could not save the device request.');
+      notifyRequestAsync(payload.action,payload);
       closeExistingDeviceRequest();
       localStorage.removeItem('cached_passes_'+currentUser.email);
       refreshMemberView(context.passId);
@@ -2461,12 +2648,11 @@
     let rType=String(r.Type||'');
     const validityPeriod=formatToDDMMYYYY(r.StartDate)+' - '+formatToDDMMYYYY(r.EndDate||r.StartDate);
     let displayHostName=(r.HostName||'-').split('||PIN:')[0];
-    let actualPin=(r.HostName||'').includes('||PIN:')?(r.HostName||'').split('||PIN:')[1]:null;
+    let hasAccountPin=!!r.HasAccountPIN||/\|\|PIN:\d{4}$/.test(String(r.HostName||''));
     let h='<div><strong>'+t('lbl_host_name')+'</strong>'+displayHostName+'</div>';
     if(currentUser&&currentUser.role==='admin'){
-      let pinDisplay=actualPin?actualPin:'NOT SET';
-      let actionBtn=actualPin?'<button onclick="adminResetPin(\''+r.HostEmail+'\')" class="btn-primary btn-danger btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">🔄 RESET</button>':'';
-      h+='<div style="margin-bottom:10px;"><strong>ACCOUNT PIN</strong><div style="display:flex; gap:10px; align-items:center; margin-top:5px;"><span id="admin-view-pin" style="color:'+(actualPin?'var(--danger)':'var(--text-muted)')+'; font-weight:bold; font-size:16px; letter-spacing: 2px; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:4px;">****</span><button onclick="document.getElementById(\'admin-view-pin\').innerText=\''+pinDisplay+'\'; this.style.display=\'none\';" class="btn-primary btn-outline btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">👁️ SHOW</button>'+actionBtn+'</div></div>';
+      let actionBtn=hasAccountPin?'<button onclick="adminResetPin(\''+r.HostEmail+'\')" class="btn-primary btn-danger btn-sm" style="width:auto; padding:4px 10px; font-size:11px;">🔄 RESET</button>':'';
+      h+='<div style="margin-bottom:10px;"><strong>ACCOUNT PIN</strong><div style="display:flex; gap:10px; align-items:center; margin-top:5px;"><span style="color:var(--text-muted);font-weight:bold;font-size:13px;">'+(hasAccountPin?'SET (HIDDEN)':'NOT SET')+'</span>'+actionBtn+'</div></div>';
     }
     h+='<div><strong>'+t('lbl_host_email')+'</strong>'+(r.HostEmail||'-')+'</div><div><strong>'+t('visitor_name')+'</strong>'+(r.VisitorName||'-')+'</div><div><strong>'+t('type_header')+'</strong>'+(t(rType.toLowerCase())||'-')+'</div><div><strong>'+t('location_label')+'</strong>'+(r.Location||'-')+'</div><div><strong>'+t('lbl_validity')+'</strong>'+validityPeriod+'</div><div><strong>'+t('slp_ticket')+'</strong>'+(r.SlpTicketNo||'-')+'</div><div><strong>'+t('contact_no')+'</strong>'+(r.ContactNo||'-')+'</div><div><strong>IMEI NUMBER</strong>'+(r.ImeiNumber||'-')+'</div>';
     if(rType==='Visitor')h+='<div><strong>'+t('invited_by')+'</strong>'+(r.InvitedBy||'-')+'</div>';
@@ -2586,9 +2772,12 @@
 
   async function bulkApproveNewMembers(passId){if(!confirm('Accept all new member requests?'))return;beginPleaseWait('PLEASE WAIT...');try{await appsScriptAction({action:'approve_pass',id:passId});localStorage.removeItem('cached_admin_data');refreshMemberView(passId,'add');}catch(error){alert('Approval failed: '+error.message);}finally{endPleaseWait();}}
 
-  function printSelected(){const cbs=document.querySelectorAll('.print-checkbox.row-checkbox:checked');if(cbs.length===0)return alert("Please select at least one approved pass.");const pm=confirm("Print Layout Selection:\n\n[OK] = MULTIPLE passes per page\n[Cancel] = SINGLE pass per page");let copiesInput=prompt("How many copies of EACH selected pass do you want to print?","1");let copies=parseInt(copiesInput,10);if(isNaN(copies)||copies<1)copies=1;const pw=window.open('','','width=800,height=600');let cardsHtml='';cbs.forEach(function(cb){const id=cb.value,name=cb.getAttribute('data-name'),type=cb.getAttribute('data-type'),loc=cb.getAttribute('data-location'),st=cb.getAttribute('data-status'),date=cb.getAttribute('data-date');let qrDataUrl=getQRDataURL(id);for(let i=0;i<copies;i++){cardsHtml+='<div class="card"><div class="top-row"><div><p class="name">'+name+'</p><p class="sub">'+type+' &bull; '+loc+'</p><p class="date">Valid: '+date+'</p></div><div><p class="status">'+st+'</p><p class="id">'+id+'</p></div></div><div class="qr-box"><img src="'+qrDataUrl+'"></div></div>';}});let ps=pm?'@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}':'@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}';pw.document.write('<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:\'Inter\',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}'+ps+'</style></head><body>'+cardsHtml+'</body></html>');pw.document.close();pw.focus();setTimeout(function(){pw.print();pw.close();},250);}
+  function getContractorCompanyLabel(row, fallbackName){const passRow=row||{};const candidate=String(passRow.CompanyName||passRow.Company||passRow['Company / Contractor Name']||passRow['Company / Contractor']||passRow.ProjectName||passRow['Project Name']||fallbackName||'Company').trim();return candidate||'Company';}
+  function resolvePrintPassLabel(name,type,forceLeadMode,companyName){const passType=String(type||'').trim().toLowerCase();const label=String(name||'').trim();if(passType==='contractor'){const useLead=forceLeadMode!==undefined?forceLeadMode:window.confirm('Print pass for:\n\n[OK] = Lead\n[Cancel] = Company');if(useLead)return (label||'Lead');const companyLabel=getContractorCompanyLabel({CompanyName:companyName,Company:companyName,'Company / Contractor Name':companyName,'Company / Contractor':companyName,ProjectName:companyName,'Project Name':companyName},label||'Company');return companyLabel||'Company';}if(passType==='visitor'){const useLead=forceLeadMode!==undefined?forceLeadMode:window.confirm('Print pass for:\n\n[OK] = Lead\n[Cancel] = Team Members');return useLead ? (label||'Lead') : 'Team Members';}return label||'Lead';}
+  function printSelected(){const cbs=document.querySelectorAll('.print-checkbox.row-checkbox:checked');if(cbs.length===0)return alert("Please select at least one approved pass.");const pm=confirm("Print Layout Selection:\n\n[OK] = MULTIPLE passes per page\n[Cancel] = SINGLE pass per page");let copiesInput=prompt("How many copies of EACH selected pass do you want to print?","1");let copies=parseInt(copiesInput,10);if(isNaN(copies)||copies<1)copies=1;const contractorSelectionNeeded=[].some.call(cbs,function(cb){return String(cb.getAttribute('data-type')||'').trim().toLowerCase()==='contractor';});const visitorSelectionNeeded=[].some.call(cbs,function(cb){return String(cb.getAttribute('data-type')||'').trim().toLowerCase()==='visitor';});const contractorMode=contractorSelectionNeeded ? window.confirm('Print selected contractor passes for:\n\n[OK] = Lead\n[Cancel] = Company') : undefined;const visitorMode=visitorSelectionNeeded ? window.confirm('Print selected visitor passes for:\n\n[OK] = Lead\n[Cancel] = Team Members') : undefined;const pw=window.open('','','width=800,height=600');let cardsHtml='';cbs.forEach(function(cb){const id=cb.value,name=cb.getAttribute('data-name'),type=cb.getAttribute('data-type'),loc=cb.getAttribute('data-location'),st=cb.getAttribute('data-status'),date=cb.getAttribute('data-date'),companyName=cb.getAttribute('data-company')||'';const selectedMode=String(type||'').trim().toLowerCase()==='contractor' ? contractorMode : visitorMode;const label=resolvePrintPassLabel(name,type,selectedMode,companyName);let qrDataUrl=getQRDataURL(id);for(let i=0;i<copies;i++){cardsHtml+='<div class="card"><div class="top-row"><div><p class="name">'+escapeHtmlForPrint(label)+'</p><p class="sub">'+escapeHtmlForPrint(type)+' &bull; '+escapeHtmlForPrint(loc)+'</p><p class="date">Valid: '+escapeHtmlForPrint(date)+'</p></div><div><p class="status">'+escapeHtmlForPrint(st)+'</p><p class="id">'+escapeHtmlForPrint(id)+'</p></div></div><div class="qr-box"><img src="'+qrDataUrl+'"></div></div>';} });let ps=pm?'@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}':'@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-after:always;box-sizing:border-box}.card:last-child{page-break-after:auto}}';pw.document.write('<html><head><title>Batch Print Passes</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:\'Inter\',sans-serif;display:flex;flex-wrap:wrap;gap:15px}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}'+ps+'</style></head><body>'+cardsHtml+'</body></html>');pw.document.close();pw.focus();setTimeout(function(){pw.print();pw.close();},250);}
 
-  function printQR(name,type,location,id,status,date){const pm=confirm("Print Layout Selection:\n\n[OK] = Standard Printer\n[Cancel] = ID Card Printer");let copiesInput=prompt("How many copies do you want to print on the page?","1");let copies=parseInt(copiesInput,10);if(isNaN(copies)||copies<1)copies=1;const pw=window.open('','','width=800,height=600');let qrDataUrl=getQRDataURL(id);let cardsHtml='';for(let i=0;i<copies;i++){cardsHtml+='<div class="card"><div class="top-row"><div><p class="name">'+name+'</p><p class="sub">'+type+' &bull; '+location+'</p><p class="date">Valid: '+date+'</p></div><div><p class="status">'+status+'</p><p class="id">'+id+'</p></div></div><div class="qr-box"><img src="'+qrDataUrl+'"></div></div>';}let ps=pm?'@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}':'@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-inside:avoid;box-sizing:border-box}}';pw.document.write('<html><head><title>Print QR Pass</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:\'Inter\',sans-serif;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:15px;}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}'+ps+'</style></head><body>'+cardsHtml+'</body></html>');pw.document.close();pw.focus();setTimeout(function(){pw.print();pw.close();},250);}
+  function escapeHtmlForPrint(value){return String(value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');}
+  function printQR(name,type,location,id,status,date,companyName){const label=resolvePrintPassLabel(name,type,undefined,companyName);const pm=confirm("Print Layout Selection:\n\n[OK] = Standard Printer\n[Cancel] = ID Card Printer");let copiesInput=prompt("How many copies do you want to print on the page?","1");let copies=parseInt(copiesInput,10);if(isNaN(copies)||copies<1)copies=1;const pw=window.open('','','width=800,height=600');let qrDataUrl=getQRDataURL(id);let cardsHtml='';for(let i=0;i<copies;i++){cardsHtml+='<div class="card"><div class="top-row"><div><p class="name">'+escapeHtmlForPrint(label)+'</p><p class="sub">'+escapeHtmlForPrint(type)+' &bull; '+escapeHtmlForPrint(location)+'</p><p class="date">Valid: '+escapeHtmlForPrint(date)+'</p></div><div><p class="status">'+escapeHtmlForPrint(status)+'</p><p class="id">'+escapeHtmlForPrint(id)+'</p></div></div><div class="qr-box"><img src="'+qrDataUrl+'"></div></div>';}let ps=pm?'@media print{@page{margin:10mm}body{display:flex;flex-wrap:wrap;gap:5mm;align-content:flex-start;justify-content:flex-start}.card{page-break-inside:avoid;border:1px solid #ccc !important}}':'@media print{@page{size:85.6mm 54mm;margin:0}body{display:block;margin:0;padding:0;background:#fff}.card{border:none !important;border-radius:0;margin:0;padding:4mm;width:85.6mm;height:54mm;page-break-inside:avoid;box-sizing:border-box}}';pw.document.write('<html><head><title>Print QR Pass</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"><style>*{box-sizing:border-box;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{margin:0;padding:20px;background:#fff;font-family:\'Inter\',sans-serif;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:15px;}.card{width:85.6mm;height:54mm;background:white;border-radius:2mm;padding:4mm;border:1px solid #ccc;position:relative;overflow:hidden}.top-row{display:flex;justify-content:space-between;align-items:flex-start}.name{font-size:10pt;font-weight:700;margin:0;color:black;line-height:1.1;max-width:48mm;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.sub{font-size:7pt;color:#555;margin:2px 0 0 0}.date{font-size:6pt;font-weight:600;color:#444;margin:2px 0 0 0}.status{font-size:8pt;font-weight:700;color:#10b981;margin:0;text-align:right;text-transform:uppercase}.id{font-size:6pt;color:#555;margin:2px 0 0 0;text-align:right}.qr-box{display:flex;justify-content:center;align-items:center;margin-top:2mm}'+ps+'</style></head><body>'+cardsHtml+'</body></html>');pw.document.close();pw.focus();setTimeout(function(){pw.print();pw.close();},250);}
 
   function switchScanMode(mode){const btnCam=document.getElementById('btn-mode-camera');const btnGun=document.getElementById('btn-mode-gun');const gunContainer=document.getElementById('gun-scanner-container');const camWrapper=document.getElementById('camera-mode-wrapper');const gunInput=document.getElementById('gun-scan-input');if(mode==='gun'){if(btnCam)btnCam.className="btn-primary btn-outline";if(btnGun)btnGun.className="btn-primary";if(camWrapper)camWrapper.classList.add('hidden');if(gunContainer)gunContainer.classList.remove('hidden');stopScanner();if(gunInput){gunInput.focus();gunInput.value="";}}else{if(btnCam)btnCam.className="btn-primary";if(btnGun)btnGun.className="btn-primary btn-outline";if(gunContainer)gunContainer.classList.add('hidden');if(camWrapper)camWrapper.classList.remove('hidden');}}
   function handleGunScan(event){if(event.key==='Enter'){event.preventDefault();const code=event.target.value.replace(/\s+/g,'').trim().toUpperCase();if(code){event.target.value="";onScanSuccess(code);}}}
@@ -2733,7 +2922,7 @@
       const verifyRequest=cachedData
         ?{action:'get_gate_verification',id:decodedText,passType:cachedData.Type}
         :{action:'get_single',id:decodedText};
-      const resData=await appsScriptJsonp(verifyRequest,null,15000);
+      const resData=await appsScriptReadOnly(verifyRequest,15000);
       if(resData&&!resData.error){
         data=cachedData?Object.assign({},cachedData,resData):convertDriveUrls(resData);
         guardPassCache.set(upperId,data);
@@ -2915,13 +3104,37 @@
     if(btn){btn.innerText="SAVING...";btn.disabled=true;}
     if(btnTop){btnTop.innerText="SAVING...";btnTop.disabled=true;}
     const gInfo=currentUser.name+' ('+currentUser.location+')';
-    const actionLabel=currentScanAction==='check_out'?t("btn_checkout"):t("confirm_action");
-    const pass=guardPassCache.get(String(currentScannedID||'').toUpperCase());
-    const payload=JSON.stringify({action:currentScanAction,id:currentScannedID,passType:pass&&pass.Type||'',guardInfo:gInfo,headCount:hcVal});
+    const scanAction=currentScanAction;
+    const scanId=currentScannedID;
+    const upperId=String(scanId||'').toUpperCase();
+    const actionLabel=scanAction==='check_out'?t("btn_checkout"):t("confirm_action");
+    const pass=guardPassCache.get(upperId);
+    if(!pass){
+      alert('Pass data is unavailable. Please close and scan the QR again.');
+      if(btn){btn.innerText=actionLabel;btn.disabled=false;}
+      if(btnTop){btnTop.innerText=actionLabel;btnTop.disabled=false;}
+      isProcessingScan=false;
+      return;
+    }
     try{
-      const response=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:payload,mode:'no-cors'});
-      const result=await response.json();
-      if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The gate action was not confirmed by the server.');
+      const result=await appsScriptAction({
+        action:scanAction,
+        id:scanId,
+        passType:pass.Type||'',
+        guardInfo:gInfo,
+        headCount:hcVal
+      },60000);
+      if(!result.time)throw new Error('The server confirmed the gate action without returning its recorded time.');
+      const confirmedAction=String(result.action||'').toUpperCase();
+      if(confirmedAction!==(scanAction==='check_in'?'IN':'OUT'))throw new Error('The server response did not match the requested gate action.');
+      if(confirmedAction==='IN'){
+        pass.CheckInTime=result.time;
+        pass.CheckOutTime='';
+      }else{
+        pass.CheckOutTime=result.time;
+      }
+      pass.ScannedByGuard=gInfo;
+      guardPassCache.set(upperId,pass);
     }catch(e){
       alert(e&&e.message?e.message:"Network error. Please try again.");
       if(btn){btn.innerText=actionLabel;btn.disabled=false;}
@@ -2929,7 +3142,6 @@
       isProcessingScan=false;
       return;
     }
-    try{const upperId=String(currentScannedID).toUpperCase();const cached=guardPassCache.get(upperId);if(cached){const nowIso=new Date().toISOString();if(currentScanAction==='check_in'){cached.CheckInTime=nowIso;cached.CheckOutTime='';cached.ScannedByGuard=gInfo;}else{cached.CheckOutTime=nowIso;cached.ScannedByGuard=gInfo;}guardPassCache.set(upperId,cached);}}catch(e){}
     if(btn){btn.innerText=t("confirm_action");btn.disabled=false;}
     if(btnTop){btnTop.innerText=t("confirm_action");btnTop.disabled=false;}
     const modal=document.getElementById('scan-confirm-modal');if(modal)modal.classList.add('hidden');
@@ -3023,7 +3235,7 @@
     }
     return xhr.then(function(){
       if(payload.action==='add_team_members'){
-        var deadline=Date.now()+120000;
+        var deadline=Date.now()+60000;
         var pollDelay=500;
         function pollOperation(){
           return appsScriptJsonp({action:'get_operation_result',requestId:payload.requestId}).then(function(result){
@@ -3031,25 +3243,25 @@
             if(result&&result.status==='error')throw new Error(result.message||'The server could not save the new team members.');
             if(Date.now()>=deadline)throw new Error('The request was sent, but its result could not be confirmed. Refresh the pass before retrying.');
             var delay=pollDelay;
-            pollDelay=Math.min(pollDelay*2,4000);
+            pollDelay=Math.min(pollDelay*2,2000);
             return wait(delay).then(pollOperation);
           },function(){
             if(Date.now()>=deadline)throw new Error('The request was sent, but its result could not be confirmed. Refresh the pass before retrying.');
             var delay=pollDelay;
-            pollDelay=Math.min(pollDelay*2,4000);
+            pollDelay=Math.min(pollDelay*2,2000);
             return wait(delay).then(pollOperation);
           });
         }
         return pollOperation();
       }
-      var deadline=Date.now()+120000;
-      var pollDelay=1000;
+        var deadline=Date.now()+15000;
+        var pollDelay=500;
       function scheduleNext(){
         if(Date.now()>=deadline){
           throw new Error('The update may have been saved, but the server did not confirm it. Refresh the pass before retrying to avoid a duplicate.');
         }
         return wait(Math.min(pollDelay,deadline-Date.now())).then(function(){
-          pollDelay=Math.min(pollDelay*2,8000);
+            pollDelay=Math.min(pollDelay*2,4000);
           return poll();
         });
       }
@@ -3078,7 +3290,39 @@
       showScanResult('SCAN ERROR','Could not process this QR code. Please try scanning again.','bg-red',false);
     });
   }
-  async function submitAddMorePeople(keepAdding){keepAdding=!!keepAdding;if(addMoreTeamList.length===0)return alert(addMemberText("empty"));if(addMoreTeamList.length>10)return alert(addMemberText("limit"));if(!keepAdding&&!confirm(addMemberText("confirm")))return;let memberCount=addMoreTeamList.length;let btn=document.getElementById("btn-submit-add-more");btn.innerText=currentLang==='ar'?'جارٍ الإرسال...':'SUBMITTING...';btn.disabled=true;let cleanTeam=addMoreTeamList.map(function(m){return {iqama:m.rawIqama,selfie:m.rawSelfie,devicePhoto:m.rawDevicePhoto,name:m.name,iqamaText:m.iqamaText,deviceString:m.deviceType!=="None"?m.deviceType+' ('+m.deviceId+')':"None"};});let payload={action:"add_team_members",id:addMorePassId,team:JSON.stringify(cleanTeam)};beginPleaseWait('PLEASE WAIT...');try{await submitAppsScriptForm(payload);await loadMyPasses(true,true);addMoreTeamList=[];renderAddTeamRoster();if(!keepAdding){closeAddMoreModal();}else{startAddMoreTimer();}endPleaseWait();alert(addMemberNotice(memberCount));}catch(e){endPleaseWait();console.error("[Add members] Submission failed.",e);alert(addMemberText("failed"));}finally{btn.innerText=t("submit_send_approval");btn.disabled=false;}}
+  async function submitAddMorePeople(keepAdding){
+    keepAdding=!!keepAdding;
+    if(addMoreTeamList.length===0)return alert(addMemberText("empty"));
+    if(addMoreTeamList.length>10)return alert(addMemberText("limit"));
+    if(!keepAdding&&!confirm(addMemberText("confirm")))return;
+    let memberCount=addMoreTeamList.length;
+    let btn=document.getElementById("btn-submit-add-more");
+    btn.innerText=currentLang==='ar'?'جارٍ الإرسال...':'SUBMITTING...';
+    btn.disabled=true;
+    let cleanTeam=addMoreTeamList.map(function(m){
+      return {iqama:m.rawIqama,selfie:m.rawSelfie,devicePhoto:m.rawDevicePhoto,name:m.name,iqamaText:m.iqamaText,deviceString:m.deviceType!=="None"?m.deviceType+' ('+m.deviceId+')':"None"};
+    });
+    let payload={action:"add_team_members",id:addMorePassId,team:JSON.stringify(cleanTeam)};
+    beginPleaseWait('PLEASE WAIT...');
+    try{
+      await submitAppsScriptForm(payload);
+      notifyRequestAsync(payload.action,payload);
+      loadMyPasses(true,true);
+      addMoreTeamList=[];
+      renderAddTeamRoster();
+      if(!keepAdding)closeAddMoreModal();
+      else startAddMoreTimer();
+      endPleaseWait();
+      alert(addMemberNotice(memberCount));
+    }catch(e){
+      endPleaseWait();
+      console.error("[Add members] Submission failed.",e);
+      alert(addMemberText("failed"));
+    }finally{
+      btn.innerText=t("submit_send_approval");
+      btn.disabled=false;
+    }
+  }
 
   document.addEventListener('DOMContentLoaded',function(){
     const em=document.getElementById('lo-mail');
@@ -3480,4 +3724,3 @@
   })();
   </script>
   </body></html>
-  
