@@ -1375,7 +1375,7 @@
   function postAdminRequest(payload){
     var requestId=payload.adminRequestId;
     var pollStartedAt=Date.now();
-    var pollTimeout=30000;
+    var pollTimeout=90000;
     var pollDelay=150;
     var cleanupPost;
     try{
@@ -1385,7 +1385,7 @@
     }
     function poll(){
       if(Date.now()-pollStartedAt>=pollTimeout){
-        throw new Error('The Apps Script backend did not confirm this request. Verify that the latest Code.gs is deployed as a web app and try again.');
+        throw new Error('The Apps Script request was not confirmed within 90 seconds. Check Apps Script > Executions for a failed request. If it may have completed, refresh the portal before retrying to avoid a duplicate action.');
       }
       return fetchAdminRequestResult(requestId).then(function(result){
         if(result&&result.status==='pending'){
@@ -9031,3 +9031,4 @@
   })();
   </script>
   </body></html>
+  
