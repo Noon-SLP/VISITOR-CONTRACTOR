@@ -7164,6 +7164,36 @@
   function handlePrintCheckbox(cb){if(cb.checked)checkedPrintIds.add(cb.value);else checkedPrintIds.delete(cb.value);var selectAll=document.getElementById('selectAllCheckbox');if(selectAll&&!selectAll.dataset.bulkUpdating){var rows=document.querySelectorAll('.print-checkbox.row-checkbox');selectAll.checked=rows.length>0&&Array.prototype.every.call(rows,function(row){return row.checked;});}}
   function toggleSelectAll(src){const cbs=document.querySelectorAll('.print-checkbox.row-checkbox');const checked=src.checked;src.dataset.bulkUpdating='true';cbs.forEach(function(cb){cb.checked=checked;handlePrintCheckbox(cb);});delete src.dataset.bulkUpdating;src.checked=cbs.length>0&&Array.prototype.every.call(cbs,function(cb){return cb.checked;});}
 
+  function showAdminDataLoadError(error){
+    var message=String(error&&error.message||'');
+    var expiredSession=/admin session expired/i.test(message);
+    var statusText=expiredSession
+      ?'Your admin session expired. Sign in again to load requests.'
+      :'Could not refresh requests from the Apps Script backend. Saved requests, if available, are still shown.';
+    function appendStatus(tableId,columnCount){
+      var table=document.getElementById(tableId);
+      if(!table)return;
+      var row=document.createElement('tr');
+      var cell=document.createElement('td');
+      cell.colSpan=columnCount;
+      cell.className='text-center';
+      cell.style.padding='12px';
+      cell.textContent=statusText+' ';
+      if(!expiredSession){
+        var retry=document.createElement('button');
+        retry.type='button';
+        retry.className='btn-primary btn-outline btn-sm';
+        retry.textContent='RETRY';
+        retry.addEventListener('click',function(){loadAdminData(true);});
+        cell.appendChild(retry);
+      }
+      row.appendChild(cell);
+      table.appendChild(row);
+    }
+    appendStatus('admin-table-pending',5);
+    appendStatus('admin-table-active',8);
+  }
+
   async function loadAdminData(isSilent){
     if(adminRefreshInProgress)return;
     adminRefreshInProgress=true;
@@ -7190,7 +7220,8 @@
       }
     }catch(e){
       renderAdminData(globalAdminData||[]);
-      if(!isSilent)console.error('[Admin data] Refresh failed; preserving the last rendered data.',e);
+      console.error('[Admin data] Refresh failed; preserving the last rendered data.',e);
+      showAdminDataLoadError(e);
     }finally{
       adminRefreshInProgress=false;
     }
