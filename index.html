@@ -838,6 +838,9 @@
   *::-webkit-scrollbar-corner{background:#12151c}
   </style>
   <style id="reference-background-colors">
+  .team-search-filter-hidden,
+  #scan-result.fullscreen-scan .team-member-scan-row.team-search-filter-hidden,
+  #scan-result.fullscreen-scan .device-photo-card.team-search-filter-hidden{display:none!important}
   body{background-color:#0b1019!important}
   #login-view{
     background-color:#0b1019!important;
@@ -8246,10 +8249,10 @@
       return !q||searchableText.includes(q);
     }
     document.querySelectorAll('.team-member-scan-row').forEach(function(row){
-      row.style.display=matchesSearch(row)?'flex':'none';
+      row.classList.toggle('team-search-filter-hidden',!matchesSearch(row));
     });
     document.querySelectorAll('.device-photo-card').forEach(function(card){
-      card.style.display=matchesSearch(card)?'block':'none';
+      card.classList.toggle('team-search-filter-hidden',!matchesSearch(card));
     });
   }
   var teamSearchInput=document.getElementById('team-search-filter');
