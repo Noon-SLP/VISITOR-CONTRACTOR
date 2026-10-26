@@ -1338,51 +1338,22 @@
     return appsScriptJsonpAttempt({action:'admin_auth_result',requestId:requestId},null,0,10000);
   }
   function submitAdminRequest(payload){
-    var frameName='admin-request-'+Date.now()+'-'+Math.random().toString(36).slice(2);
-    var frame=document.createElement('iframe');
-    frame.name=frameName;
-    frame.title='Secure Apps Script request';
-    frame.setAttribute('aria-hidden','true');
-    frame.style.cssText='display:none!important;width:0;height:0;border:0;';
-    var form=document.createElement('form');
-    form.method='POST';
-    form.action=freshScriptUrl();
-    form.target=frameName;
-    form.enctype='application/x-www-form-urlencoded';
-    form.acceptCharset='UTF-8';
-    form.style.display='none';
-    var payloadInput=document.createElement('input');
-    payloadInput.type='hidden';
-    payloadInput.name='payload';
-    payloadInput.value=JSON.stringify(payload);
-    form.appendChild(payloadInput);
-    document.body.append(frame,form);
-    try{
-      form.submit();
-    }catch(error){
-      form.remove();
-      frame.remove();
-      throw error;
-    }
-    var cleaned=false;
-    var cleanupTimer=setTimeout(cleanup,45000);
-    function cleanup(){
-      if(cleaned)return;
-      cleaned=true;
-      clearTimeout(cleanupTimer);
-      form.remove();
-      frame.remove();
-    }
-    return cleanup;
+    return fetch(freshScriptUrl(),{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body:'payload='+encodeURIComponent(JSON.stringify(payload)),
+      cache:'no-store'
+    });
   }
   function postAdminRequest(payload){
     var requestId=payload.adminRequestId;
     var pollStartedAt=Date.now();
     var pollTimeout=90000;
     var pollDelay=150;
-    var cleanupPost;
+    var submission;
     try{
-      cleanupPost=submitAdminRequest(payload);
+      submission=submitAdminRequest(payload);
     }catch(postError){
       return Promise.reject(new Error('The secure Apps Script request could not be submitted: '+(postError&&postError.message?postError.message:'Unknown error')));
     }
@@ -1407,12 +1378,10 @@
         return new Promise(function(resolve){setTimeout(resolve,retryDelay);}).then(poll);
       });
     }
-    return poll().then(function(result){
-      cleanupPost();
-      return result;
-    },function(error){
-      cleanupPost();
-      throw error;
+    return Promise.resolve(submission).then(function(){
+      return poll();
+    },function(postError){
+      throw new Error('The secure Apps Script request could not be submitted: '+(postError&&postError.message?postError.message:'Unknown error'));
     });
   }
   function appsScriptJsonp(params,signal,timeoutMs){
@@ -7646,9 +7615,13 @@
     btn.textContent='REMOVING...';btn.disabled=true;
     try{
       await runTeamMemberAction('remove_team_member',passId,memberIndex,memberIqama);
-      updateCachedTeamMemberAction(passId,[memberIqama],'remove');
+      localStorage.removeItem('cached_admin_data');
+      await refreshMemberView(passId);
       alert('Team member removed successfully.');
-    }catch(error){alert('Failed to remove: '+error.message);if(btn.isConnected)btn.disabled=false;}
+    }catch(error){
+      alert('Failed to remove: '+error.message);
+      if(btn.isConnected){btn.textContent='REMOVE';btn.disabled=false;}
+    }
   }
 
   async function adminApproveTeamMember(passId,memberIndex,memberIqama,btn){
@@ -7955,13 +7928,13 @@
       let td=[];
       let lines=tMembers.split(/\n\s*\n/).filter(function(b){return b.trim()!=='';});
       lines.forEach(function(block,idx){
-        let nameMatch=block.match(/Name:\s*([^\|]+)/);
-        let iqamaMatch=block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/);
-        let deviceMatch=block.match(/Device:\s*(.*?)(?:\n|$)/);
+        let nameMatch=block.match(/^Name:[ \t]*([^|\r\n]*)/mi);
+        let iqamaMatch=block.match(/^[^\r\n]*\|[ \t]*Iqama:[ \t]*([^|\r\n]*)/mi);
+        let deviceMatch=block.match(/^Device:[ \t]*([^\r\n]*)/mi);
         let extractedUrls=block.match(/(?:https?:\/\/|data:image\/)[^\s\|]+/g)||[];
         if(extractedUrls.length<2){extractedUrls=block.split(/\r?\n/).slice(2).map(function(line){return normalizeImageUrl(line);}).filter(function(url){return !!url;});}
         if(extractedUrls.length>=1 || nameMatch || iqamaMatch){
-          let nameRaw=nameMatch?nameMatch[1].trim():'Team Member '+(idx+1);
+          let nameRaw=nameMatch&&nameMatch[1].trim()?nameMatch[1].trim():'Team Member '+(idx+1);
           let blockUpper=block.toUpperCase();
           let nameUpper=nameRaw.toUpperCase();
           let isNew=nameUpper.includes('*NEW_MEMBER*')||blockUpper.includes('*NEW_MEMBER*')||nameUpper.includes('[NEW]')||blockUpper.includes('[NEW]');
@@ -7972,7 +7945,7 @@
           let isDeviceAddReq=!!pendingDeviceMatch;
           let cleanName=nameRaw.replace(/\*NEW_MEMBER\*|\[NEW\]|\*NEW\*|\(NEW\)|\[REMOVE_REQUESTED\]|\*\[REMOVE_REQUESTED\]\*/gi,'').replace(/\s*\[REQUESTED_AT:[^\]]*\]/gi,'').trim();
           let cleanDevice=deviceMatch?deviceMatch[1].replace(/\[DEVICE_REVOKE_REQUESTED\]|\*\[DEVICE_REVOKE_REQUESTED\]\*/gi,'').trim():'None';
-          td.push({originalIndex:idx,person:idx+1,name:cleanName,isNew:isNew,requestedAt:requestedAtMatch?requestedAtMatch[1].trim():'',isRemoveRequested:isRemoveRequested,isDeviceRevokeReq:isDeviceRevokeReq,isDeviceAddReq:isDeviceAddReq,pendingDevice:pendingDeviceMatch?pendingDeviceMatch[1].trim():'',iqamaText:iqamaMatch?normalizeTeamMemberIqama(iqamaMatch[1]):'N/A',device:cleanDevice,iqama:normalizeImageUrl(extractedUrls[0]||''),selfie:normalizeImageUrl(extractedUrls[1]||extractedUrls[0]||''),devicePhotos:extractedUrls.slice(2).map(function(url){return normalizeImageUrl(url);}).filter(Boolean)});
+          td.push({originalIndex:idx,person:idx+1,name:cleanName,isNew:isNew,requestedAt:requestedAtMatch?requestedAtMatch[1].trim():'',isRemoveRequested:isRemoveRequested,isDeviceRevokeReq:isDeviceRevokeReq,isDeviceAddReq:isDeviceAddReq,pendingDevice:pendingDeviceMatch?pendingDeviceMatch[1].trim():'',iqamaText:iqamaMatch?normalizeTeamMemberIqama(iqamaMatch[1])||'N/A':'N/A',device:cleanDevice,iqama:normalizeImageUrl(extractedUrls[0]||''),selfie:normalizeImageUrl(extractedUrls[1]||extractedUrls[0]||''),devicePhotos:extractedUrls.slice(2).map(function(url){return normalizeImageUrl(url);}).filter(Boolean)});
         }
       });
       let leadNameRaw=String(r.VisitorName||'').trim();
@@ -8350,19 +8323,19 @@
     if(tMembers.trim()!==""){
       let lines=tMembers.split('\n\n');
       lines.forEach(function(block,idx){
-        let nameMatch=block.match(/Name:\s*([^\|]+)/);
-        let iqamaMatch=block.match(/Iqama:\s*(.*?)(?:\s*\||\n)/);
-        let deviceMatch=block.match(/Device:\s*(.*?)(?:\n|$)/);
+        let nameMatch=block.match(/^Name:[ \t]*([^|\r\n]*)/mi);
+        let iqamaMatch=block.match(/^[^\r\n]*\|[ \t]*Iqama:[ \t]*([^|\r\n]*)/mi);
+        let deviceMatch=block.match(/^Device:[ \t]*([^\r\n]*)/mi);
         let extractedUrls=block.match(/(?:https?:\/\/|data:image\/)[^\s\|]+/g)||[];
         if(extractedUrls.length<2){extractedUrls=block.split(/\r?\n/).slice(2).map(function(line){return normalizeImageUrl(line);}).filter(function(url){return !!url;});}
         if(extractedUrls.length>=1 || nameMatch || iqamaMatch){
-          let nameRaw=nameMatch?nameMatch[1].trim():'Team Member '+(idx+1);
+          let nameRaw=nameMatch&&nameMatch[1].trim()?nameMatch[1].trim():'Team Member '+(idx+1);
           let blockUpper=block.toUpperCase();let nameUpper=nameRaw.toUpperCase();
           let isNew=nameUpper.includes('*NEW_MEMBER*')||blockUpper.includes('*NEW_MEMBER*')||nameUpper.includes('[NEW]')||blockUpper.includes('[NEW]');
           let isRemoveRequested=nameUpper.includes('[REMOVE_REQUESTED]');
           let pendingDeviceMatch=block.match(/^Pending Device:\s*(.*?)\s*\[DEVICE_ADD_REQUESTED\]\s*$/mi);
           let cleanName=nameRaw.replace(/\*NEW_MEMBER\*|\[NEW\]|\*NEW\*|\(NEW\)|\[REMOVE_REQUESTED\]|\*\[REMOVE_REQUESTED\]\*/gi,'').replace(/\s*\[REQUESTED_AT:[^\]]*\]/gi,'').trim();
-          teamData.push({person:idx+1,name:cleanName,isNew:isNew,isRemoveRequested:isRemoveRequested,isDeviceAddReq:!!pendingDeviceMatch,pendingDevice:pendingDeviceMatch?pendingDeviceMatch[1].trim():'',iqamaText:iqamaMatch?normalizeTeamMemberIqama(iqamaMatch[1]):'N/A',device:deviceMatch?deviceMatch[1].trim():'None',iqama:extractedUrls[0]||'',selfie:extractedUrls[1]||extractedUrls[0]||'',devicePhotos:extractedUrls.slice(2),devicePhoto:extractedUrls.length>2?extractedUrls[2]:'No File'});
+          teamData.push({person:idx+1,name:cleanName,isNew:isNew,isRemoveRequested:isRemoveRequested,isDeviceAddReq:!!pendingDeviceMatch,pendingDevice:pendingDeviceMatch?pendingDeviceMatch[1].trim():'',iqamaText:iqamaMatch?normalizeTeamMemberIqama(iqamaMatch[1])||'N/A':'N/A',device:deviceMatch?deviceMatch[1].trim():'None',iqama:extractedUrls[0]||'',selfie:extractedUrls[1]||extractedUrls[0]||'',devicePhotos:extractedUrls.slice(2),devicePhoto:extractedUrls.length>2?extractedUrls[2]:'No File'});
         }
       });
       maxWorkers=teamData.length+1;
