@@ -5664,11 +5664,15 @@
       if(document.visibilityState==='hidden')return;
       if(r==='ops')loadMyPasses(false,true);
       else if(r==='admin'){
+        updateActiveRequestDurations();
         loadAdminData(true);
         refreshAdminApprovalPanels();
       }
     },r==='admin'?30000:15000);
   }
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState!=='hidden')updateActiveRequestDurations();
+  });
   function toggleFullScreen(){const d=document,de=d.documentElement;const req=de.requestFullscreen||de.mozRequestFullScreen||de.webkitRequestFullScreen||de.msRequestFullscreen;const exit=d.exitFullscreen||d.mozCancelFullScreen||d.webkitExitFullscreen||d.msExitFullscreen;try{if(!d.fullscreenElement&&!d.mozFullScreenElement&&!d.webkitFullscreenElement&&!d.msFullscreenElement){if(req)Promise.resolve(req.call(de)).catch(function(e){console.warn('Fullscreen request failed:',e);});else alert("Fullscreen not supported");}else if(exit)Promise.resolve(exit.call(d)).catch(function(e){console.warn('Exiting fullscreen failed:',e);});}catch(e){console.warn('Fullscreen operation failed:',e);alert("Fullscreen is unavailable in this browser.");}}
   function toggleSidebar(){const sb=document.getElementById('sidebar');if(!sb)return;sb.classList.toggle('minimized');const isMinimized=sb.classList.contains('minimized');document.body.classList.toggle('sidebar-minimized',isMinimized);const button=sb.querySelector('.toggle-btn');if(button)button.setAttribute('aria-expanded',String(!isMinimized));}
   const appLayout=document.getElementById('app-layout');
@@ -6587,6 +6591,18 @@
   function formatHistoryDurationValue(startValue,endValue,storedValue){
     return formatHistoryDuration(startValue,endValue,storedValue).replace(/^DURATION:\s*/,'');
   }
+  function formatElapsedDuration(startTimestamp,now){
+    const start=Number(startTimestamp);
+    if(!Number.isFinite(start)||start<=0)return '—';
+    const minutes=Math.max(0,Math.floor(((now||Date.now())-start)/60000));
+    return Math.floor(minutes/60)+'h '+(minutes%60)+'m';
+  }
+  function updateActiveRequestDurations(){
+    const now=Date.now();
+    document.querySelectorAll('.active-request-card-duration-value[data-check-in-ms]').forEach(function(element){
+      element.textContent=formatElapsedDuration(element.dataset.checkInMs,now);
+    });
+  }
 
   async function copyRequestEmail(button){
     const email=String(button&&button.dataset.copyEmail||'').trim();
@@ -7074,14 +7090,14 @@
               +'<button class="btn-primary btn-danger" onclick="adminRevokePass(\''+row.UniqueID+'\')">🚫 REVOKE PASS</button>'
               +'<button class="btn-primary btn-outline" onclick="openExtendPass(\''+row.UniqueID+'\',\''+rType+'\')">'+t('btn_extend')+'</button>'
               +'</div>';
-            let ciTime='-';let durHtml='—';
+            let ciTime='-';let durHtml='—';let checkInTimestamp=0;
             const isInside=!!row.CheckInTime&&!row.CheckOutTime;
             if(row.CheckInTime)ciTime=formatTime(row.CheckInTime);
-            if(isInside){let ciObj=new Date(row.CheckInTime);if(!isNaN(ciObj.getTime())){let now=new Date().getTime();let diffMins=Math.floor((now-ciObj.getTime())/60000);if(diffMins<0)diffMins=0;let h=Math.floor(diffMins/60);let m=diffMins%60;durHtml=h+'h '+m+'m';}}
+            if(isInside){const ciDate=parseFlexibleDate(row.CheckInTime);if(ciDate){checkInTimestamp=ciDate.getTime();durHtml=formatElapsedDuration(checkInTimestamp);}}
             const emailText=escapeHistoryText(rHostEmail);
             const emailCell=rHostEmail?'<span class="active-request-card-email">Email: '+emailText+'</span> <button type="button" class="copy-email-button" data-copy-email="'+emailText+'" onclick="copyRequestEmail(this)" title="Copy email" aria-label="Copy email address">⧉</button>':'';
             const badgeHtml=dateBadge.replace(/^<br>/,'');
-            const activeCard='<article class="active-request-card"><div class="active-request-card-heading"><div class="active-request-card-identity"><strong class="active-request-card-name">'+escapeHistoryText(rVisitorName)+'</strong>'+emailCell+'</div><div class="active-request-card-state">'+cbHtml+'<span class="active-request-status">ACTIVE</span></div></div><div class="active-request-card-meta"><span class="active-request-card-dates">📅 VALIDITY: '+escapeHistoryText(dateStr)+'</span></div><div class="active-request-card-checkin"><div class="active-request-card-checkin-meta"><span class="active-request-card-checkin-label">CHECK-IN: '+escapeHistoryText(ciTime)+'</span><span class="active-request-card-duration"><span class="active-request-card-duration-label">Duration</span><strong class="active-request-card-duration-value">'+escapeHistoryText(durHtml)+'</strong></span></div><div class="active-request-card-checkin-details">'+(badgeHtml?'<span class="active-request-card-type-badge">'+badgeHtml+'</span>':'')+'<span class="active-request-card-location">📍 '+escapeHistoryText(rLocation)+'</span></div></div>'+actionBtns+'</article>';
+            const activeCard='<article class="active-request-card"><div class="active-request-card-heading"><div class="active-request-card-identity"><strong class="active-request-card-name">'+escapeHistoryText(rVisitorName)+'</strong>'+emailCell+'</div><div class="active-request-card-state">'+cbHtml+'<span class="active-request-status">ACTIVE</span></div></div><div class="active-request-card-meta"><span class="active-request-card-dates">📅 VALIDITY: '+escapeHistoryText(dateStr)+'</span></div><div class="active-request-card-checkin"><div class="active-request-card-checkin-meta"><span class="active-request-card-checkin-label">CHECK-IN: '+escapeHistoryText(ciTime)+'</span><span class="active-request-card-duration"><span class="active-request-card-duration-label">Duration</span><strong class="active-request-card-duration-value"'+(checkInTimestamp?' data-check-in-ms="'+checkInTimestamp+'"':'')+'>'+escapeHistoryText(durHtml)+'</strong></span></div><div class="active-request-card-checkin-details">'+(badgeHtml?'<span class="active-request-card-type-badge">'+badgeHtml+'</span>':'')+'<span class="active-request-card-location">📍 '+escapeHistoryText(rLocation)+'</span></div></div>'+actionBtns+'</article>';
             if(isChecked)activeCheckedCount++;
             if(String(rType).trim().toLowerCase()==='contractor'){
               hContractorActive+=activeCard;
