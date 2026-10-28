@@ -4859,12 +4859,17 @@
     return facilityAdminRequestPromise;
   }
   var selectedFacilityAdminHistoryFilter='all';
+  function isOfficeHostApprovalPending(record){
+    if(!record||String(record.Type||'').trim().toLowerCase()!=='office visitor')return false;
+    var approvalStatus=String(record.OfficeHostApprovalStatus||'').trim().toLowerCase();
+    return !!approvalStatus&&approvalStatus!=='approved';
+  }
   function countPendingAccessRequests(data){
     if(!Array.isArray(data))return 0;
     return data.filter(function(record){
       if(!record||!record.UniqueID)return false;
       var status=String(record.Status||'Pending').trim().toLowerCase();
-      if(status==='pending')return true;
+      if(status==='pending')return !isOfficeHostApprovalPending(record);
       if(status!=='approved')return false;
       var endDate=parseFlexibleDate(record.EndDate||record.StartDate);
       if(endDate){endDate.setHours(23,59,59,999);if(endDate<new Date())return false;}
@@ -7075,7 +7080,7 @@
           let isRemovalRequest=removeCount>0||revokeCount>0;
           let isDeviceAddRequest=deviceAddCount>0;
           let rowId="'"+String(row.UniqueID).replace(/'/g,"\\'")+"'";
-          if(rStatus==='Pending'||hasActionPending){
+          if((rStatus==='Pending'&&!isOfficeHostApprovalPending(row))||hasActionPending){
             let actionBtns='<div class="pending-actions">';
             if(isRemovalRequest||isDeviceAddRequest||newCount>0){actionBtns+='<button type="button" class="btn-primary btn-outline btn-sm" onclick="event.preventDefault();event.stopPropagation();openViewRecord('+rowId+');return false;">'+t('btn_view')+'</button>';}
             else{actionBtns+='<button type="button" class="btn-primary btn-success btn-sm" onclick="event.preventDefault();event.stopPropagation();updateStatus('+rowId+',\'Approved\');return false;">'+t('btn_approve')+'</button><button type="button" class="btn-primary btn-danger btn-sm" onclick="event.preventDefault();event.stopPropagation();updateStatus('+rowId+',\'Rejected\');return false;">'+t('btn_reject')+'</button><button type="button" class="btn-primary btn-outline btn-sm" onclick="event.preventDefault();event.stopPropagation();openExtendPass('+rowId+','+JSON.stringify(rType)+');return false;">'+t('btn_extend')+'</button><button type="button" class="btn-primary btn-outline btn-sm" onclick="event.preventDefault();event.stopPropagation();openViewRecord('+rowId+');return false;">'+t('btn_view')+'</button>';}
