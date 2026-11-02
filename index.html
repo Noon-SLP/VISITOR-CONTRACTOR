@@ -4866,13 +4866,24 @@
     }
     function countPendingAccessRequests(data){
       if(!Array.isArray(data))return 0;
+      var si=document.getElementById('filter-start');
+      var ei=document.getElementById('filter-end');
+      var fStart=si&&si.value?si.value:'';
+      var fEnd=ei&&ei.value?ei.value:'';
+      var now=new Date();
       return data.filter(function(record){
         if(!record||!record.UniqueID)return false;
+        if(!matchesAdminDataScope(record,'approvals'))return false;
+        if(!isDateInRange(record.StartDate,currentAdminFilter,fStart,fEnd))return false;
         var status=String(record.Status||'Pending').trim().toLowerCase();
+        var endDate=parseFlexibleDate(record.EndDate||record.StartDate);
+        if(endDate){
+          endDate=new Date(endDate.getTime());
+          endDate.setHours(23,59,59,999);
+          if(endDate<now)return false;
+        }
         if(status==='pending')return !isOfficeHostApprovalPending(record);
         if(status!=='approved')return false;
-        var endDate=parseFlexibleDate(record.EndDate||record.StartDate);
-        if(endDate){endDate.setHours(23,59,59,999);if(endDate<new Date())return false;}
         var teamMembers=String(record.TeamMembers||'');
         var blocks=teamMembers.trim()?teamMembers.split(/\n\s*\n/).filter(function(block){return block.trim();}):[];
         var hasPendingTeamAction=blocks.some(function(block){
