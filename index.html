@@ -1292,6 +1292,83 @@
       async function adminRejectLeadDeviceAdd(passId,button){if(!confirm('Reject the lead additional device request?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'reject_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');refreshMemberView(passId,'device-add');}catch(error){alert('Lead device rejection failed: '+error.message);if(button)button.disabled=false;}}
     const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxyQ4kGKgsNS076UvKCk0ezCVSzp2DlqYobiprd8Qrvt5oJBWrVlszD7-jm2mOYtsTUvg/exec';
     function freshScriptUrl(){return SCRIPT_URL+'?cacheBust='+Date.now()+'-'+Math.random().toString(36).slice(2);}
+    var appVersionFingerprint=null;
+    var appUpdateCheckInFlight=false;
+    var appUpdateCheckWarningShown=false;
+    function fingerprintAppSource(source){
+      var first=2166136261;
+      var second=2246822519;
+      for(var index=0;index<source.length;index++){
+        var code=source.charCodeAt(index);
+        first=Math.imul(first^code,16777619);
+        second=Math.imul(second^code,3266489917);
+      }
+      return source.length+':'+(first>>>0).toString(36)+':'+(second>>>0).toString(36);
+    }
+    function showAppUpdateNotice(){
+      if(document.getElementById('app-update-notice'))return;
+      var notice=document.createElement('div');
+      notice.id='app-update-notice';
+      notice.setAttribute('role','status');
+      notice.setAttribute('aria-live','polite');
+      notice.style.cssText='position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2147483647;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;width:min(560px,calc(100vw - 24px));box-sizing:border-box;padding:11px 14px;border:1px solid rgba(255,199,0,.65);border-radius:12px;background:linear-gradient(145deg,#202735,#10151f);box-shadow:0 12px 36px rgba(0,0,0,.55),0 0 24px rgba(255,199,0,.12);color:#ffe17a;font:700 13px Inter,Arial,sans-serif;text-align:center;';
+      var message=document.createElement('span');
+      message.textContent='Update available — please refresh.';
+      var refreshButton=document.createElement('button');
+      refreshButton.type='button';
+      refreshButton.textContent='Refresh';
+      refreshButton.style.cssText='padding:7px 12px;border:0;border-radius:7px;background:#ffc700;color:#111;font:800 11px Inter,Arial,sans-serif;cursor:pointer;';
+      refreshButton.addEventListener('click',function(){window.location.reload();});
+      notice.append(message,refreshButton);
+      document.body.appendChild(notice);
+    }
+    function checkForAppUpdate(){
+      if(appUpdateCheckInFlight||window.location.protocol==='file:')return;
+      appUpdateCheckInFlight=true;
+      var checkUrl=new URL(window.location.href);
+      checkUrl.hash='';
+      checkUrl.searchParams.set('__app_update_check',Date.now()+'-'+Math.random().toString(36).slice(2));
+      var url=checkUrl.toString();
+      fetch(url,{method:'HEAD',cache:'no-store',credentials:'same-origin'})
+        .then(function(response){
+          if(!response.ok)return '';
+          var entityTag=response.headers.get('etag');
+          var lastModified=response.headers.get('last-modified');
+          return entityTag?'etag:'+entityTag:(lastModified?'modified:'+lastModified+'|'+(response.headers.get('content-length')||''):'');
+        })
+        .catch(function(){return '';})
+        .then(function(headerFingerprint){
+          if(headerFingerprint)return headerFingerprint;
+          return fetch(url,{method:'GET',cache:'no-store',credentials:'same-origin'})
+            .then(function(response){
+              if(!response.ok)throw new Error('Update check returned HTTP '+response.status+'.');
+              return response.text();
+            })
+            .then(function(source){return 'source:'+fingerprintAppSource(source);});
+        })
+        .then(function(latestFingerprint){
+          if(appVersionFingerprint===null){
+            appVersionFingerprint=latestFingerprint;
+          }else if(latestFingerprint!==appVersionFingerprint){
+            showAppUpdateNotice();
+          }
+          appUpdateCheckWarningShown=false;
+        })
+        .catch(function(error){
+          if(!appUpdateCheckWarningShown){
+            console.warn('[App update] Unable to check for a newer website version.',error);
+            appUpdateCheckWarningShown=true;
+          }
+        })
+        .finally(function(){appUpdateCheckInFlight=false;});
+    }
+    if(window.location.protocol!=='file:'){
+      checkForAppUpdate();
+      window.setInterval(checkForAppUpdate,120000);
+      document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible')checkForAppUpdate();
+      });
+    }
     function showRequestEmailFailure(result){
       if(result&&result.notificationSent===true)return;
       if(result&&result.notificationSent===false){
@@ -5411,6 +5488,7 @@
         officeModeIsActive=isOffice;
         if(requestCard)requestCard.classList.toggle('office-request-mode',isOffice);
         officeFields.classList.toggle('hidden',!isOffice);
+        countryFacilityRow.classList.toggle('hidden',isOffice);
         requestLocationGroup.classList.toggle('hidden',isOffice||requestLocation.dataset.hasFacilities!=='true');
         if(!isOffice)clearOfficeRequestVehiclePicture();
         if(submitButton)submitButton.textContent=isOffice?t('office_submit_request'):t('submit_approval');
