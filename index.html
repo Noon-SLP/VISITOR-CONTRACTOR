@@ -1243,29 +1243,7 @@
   <script>
     async function adminApproveLeadDeviceAdd(passId,button){if(!confirm('Approve the lead additional device?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'approve_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');refreshMemberView(passId,'device-add');}catch(error){alert('Lead device approval failed: '+error.message);if(button)button.disabled=false;}}
     async function adminRejectLeadDeviceAdd(passId,button){if(!confirm('Reject the lead additional device request?'))return;if(button)button.disabled=true;try{await appsScriptAction({action:'reject_lead_device_add',id:passId});localStorage.removeItem('cached_admin_data');refreshMemberView(passId,'device-add');}catch(error){alert('Lead device rejection failed: '+error.message);if(button)button.disabled=false;}}
-  const SCRIPT_URL='https://script.google.com/macros/s/AKfycby6SBhfL178bNFOQbOeMldvLGfjcf5uP2eB4_MvgZhVhRGS8E5h6EKcA04r8ngrGi9E/exec';
-  const BACKEND_CACHE_SCOPE=JSON.stringify([SCRIPT_URL,'1fsn1GBiEiI6WD97lxXPodQRWt6A9D8CPfsFRYSoSKmg']);
-  function clearCachesForBackendChange(){
-    [
-      {name:'localStorage',getStorage:function(){return window.localStorage;}},
-      {name:'sessionStorage',getStorage:function(){return window.sessionStorage;}}
-    ].forEach(function(storageSource){
-      try{
-        var storage=storageSource.getStorage();
-        if(storage.getItem('noon_backend_url')===BACKEND_CACHE_SCOPE)return;
-        var keys=[];
-        for(var i=0;i<storage.length;i++){
-          var key=storage.key(i);
-          if(key&&(key.indexOf('cached_')===0||key.indexOf('noon_session_')===0||key==='noon_session_guard'||key.indexOf('noon_shift_start_')===0))keys.push(key);
-        }
-        keys.forEach(function(key){storage.removeItem(key);});
-        storage.setItem('noon_backend_url',BACKEND_CACHE_SCOPE);
-      }catch(storageError){
-        console.error('[Environment] Unable to isolate saved data for this backend in '+storageSource.name+'.',storageError);
-      }
-    });
-  }
-  clearCachesForBackendChange();
+  const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxyQ4kGKgsNS076UvKCk0ezCVSzp2DlqYobiprd8Qrvt5oJBWrVlszD7-jm2mOYtsTUvg/exec';
   function freshScriptUrl(){return SCRIPT_URL+'?cacheBust='+Date.now()+'-'+Math.random().toString(36).slice(2);}
   function showRequestEmailFailure(result){
     if(result&&result.notificationSent===true)return;
@@ -1316,11 +1294,6 @@
   function adminApiPost(params,timeoutMs){
     if(!currentUser||currentUser.role!=='admin'||!currentUser.adminToken){
       return Promise.reject(new Error('Your admin session expired. Please sign in again.'));
-    }
-    var sessionExpiresAt=Number(currentUser.expiresAt);
-    if(sessionExpiresAt>Date.now()&&sessionExpiresAt-Date.now()<CLIENT_ADMIN_SESSION_TTL_MS/3){
-      currentUser.expiresAt=Date.now()+CLIENT_ADMIN_SESSION_TTL_MS;
-      saveSession();
     }
     var payload=Object.assign({},params,{
       adminToken:currentUser.adminToken,
@@ -1616,117 +1589,13 @@
   dict.ar.office_mode="المكتب (السعودية فقط)";
   dict.en.country_not_set="Country not set";
   dict.ar.country_not_set="لم يتم تحديد الدولة";
-  dict.en.all_passes="Pass History";
-  dict.ar.all_passes="سجل التصاريح";
-  dict.en.pass_history_eyebrow="GLOBAL ADMIN ARCHIVE";
-  dict.ar.pass_history_eyebrow="أرشيف المسؤول العام";
-  dict.en.archive_from="FROM";
-  dict.ar.archive_from="من";
-  dict.en.archive_to="TO";
-  dict.ar.archive_to="إلى";
-  dict.en.restore_visit_date_from="Visit Date / Validity (From)";
-  dict.ar.restore_visit_date_from="تاريخ الزيارة / الصلاحية (من)";
-  dict.en.restore_visit_date_to="Visit Date / Validity (To)";
-  dict.ar.restore_visit_date_to="تاريخ الزيارة / الصلاحية (إلى)";
-  dict.en.archived_statuses="Rejected & completed";
-  dict.ar.archived_statuses="المرفوضة والمكتملة";
-  dict.en.all_passes_search="Search name, pass ID, email, type, or location";
-  dict.ar.all_passes_search="ابحث بالاسم أو رقم التصريح أو البريد الإلكتروني أو النوع أو الموقع";
-  dict.en.all_statuses="All statuses";
-  dict.ar.all_statuses="كل الحالات";
-  dict.en.status_active="Active";
-  dict.ar.status_active="نشط";
-  dict.en.pass_id="Pass ID";
-  dict.ar.pass_id="رقم التصريح";
-  dict.en.host_email="Host Email";
-  dict.ar.host_email="بريد المضيف";
-  dict.en.archive_type="Type";
-  dict.ar.archive_type="النوع";
-  dict.en.archive_location="Location";
-  dict.ar.archive_location="الموقع";
-  dict.en.visit_dates="Visit Dates";
-  dict.ar.visit_dates="تواريخ الزيارة";
-  dict.en.archive_contact="Contact";
-  dict.ar.archive_contact="رقم التواصل";
-  dict.en.approved_by="Approved by";
-  dict.ar.approved_by="تمت الموافقة بواسطة";
-  dict.en.rejected_by="Rejected by";
-  dict.ar.rejected_by="تم الرفض بواسطة";
-  dict.en.revoked_by="Revoked by";
-  dict.ar.revoked_by="تم إلغاء التصريح بواسطة";
-  dict.en.new_pass_badge="NEW";
-  dict.ar.new_pass_badge="جديد";
-  dict.en.pass_decisions="PASS DECISION RECORD";
-  dict.ar.pass_decisions="سجل قرارات التصريح";
-  dict.en.pass_decision_history="DECISION HISTORY";
-  dict.ar.pass_decision_history="سجل القرارات";
-  dict.en.pass_completed_eyebrow="PASS STATUS UPDATE";
-  dict.ar.pass_completed_eyebrow="تحديث حالة التصريح";
-  dict.en.btn_ok="OK";
-  dict.ar.btn_ok="حسنًا";
-  dict.en.no_pass_matches="No passes match the selected search or status.";
-  dict.ar.no_pass_matches="لا توجد تصاريح تطابق البحث أو الحالة المحددة.";
-  dict.en.no_passes_available="No passes are available.";
-  dict.ar.no_passes_available="لا توجد تصاريح متاحة.";
-  dict.en.pass_count_one="pass";
-  dict.ar.pass_count_one="تصريح";
-  dict.en.pass_count_many="passes";
-  dict.ar.pass_count_many="تصاريح";
-  dict.en.view_pass_details="VIEW DETAILS";
-  dict.ar.view_pass_details="عرض التفاصيل";
-  dict.en.approve_new_visit="APPROVE / NEW VISIT";
-  dict.ar.approve_new_visit="موافقة / زيارة جديدة";
-  dict.en.reapprove_pass="REAPPROVE";
-  dict.ar.reapprove_pass="إعادة الموافقة";
-  dict.en.set_pending="SET PENDING";
-  dict.ar.set_pending="إعادة إلى قيد الانتظار";
-  dict.en.pass_completed_title="PASS COMPLETED";
-  dict.ar.pass_completed_title="اكتمل التصريح";
-  dict.en.passes_completed_title="PASSES COMPLETED";
-  dict.ar.passes_completed_title="اكتملت التصاريح";
-  dict.en.pass_completed_summary="This pass is now complete:";
-  dict.ar.pass_completed_summary="اكتمل هذا التصريح:";
-  dict.en.passes_completed_summary="These passes are now complete:";
-  dict.ar.passes_completed_summary="اكتملت هذه التصاريح:";
-  dict.en.pass_revoked_title="PASS REVOKED";
-  dict.ar.pass_revoked_title="تم إلغاء التصريح";
-  dict.en.passes_revoked_title="PASSES REVOKED";
-  dict.ar.passes_revoked_title="تم إلغاء التصاريح";
-  dict.en.pass_revoked_summary="This pass was revoked by";
-  dict.ar.pass_revoked_summary="تم إلغاء هذا التصريح بواسطة";
-  dict.en.passes_revoked_summary="These passes were revoked. The person who revoked each pass is listed below.";
-  dict.ar.passes_revoked_summary="تم إلغاء هذه التصاريح. يظهر أدناه اسم الشخص الذي ألغى كل تصريح.";
-  dict.en.restore_pass_title="APPROVE PASS / NEW VISIT";
-  dict.ar.restore_pass_title="الموافقة على التصريح / زيارة جديدة";
-  dict.en.restore_pass_button="APPROVE WITH NEW DATES";
-  dict.ar.restore_pass_button="الموافقة بالتواريخ الجديدة";
-  dict.en.confirm_restore_pass="Approve and restore pass";
-  dict.ar.confirm_restore_pass="هل تريد الموافقة على التصريح وإعادته";
-  dict.en.confirm_extend_pass="Extend pass";
-  dict.ar.confirm_extend_pass="هل تريد تمديد التصريح";
-  dict.en.end_before_start="The end date cannot be before the start date.";
-  dict.ar.end_before_start="لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ البدء.";
-  dict.en.select_both_dates="Please select both Start and End dates.";
-  dict.ar.select_both_dates="يرجى تحديد تاريخي البدء والانتهاء.";
-  dict.en.close_completed_notice="Close completed pass notice";
-  dict.ar.close_completed_notice="إغلاق إشعار اكتمال التصريح";
-  function addMemberNotice(count,duplicates){
-    duplicates=Number(duplicates)||0;
-    if(count<=0){
-      if(currentLang==='ar')return "لم تتم إضافة أعضاء جدد لأن جميع الأعضاء المرسلين موجودون بالفعل في هذا التصريح.";
-      return "No new team members were added because all submitted members are already on this pass.";
-    }
-    let notice;
+  function addMemberNotice(count){
     if(currentLang==='ar'){
-      if(count===1)notice="تنبيه: تمت إضافة عضو جديد إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على العضو الجديد.";
-      else if(count===2)notice="تنبيه: تمت إضافة عضوين جديدين إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على كل عضو جديد.";
-      else notice="تنبيه: تمت إضافة "+count+" أعضاء جدد إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على كل عضو جديد.";
-      if(duplicates>0)notice+="\n\nتم تجاهل "+duplicates+" عضو مكرر لأن بياناته موجودة بالفعل في هذا التصريح.";
-      return notice;
+      if(count===1)return "تنبيه: تمت إضافة عضو جديد إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على العضو الجديد.";
+      if(count===2)return "تنبيه: تمت إضافة عضوين جديدين إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على كل عضو جديد.";
+      return "تنبيه: تمت إضافة "+count+" أعضاء جدد إلى هذا التصريح. يظل التصريح معتمدًا، ويجب أن يوافق المسؤول على كل عضو جديد.";
     }
-    notice="NOTICE: "+count+" new member"+(count===1?" has":"s have")+" been added to this pass. The pass remains approved; an admin must approve each new member.";
-    if(duplicates>0)notice+="\n\n"+duplicates+" duplicate team member"+(duplicates===1?" was":"s were")+" already on this pass and skipped.";
-    return notice;
+    return "NOTICE: "+count+" new member"+(count===1?" has":"s have")+" been added to this pass. The pass remains approved; an admin must approve each new member.";
   }
   function addMemberText(key){
     const messages={
@@ -1745,20 +1614,7 @@
     };
     return messages[currentLang][key];
   }
-  function toggleLang(){
-    currentLang=currentLang==='en'?'ar':'en';
-    document.documentElement.dir=currentLang==='ar'?'rtl':'ltr';
-    updateUI();
-    updateAdminAuthForm();
-    if(document.getElementById('admin-sec-all-passes'))renderAdminPassArchive();
-    if(document.getElementById('extend-type')&&document.getElementById('extend-type').value==='restore'){
-      const restoreTitle=document.querySelector('#extend-pass-modal .record-modal-header h3');
-      const restoreButton=document.getElementById('btn-submit-extend');
-      if(restoreTitle)restoreTitle.textContent=t('restore_pass_title');
-      if(restoreButton)restoreButton.textContent=t('restore_pass_button');
-    }
-    if(currentUser&&currentUser.accessLevel==='superadmin'&&!facilityAdminRequestActionInProgress)refreshFacilityAdminRequests(true);
-  }
+  function toggleLang(){currentLang=currentLang==='en'?'ar':'en';document.documentElement.dir=currentLang==='ar'?'rtl':'ltr';updateUI();updateAdminAuthForm();if(currentUser&&currentUser.accessLevel==='superadmin'&&!facilityAdminRequestActionInProgress)refreshFacilityAdminRequests(true);}
   function setTranslatedContent(el,value){
     const textContainer=el.matches('.office-photo-actions button, .office-photo-actions .file-picker')&&el.querySelector('svg')?el.querySelector('span'):null;
     if(textContainer)textContainer.textContent=value;
@@ -1830,7 +1686,7 @@
   }
   function safeImg(u){return normalizeImageUrl(u)||'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\'%3E%3Crect width=\'40\' height=\'40\' fill=\'%23333\'/%3E%3Ctext x=\'20\' y=\'24\' font-size=\'14\' text-anchor=\'middle\' fill=\'%23888\'%3E%3F%3C/text%3E%3C/svg%3E';}
 
-  const urlParams=new URLSearchParams(window.location.search);const currentRoleParam=urlParams.get('role')||'default';const SESSION_KEY='noon_session_'+currentRoleParam;const GUARD_SESSION_KEY='noon_session_guard';const SESSION_MAX_AGE_MS=12*60*60*1000;const CLIENT_ADMIN_SESSION_TTL_MS=6*60*60*1000;let adminSignupMode=false;let adminPasswordResetMode=false;let html5QrCode=null;let scannerFacingMode='environment';let scannerLibraryPromise=null;let scannerOperation=Promise.resolve();let currentUser=null;let currentScannedID=null;let currentScanAction='check_in';let currentAdminFilter='all';let autoRefreshTimer=null;let globalAdminData=[];let showOfficeRequests=false;let globalAdminHistory=[];let adminDataScopes={approvals:{country:'all',facility:'all'},history:{country:'all',facility:'all'},analytics:{country:'all',facility:'all'}};let myPassesData=[];let checkedPrintIds=new Set();let liveStream=null;let currentFacingMode='environment';let targetPhotoType='';let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null};let teamList=[];let currentTeamCounter=1;let isProcessingScan=false;let userSecurityPin=null;let lockedPassesData=null;let pinCreateMode='submit';let currentBatchType='new';
+  const urlParams=new URLSearchParams(window.location.search);const currentRoleParam=urlParams.get('role')||'default';const SESSION_KEY='noon_session_'+currentRoleParam;const GUARD_SESSION_KEY='noon_session_guard';const SESSION_MAX_AGE_MS=12*60*60*1000;let adminSignupMode=false;let adminPasswordResetMode=false;let html5QrCode=null;let scannerFacingMode='environment';let scannerLibraryPromise=null;let scannerOperation=Promise.resolve();let currentUser=null;let currentScannedID=null;let currentScanAction='check_in';let currentAdminFilter='all';let autoRefreshTimer=null;let globalAdminData=[];let showOfficeRequests=false;let globalAdminHistory=[];let adminDataScopes={approvals:{country:'all',facility:'all'},history:{country:'all',facility:'all'},analytics:{country:'all',facility:'all'}};let myPassesData=[];let checkedPrintIds=new Set();let liveStream=null;let currentFacingMode='environment';let targetPhotoType='';let capturedImages={iqama:null,selfie:null,imeiphoto:null,vehicle:null,fmpoc:null};let teamList=[];let currentTeamCounter=1;let isProcessingScan=false;let userSecurityPin=null;let lockedPassesData=null;let pinCreateMode='submit';let currentBatchType='new';
   let guardSessionExpiryTimer=null;
   let historySortOrder='desc';
   let expandedHistoryGroups=new Set();
@@ -1995,7 +1851,6 @@
       try{
         var storage=storageSource.getStorage();
         storage.removeItem(SESSION_KEY);
-        storage.removeItem(GUARD_SESSION_KEY);
       }catch(storageError){
         console.warn('[Session] Unable to clear the current session from '+storageSource.name+'.',storageError);
       }
@@ -5502,7 +5357,7 @@
       if(currentUser&&currentUser.role==='admin'){
         const vn=document.getElementById('req-vname'),ae=document.getElementById('req-admin-email'),ag=document.getElementById('admin-email-group'),sb=document.getElementById('sidebar'),han=document.getElementById('header-admin-name'),na=document.getElementById('nav-sidebar-admin');
         const msb=document.getElementById('admin-manual-search-box');
-        const cacheOwner=JSON.stringify([BACKEND_CACHE_SCOPE,currentUser.email||'',currentUser.accessLevel||'',currentUser.location||'ALL']);
+        const cacheOwner=JSON.stringify([currentUser.email||'',currentUser.accessLevel||'',currentUser.location||'ALL']);
         if(localStorage.getItem('cached_admin_data_owner')!==cacheOwner){
           localStorage.removeItem('cached_admin_data');
           localStorage.removeItem('cached_admin_history');
@@ -5516,7 +5371,6 @@
         setupAdminHeaderIdentity();
         ensureSuperAdminApprovalPanel();
         ensureGuardSignupApprovalPanel();
-        ensureAdminPassArchiveUi();
         if(na)na.classList.remove('hidden');
         const ng=document.getElementById('nav-sidebar-guard');if(ng)ng.classList.toggle('hidden',currentUser.accessLevel==='facility');
         if(msb)msb.classList.remove('hidden');
@@ -5746,10 +5600,10 @@
   function saveSession(){
     if(!currentUser)return;
     const loginTime=Date.now();
-    const defaultSessionTtlMs=currentUser.role==='admin'||currentUser.role==='superadmin' ? CLIENT_ADMIN_SESSION_TTL_MS : SESSION_MAX_AGE_MS;
-    const storedExpiry=Number(currentUser.expiresAt) || loginTime + defaultSessionTtlMs;
-    currentUser.expiresAt=String(storedExpiry);
-    const sessionText=JSON.stringify({user:currentUser,time:loginTime,expiresAt:storedExpiry});
+    const guardExpiry=currentUser.role==='guard'
+      ?Number(currentUser.expiresAt)||loginTime+SESSION_MAX_AGE_MS
+      :null;
+    const sessionText=JSON.stringify({user:currentUser,time:loginTime,expiresAt:guardExpiry});
     const storages=[{name:'localStorage',getStorage:function(){return window.localStorage;}}];
     if(currentUser.role==='guard')storages.push({name:'sessionStorage',getStorage:function(){return window.sessionStorage;}});
     storages.forEach(function(storageSource){
@@ -5762,7 +5616,7 @@
       }
     });
     if(currentUser.role==='guard'){
-      scheduleGuardSessionExpiry(storedExpiry);
+      scheduleGuardSessionExpiry(guardExpiry);
     }
   }
   function scheduleGuardSessionExpiry(expiresAt){
@@ -5874,7 +5728,6 @@
     document.querySelectorAll('.dashboard').forEach(function(e){e.classList.add('hidden');});
     const tv=document.getElementById('dashboard-'+vId);
     if(tv)tv.classList.remove('hidden');
-    if(vId==='admin')switchAdminTab('approvals');
     document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active');});
     const an=document.getElementById('nav-sidebar-'+vId);
     if(an)an.classList.add('active');
@@ -6320,10 +6173,10 @@
     let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',imB64='',imMime='image/jpeg',vB64='',vMime='image/jpeg';
     let leadDevType=document.getElementById('req-lead-device-type').value;
     let leadDevId=document.getElementById('req-lead-device-id').value;
-    let cleanTeam=[];
-    let fmPocVal='';
     if(leadDevType!=='None'&&!leadDevId.trim())return alert("Please provide the Lead device IMEI/Serial number.");
     let leadImeiVal=leadDevType!=='None'?leadDevType+' ('+leadDevId.trim()+')':'';
+    let cleanTeam=[];
+    let fmPocVal='';
     var selectedImageFiles=[
       {input:ii,label:'Lead Iqama / ID'},
       {input:si,label:'Lead selfie'},
@@ -6333,7 +6186,7 @@
     for(var selectedFileIndex=0;selectedFileIndex<selectedImageFiles.length;selectedFileIndex++){
       var selectedEntry=selectedImageFiles[selectedFileIndex];
       var selectedFile=selectedEntry.input&&selectedEntry.input.files&&selectedEntry.input.files[0];
-      if(selectedFile&&selectedFile.type&&!/^image\//i.test(selectedFile.type)){
+      if(selectedFile&&!/^image\//i.test(selectedFile.type||'')){
         alert(selectedEntry.label+' must be an image file. PDF and document files are not supported.');
         return;
       }
@@ -6701,8 +6554,6 @@
     });
   }
   function switchAdminTab(tName){
-    if(tName==='all-passes'&&(!currentUser||currentUser.role!=='admin'||currentUser.accessLevel!=='superadmin'))return;
-    if(tName==='all-passes')ensureAdminPassArchiveUi();
     if(tName==='guard-requests')ensureGuardSignupApprovalPanel();
     if(tName==='history'){
       ensureOfficeVisitorHistoryUi();
@@ -6712,10 +6563,6 @@
     document.querySelectorAll('.admin-nav-horizontal li').forEach(function(tab){tab.classList.remove('active');});
     var navItem=document.getElementById('nav-'+tName);
     if(navItem)navItem.classList.add('active');
-    var archiveSideNav=document.getElementById('nav-sidebar-all-passes');
-    var adminSideNav=document.getElementById('nav-sidebar-admin');
-    if(archiveSideNav)archiveSideNav.classList.toggle('active',tName==='all-passes');
-    if(adminSideNav)adminSideNav.classList.toggle('active',tName!=='all-passes');
     document.querySelectorAll('.admin-section').forEach(function(section){section.classList.add('hidden');});
     var section=document.getElementById('admin-sec-'+tName);
     if(section)section.classList.remove('hidden');
@@ -6735,7 +6582,6 @@
     if(tName==='guard-requests'&&currentUser&&(currentUser.role==='admin'||currentUser.role==='superadmin')){
       refreshGuardApprovalPanels(true);
     }
-    if(tName==='all-passes')renderAdminPassArchive();
   }
   function applyAdminDateFilter(){
     renderAdminData(globalAdminData);
@@ -7192,9 +7038,7 @@
 
   function renderAdminData(data){
     if(!Array.isArray(data)){data=[];}
-    data=data.slice().sort(function(a,b){return getPassDecisionSortTime(b)-getPassDecisionSortTime(a);});
     globalAdminData=data;
-    ensureAdminPassArchiveUi();
     ensureAdminDataScopeControls('approvals',document.getElementById('admin-sec-approvals'));
     ensureAdminDataScopeControls('analytics',document.getElementById('admin-sec-analytics'));
     const tPending=document.getElementById('admin-table-pending'),tActive=document.getElementById('admin-table-active');
@@ -7282,8 +7126,7 @@
             const emailText=escapeHistoryText(rHostEmail);
             const emailCell=rHostEmail?'<span class="active-request-card-email">Email: '+emailText+'</span> <button type="button" class="copy-email-button" data-copy-email="'+emailText+'" onclick="copyRequestEmail(this)" title="Copy email" aria-label="Copy email address">⧉</button>':'';
             const badgeHtml=dateBadge.replace(/^<br>/,'');
-            const newApprovalBadge=isRecentlyApprovedPass(row)?'<span class="active-request-new-badge" title="Recently approved or reapproved">'+t('new_pass_badge')+'</span>':'';
-            const activeCard='<article class="active-request-card"><div class="active-request-card-heading"><div class="active-request-card-identity"><strong class="active-request-card-name">'+escapeHistoryText(rVisitorName)+'</strong>'+emailCell+'</div><div class="active-request-card-state">'+cbHtml+newApprovalBadge+'<span class="active-request-status">ACTIVE</span></div></div><div class="active-request-card-meta"><span class="active-request-card-dates">📅 VALIDITY: '+escapeHistoryText(dateStr)+'</span></div><div class="active-request-card-checkin"><div class="active-request-card-checkin-meta"><span class="active-request-card-checkin-label">CHECK-IN: '+escapeHistoryText(ciTime)+'</span><span class="active-request-card-duration"><span class="active-request-card-duration-label">Duration</span><strong class="active-request-card-duration-value"'+(checkInTimestamp?' data-check-in-ms="'+checkInTimestamp+'"':'')+'>'+escapeHistoryText(durHtml)+'</strong></span></div><div class="active-request-card-checkin-details">'+(badgeHtml?'<span class="active-request-card-type-badge">'+badgeHtml+'</span>':'')+'<span class="active-request-card-location">📍 '+escapeHistoryText(rLocation)+'</span></div></div>'+actionBtns+'</article>';
+            const activeCard='<article class="active-request-card"><div class="active-request-card-heading"><div class="active-request-card-identity"><strong class="active-request-card-name">'+escapeHistoryText(rVisitorName)+'</strong>'+emailCell+'</div><div class="active-request-card-state">'+cbHtml+'<span class="active-request-status">ACTIVE</span></div></div><div class="active-request-card-meta"><span class="active-request-card-dates">📅 VALIDITY: '+escapeHistoryText(dateStr)+'</span></div><div class="active-request-card-checkin"><div class="active-request-card-checkin-meta"><span class="active-request-card-checkin-label">CHECK-IN: '+escapeHistoryText(ciTime)+'</span><span class="active-request-card-duration"><span class="active-request-card-duration-label">Duration</span><strong class="active-request-card-duration-value"'+(checkInTimestamp?' data-check-in-ms="'+checkInTimestamp+'"':'')+'>'+escapeHistoryText(durHtml)+'</strong></span></div><div class="active-request-card-checkin-details">'+(badgeHtml?'<span class="active-request-card-type-badge">'+badgeHtml+'</span>':'')+'<span class="active-request-card-location">📍 '+escapeHistoryText(rLocation)+'</span></div></div>'+actionBtns+'</article>';
             if(isChecked)activeCheckedCount++;
             if(String(rType).trim().toLowerCase()==='contractor'){
               hContractorActive+=activeCard;
@@ -7328,553 +7171,6 @@
     const ss=document.getElementById('stat-status');if(ss)ss.innerHTML=sHtml||'<div class="stat-row"><span>-</span></div>';
     let topDates=Object.entries(aDate).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
     const sd=document.getElementById('stat-date');if(sd)sd.innerHTML=topDates.map(function(kv){return '<div class="stat-row"><span>'+kv[0]+'</span><span class="stat-val" style="color:var(--noon-yellow);">'+kv[1]+'</span></div>';}).join('')||'<div class="stat-row"><span>-</span></div>';
-    renderAdminPassArchive();
-  }
-
-  function ensureAdminPassArchiveUi(){
-    var canUseArchive=!!(currentUser&&currentUser.role==='admin'&&currentUser.accessLevel==='superadmin');
-    var sidebar=document.querySelector('.sidebar-nav');
-    var adminNav=document.getElementById('nav-sidebar-admin');
-    var archiveNav=document.getElementById('nav-sidebar-all-passes');
-    if(!archiveNav&&sidebar&&adminNav){
-      archiveNav=document.createElement('a');
-      archiveNav.href='#';
-      archiveNav.id='nav-sidebar-all-passes';
-      archiveNav.className='admin-tab hidden';
-      archiveNav.innerHTML='<span class="icon">📂</span><span class="nav-text" data-i18n="all_passes">'+t('all_passes')+'</span>';
-      archiveNav.addEventListener('click',function(event){
-        event.preventDefault();
-        openAdminPassArchive();
-      });
-      adminNav.insertAdjacentElement('afterend',archiveNav);
-    }
-    if(archiveNav)archiveNav.classList.toggle('hidden',!canUseArchive);
-
-    var dashboard=document.getElementById('dashboard-admin');
-    var section=document.getElementById('admin-sec-all-passes');
-    if(!section&&dashboard){
-      section=document.createElement('section');
-      section.id='admin-sec-all-passes';
-      section.className='admin-card admin-section hidden';
-      section.classList.add('admin-pass-archive');
-      section.style.cssText='padding:20px;min-width:0;';
-      var archiveHeader=document.createElement('div');
-      archiveHeader.className='pass-history-header';
-      var titleGroup=document.createElement('div');
-      titleGroup.className='pass-history-title-group';
-      var mark=document.createElement('div');
-      mark.className='pass-history-mark';
-      mark.setAttribute('aria-hidden','true');
-      mark.textContent='↗';
-      var titleCopy=document.createElement('div');
-      titleCopy.className='pass-history-title-copy';
-      var eyebrow=document.createElement('span');
-      eyebrow.className='pass-history-eyebrow';
-      eyebrow.textContent=t('pass_history_eyebrow');
-      eyebrow.setAttribute('data-i18n','pass_history_eyebrow');
-      var heading=document.createElement('h2');
-      heading.textContent=t('all_passes');
-      heading.setAttribute('data-i18n','all_passes');
-      heading.className='pass-history-title';
-      titleCopy.appendChild(eyebrow);
-      titleCopy.appendChild(heading);
-      titleGroup.appendChild(mark);
-      titleGroup.appendChild(titleCopy);
-      archiveHeader.appendChild(titleGroup);
-      var count=document.createElement('p');
-      count.id='all-passes-count';
-      count.className='pass-history-count';
-      archiveHeader.appendChild(count);
-      var toolbar=document.createElement('div');
-      toolbar.className='all-pass-toolbar';
-      toolbar.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;';
-      var search=document.createElement('input');
-      search.id='all-passes-search';
-      search.type='search';
-      search.className='input-field t-ph';
-      search.setAttribute('data-i18n','all_passes_search');
-      search.placeholder=t('all_passes_search');
-      search.setAttribute('aria-label','Search all passes');
-      search.style.cssText='flex:1 1 260px;min-width:0;';
-      var statusFilter=document.createElement('select');
-      statusFilter.id='all-passes-status-filter';
-      statusFilter.className='input-field';
-      statusFilter.setAttribute('aria-label','Filter passes by status');
-      statusFilter.style.cssText='flex:0 1 190px;min-width:160px;';
-      [
-        ['all','archived_statuses'],
-        ['completed','status_completed'],
-        ['rejected','status_rejected']
-      ].forEach(function(optionData){
-        var option=document.createElement('option');
-        option.value=optionData[0];
-        option.textContent=t(optionData[1]);
-        option.setAttribute('data-i18n',optionData[1]);
-        statusFilter.appendChild(option);
-      });
-      toolbar.appendChild(search);
-      toolbar.appendChild(statusFilter);
-      var list=document.createElement('div');
-      list.id='all-passes-list';
-      list.className='all-pass-grid';
-      list.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px;';
-      section.appendChild(archiveHeader);
-      section.appendChild(toolbar);
-      section.appendChild(list);
-      dashboard.appendChild(section);
-      search.addEventListener('input',renderAdminPassArchive);
-      statusFilter.addEventListener('change',renderAdminPassArchive);
-    }
-    if(section)section.classList.add('admin-pass-archive');
-    if(section&&!canUseArchive)section.classList.add('hidden');
-    if(!document.getElementById('admin-pass-archive-styles')){
-      var archiveStyles=document.createElement('style');
-      archiveStyles.id='admin-pass-archive-styles';
-      archiveStyles.textContent='.admin-pass-archive{position:relative;overflow:hidden;border:1px solid rgba(255,199,0,.2);border-radius:18px;background:radial-gradient(ellipse at 8% 0%,rgba(255,199,0,.075),transparent 34%),linear-gradient(145deg,rgba(17,25,39,.98),rgba(8,12,20,.98));box-shadow:0 22px 55px rgba(0,0,0,.28)}.admin-pass-archive>.admin-card-title{padding:4px 0 14px;border-bottom:1px solid rgba(148,166,190,.16);font-size:15px;letter-spacing:.09em}.all-pass-toolbar{align-items:center;padding:11px;border:1px solid rgba(148,166,190,.14);border-radius:13px;background:rgba(5,9,16,.48)}.all-pass-toolbar .input-field{height:44px;border-radius:9px;background:rgba(8,12,20,.9)}.all-pass-toolbar .input-field:focus{box-shadow:0 0 0 3px rgba(255,199,0,.1)}#all-passes-count{display:inline-flex;align-items:center;min-height:28px;padding:5px 10px;border:1px solid rgba(255,199,0,.18);border-radius:999px;background:rgba(255,199,0,.07);color:#e8d18c!important;font-weight:700;letter-spacing:.02em}.all-pass-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))!important;gap:14px!important}.all-pass-card{position:relative;isolation:isolate;display:flex;min-width:0;flex-direction:column;padding:17px;border:1px solid rgba(148,166,190,.17);border-radius:15px;background:linear-gradient(145deg,rgba(19,28,42,.96),rgba(10,15,24,.98));box-shadow:0 8px 22px rgba(0,0,0,.2);transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}.all-pass-card:before{position:absolute;inset:0 auto 0 0;width:3px;border-radius:15px 0 0 15px;background:linear-gradient(180deg,var(--noon-yellow),rgba(255,199,0,.08));content:""}.all-pass-card[data-status="completed"]:before{background:linear-gradient(180deg,#a78bfa,rgba(167,139,250,.12))}.all-pass-card[data-status="rejected"]:before{background:linear-gradient(180deg,#fb7185,rgba(251,113,133,.12))}.all-pass-card:hover{transform:translateY(-2px);border-color:rgba(255,199,0,.38);box-shadow:0 14px 30px rgba(0,0,0,.3)}.all-pass-card-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.all-pass-card-heading strong{overflow-wrap:anywhere;color:#f5f7fb;font-size:14px;line-height:1.45}.all-pass-card-status{flex:0 0 auto;padding:5px 9px;border:1px solid rgba(148,166,190,.12);border-radius:999px;background:rgba(148,166,190,.1);font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}.all-pass-card-status[data-status="active"]{color:#34d399}.all-pass-card-status[data-status="pending"]{color:#ffd54a}.all-pass-card-status[data-status="completed"]{border-color:rgba(167,139,250,.18);background:rgba(167,139,250,.11);color:#c4b5fd}.all-pass-card-status[data-status="rejected"]{border-color:rgba(251,113,133,.18);background:rgba(251,113,133,.1);color:#fda4af}.all-pass-card-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin-bottom:16px}.all-pass-card-field{min-width:0;font-size:12px;font-weight:600;line-height:1.45;overflow-wrap:anywhere;color:#d9e0eb}.all-pass-card-field span{display:block;margin-bottom:3px;color:#7f8da2;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.all-pass-card-field:last-child:nth-child(odd){grid-column:1/-1}.all-pass-card-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid rgba(148,166,190,.1)}.all-pass-card-actions button{flex:1 1 120px;min-height:36px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.04em}.all-pass-card-actions button:hover{filter:brightness(1.08);transform:translateY(-1px)}.all-pass-card-actions .btn-success{background:linear-gradient(135deg,#19c997,#0eaa84);box-shadow:0 5px 14px rgba(16,185,129,.16)}.pass-completed-popup-list{display:grid;gap:10px;margin:15px 0;max-height:55vh;overflow:auto}.pass-completed-popup-item{padding:12px;border:1px solid rgba(148,166,190,.2);border-radius:9px;background:rgba(255,255,255,.035)}.pass-completed-popup-item h4{margin:0 0 8px;color:#fff;font-size:14px}.pass-completed-popup-item p{margin:4px 0;color:var(--text-muted);font-size:12px;overflow-wrap:anywhere}@media(max-width:600px){.admin-pass-archive{padding:15px!important}.all-pass-grid{grid-template-columns:1fr!important}.all-pass-card{padding:14px}.all-pass-card-fields{gap:10px}}';
-      document.head.appendChild(archiveStyles);
-    }
-    if(!document.getElementById('pass-history-premium-styles')){
-      var premiumStyles=document.createElement('style');
-      premiumStyles.id='pass-history-premium-styles';
-      premiumStyles.textContent='.pass-history-header{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 20px;padding:4px 2px 18px;border-bottom:1px solid rgba(148,166,190,.15)}.pass-history-title-group{display:flex;align-items:center;gap:15px;min-width:0}.pass-history-mark{display:grid;place-items:center;width:50px;height:50px;flex:0 0 50px;border:1px solid rgba(255,199,0,.32);border-radius:16px;background:linear-gradient(145deg,rgba(255,199,0,.19),rgba(255,199,0,.035));box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 22px rgba(255,199,0,.08);color:var(--noon-yellow);font-size:25px;font-weight:800}.pass-history-title-copy{display:grid;gap:4px}.pass-history-eyebrow{color:#8f9db0;font-size:9px;font-weight:800;letter-spacing:.2em}.pass-history-title{margin:0;color:#f5f7fb;font-size:clamp(20px,2.2vw,27px);font-weight:800;letter-spacing:-.04em;line-height:1.15}.pass-history-count{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:92px;min-height:38px;margin:0!important;padding:7px 13px;border:1px solid rgba(255,199,0,.24);border-radius:12px;background:linear-gradient(135deg,rgba(255,199,0,.13),rgba(255,199,0,.045));box-shadow:inset 0 1px rgba(255,255,255,.055);color:#ffe28a!important;font-size:12px;font-weight:800;letter-spacing:.025em}.pass-history-count:before{width:7px;height:7px;border-radius:50%;background:#ffc700;box-shadow:0 0 10px rgba(255,199,0,.8);content:""}.all-pass-toolbar{margin-bottom:13px!important}.all-pass-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr))!important;gap:16px!important}.all-pass-card{padding:0!important;border-color:rgba(137,157,184,.18)!important;border-radius:16px!important;background:linear-gradient(150deg,rgba(20,30,46,.99),rgba(10,15,24,.99))!important;box-shadow:0 12px 30px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.04)!important;overflow:hidden}.all-pass-card:before{inset:0 0 auto!important;width:auto!important;height:3px!important;border-radius:16px 16px 0 0!important;background:linear-gradient(90deg,rgba(255,199,0,.08),var(--noon-yellow),rgba(255,199,0,.28))!important}.all-pass-card[data-status="completed"]:before{background:linear-gradient(90deg,rgba(167,139,250,.08),#a78bfa,rgba(167,139,250,.3))!important}.all-pass-card[data-status="rejected"]:before{background:linear-gradient(90deg,rgba(251,113,133,.08),#fb7185,rgba(251,113,133,.3))!important}.all-pass-card:hover{transform:translateY(-3px)!important;border-color:rgba(255,199,0,.32)!important;box-shadow:0 20px 38px rgba(0,0,0,.34),0 0 0 1px rgba(255,199,0,.055)!important}.all-pass-card-heading{align-items:center!important;margin:0!important;padding:19px 18px 15px!important}.all-pass-card-heading strong{font-size:14px!important;font-weight:750!important;letter-spacing:-.015em}.all-pass-card-status{padding:6px 9px!important;font-size:8px!important;letter-spacing:.1em!important}.all-pass-card-fields{gap:9px!important;margin:0 18px 13px!important}.all-pass-card-field{padding:9px 10px;border:1px solid rgba(148,166,190,.09);border-radius:9px;background:rgba(5,9,16,.33);font-size:11px!important}.all-pass-card-field span{font-size:8px!important;letter-spacing:.12em!important}.all-pass-card-field:last-child:nth-child(odd){grid-column:auto!important}.all-pass-date-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:0 18px 16px;padding:12px 13px;border:1px solid rgba(255,199,0,.13);border-radius:11px;background:linear-gradient(110deg,rgba(255,199,0,.075),rgba(255,199,0,.025) 65%,rgba(255,255,255,.02))}.all-pass-date-point{min-width:0}.all-pass-date-point span{display:block;margin-bottom:4px;color:#8592a6;font-size:8px;font-weight:800;letter-spacing:.15em}.all-pass-date-point strong{display:block;overflow-wrap:anywhere;color:#f1f4f8;font-size:11px;font-weight:700}.all-pass-date-arrow{color:#d8aa25;font-size:15px}.all-pass-card-actions{gap:9px!important;margin:0!important;padding:13px 18px 17px!important;border-top:1px solid rgba(148,166,190,.1)!important}.all-pass-card-actions button{min-height:38px!important;border-radius:9px!important;font-size:9px!important;letter-spacing:.09em!important}.all-pass-card-actions .btn-outline{background:rgba(255,199,0,.035)!important}.all-pass-card-actions .btn-success{background:linear-gradient(115deg,#14b889,#0b9f77)!important;box-shadow:0 7px 16px rgba(16,185,129,.19)!important}.all-pass-card-actions button:hover{filter:brightness(1.1);transform:translateY(-1px)}@media(max-width:600px){.pass-history-header{align-items:flex-start}.pass-history-mark{width:44px;height:44px;flex-basis:44px;border-radius:13px}.pass-history-count{min-width:0;padding:6px 9px;font-size:10px}.all-pass-grid{grid-template-columns:1fr!important}.all-pass-card-fields{gap:7px!important;margin-inline:13px!important}.all-pass-card-heading{padding-inline:13px!important}.all-pass-date-range{margin-inline:13px!important}.all-pass-card-actions{padding-inline:13px!important}}';
-      document.head.appendChild(premiumStyles);
-    }
-    if(!document.getElementById('pass-history-card-color-styles')){
-      var cardColorStyles=document.createElement('style');
-      cardColorStyles.id='pass-history-card-color-styles';
-      cardColorStyles.textContent='.all-pass-card{background:linear-gradient(145deg,#172b43 0%,#12243a 52%,#101d30 100%)!important;border-color:rgba(111,157,207,.28)!important}.all-pass-card-fields .all-pass-card-field{background:linear-gradient(145deg,rgba(37,62,91,.76),rgba(24,43,66,.82));border-color:rgba(131,171,214,.17)}.all-pass-card[data-status="completed"]{background:linear-gradient(145deg,#252647 0%,#1d2140 52%,#171c35 100%)!important;border-color:rgba(167,139,250,.32)!important}.all-pass-card[data-status="rejected"]{background:linear-gradient(145deg,#432738 0%,#321f30 52%,#241a2b 100%)!important;border-color:rgba(251,113,133,.32)!important}.all-pass-card[data-status="completed"] .all-pass-card-field{background:linear-gradient(145deg,rgba(69,64,112,.58),rgba(42,40,76,.72));border-color:rgba(167,139,250,.19)}.all-pass-card[data-status="rejected"] .all-pass-card-field{background:linear-gradient(145deg,rgba(105,54,76,.56),rgba(68,39,58,.72));border-color:rgba(251,113,133,.18)}';
-      document.head.appendChild(cardColorStyles);
-    }
-    if(!document.getElementById('pass-decision-new-badge-styles')){
-      var decisionBadgeStyles=document.createElement('style');
-      decisionBadgeStyles.id='pass-decision-new-badge-styles';
-      decisionBadgeStyles.textContent='.all-pass-card-heading .all-pass-new-badge,.active-request-new-badge{display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;padding:5px 8px;border:1px solid rgba(52,211,153,.32);border-radius:999px;background:linear-gradient(120deg,rgba(16,185,129,.2),rgba(16,185,129,.08));color:#8df2ca;font-size:8px;font-weight:950;letter-spacing:.13em;line-height:1;text-transform:uppercase;box-shadow:0 3px 12px rgba(16,185,129,.08)}.active-request-new-badge{margin:0 4px}';
-      document.head.appendChild(decisionBadgeStyles);
-    }
-    return section;
-  }
-
-  function getAdminArchiveStatus(pass){
-    var status=String(pass&&pass.Status||'Pending').trim().toLowerCase();
-    if(status==='rejected')return 'Rejected';
-    if(status==='pending')return 'Pending';
-    if(status==='completed')return 'Completed';
-    var endDate=parseFlexibleDate(pass&&(pass.EndDate||pass.StartDate));
-    if(endDate){
-      endDate.setHours(23,59,59,999);
-      var today=new Date();
-      today.setHours(0,0,0,0);
-      if(endDate.getTime()<today.getTime())return 'Completed';
-    }
-    return status==='approved'?'Active':String(pass&&pass.Status||'Pending');
-  }
-
-  function getLatestPassDecision(pass){
-    var latest=null;
-    function consider(decision,timestamp){
-      var date=parseFlexibleDate(timestamp);
-      if(!decision||!date)return;
-      if(!latest||date.getTime()>latest.timestamp.getTime()){
-        latest={decision:String(decision),timestamp:date};
-      }
-    }
-    (Array.isArray(pass&&pass.DecisionHistory)?pass.DecisionHistory:[]).forEach(function(entry){
-      consider(entry&&entry.decision,entry&&entry.timestamp);
-    });
-    consider('Approved',pass&&pass.ApprovedAt);
-    consider('Rejected',pass&&pass.RejectedAt);
-    consider('Revoked',pass&&pass.RevokedAt);
-    if(!pass.RevokedAt&&/^Admin:/i.test(String(pass&&pass.ScannedByGuard||''))){
-      consider('Revoked',pass.CheckOutTime);
-    }
-    return latest;
-  }
-
-  function isRecentlyApprovedPass(pass){
-    var latest=getLatestPassDecision(pass);
-    return !!(latest&&String(latest.decision).toLowerCase()==='approved'&&
-      Date.now()-latest.timestamp.getTime()<24*60*60*1000&&
-      latest.timestamp.getTime()<=Date.now());
-  }
-
-  function isPassRevoked(pass){
-    if(String(pass&&pass.Status||'').trim().toLowerCase()!=='completed')return false;
-    var latest=getLatestPassDecision(pass);
-    return !!(latest&&String(latest.decision).toLowerCase()==='revoked');
-  }
-
-  function getPassDecisionSortTime(pass){
-    var latest=getLatestPassDecision(pass);
-    return latest?latest.timestamp.getTime():0;
-  }
-
-  function appendAdminPassField(container,labelKey,value){
-    var field=document.createElement('div');
-    field.className='all-pass-card-field';
-    var fieldLabel=document.createElement('span');
-    fieldLabel.textContent=t(labelKey);
-    fieldLabel.setAttribute('data-i18n',labelKey);
-    var fieldValue=document.createElement('div');
-    fieldValue.textContent=String(value||'-');
-    field.appendChild(fieldLabel);
-    field.appendChild(fieldValue);
-    container.appendChild(field);
-  }
-
-  function formatPassDecisionAudit(pass,prefix){
-    var actor=String(pass&&pass[prefix+'By']||'').trim();
-    var timestamp=pass&&pass[prefix+'At'];
-    if(prefix==='Revoked'&&!actor){
-      var gateActor=String(pass&&pass.ScannedByGuard||'').trim();
-      var legacyAdmin=gateActor.match(/^Admin:\s*(.+)$/i);
-      if(legacyAdmin){
-        actor=legacyAdmin[1].trim();
-        timestamp=pass.CheckOutTime||timestamp;
-      }
-    }
-    if(!actor)return '-';
-    var formattedTime=timestamp?formatHistoryDateTime(timestamp):'';
-    return actor+(formattedTime?' · '+formattedTime:'');
-  }
-
-  function renderAdminPassArchive(){
-    if(!currentUser||currentUser.role!=='admin'||currentUser.accessLevel!=='superadmin')return;
-    var section=ensureAdminPassArchiveUi();
-    var list=document.getElementById('all-passes-list');
-    var count=document.getElementById('all-passes-count');
-    var search=document.getElementById('all-passes-search');
-    var statusFilter=document.getElementById('all-passes-status-filter');
-    if(!section||!list||!count)return;
-    var query=String(search&&search.value||'').trim().toLowerCase();
-    var filter=String(statusFilter&&statusFilter.value||'all').toLowerCase();
-    var passes=(Array.isArray(globalAdminData)?globalAdminData:[]).filter(function(pass){
-      if(!pass||!pass.UniqueID)return false;
-      var status=getAdminArchiveStatus(pass).toLowerCase();
-      if(status!=='rejected'&&status!=='completed')return false;
-      if(filter!=='all'&&status!==filter)return false;
-      var haystack=[
-        pass.UniqueID,pass.VisitorName,pass.CompanyName,pass.Company,pass.ProjectName,
-        pass.HostEmail,pass.Type,pass.Location
-      ].join(' ').toLowerCase();
-      return !query||haystack.indexOf(query)!==-1;
-    });
-    passes.sort(function(a,b){return getPassDecisionSortTime(b)-getPassDecisionSortTime(a);});
-    count.textContent=passes.length+' '+t(passes.length===1?'pass_count_one':'pass_count_many');
-    list.replaceChildren();
-    if(!passes.length){
-      var empty=document.createElement('div');
-      empty.className='active-request-empty';
-      empty.textContent=t(globalAdminData.length?'no_pass_matches':'no_passes_available');
-      empty.setAttribute('data-i18n',globalAdminData.length?'no_pass_matches':'no_passes_available');
-      list.appendChild(empty);
-      return;
-    }
-    passes.forEach(function(pass){
-      var card=document.createElement('article');
-      card.className='all-pass-card';
-      var cardHeading=document.createElement('div');
-      cardHeading.className='all-pass-card-heading';
-      var name=document.createElement('strong');
-      var isContractor=String(pass.Type||'').toLowerCase()==='contractor';
-      name.textContent=String(isContractor?(pass.CompanyName||pass.Company||pass.ProjectName):pass.VisitorName||pass.CompanyName||pass.ProjectName||'Pass holder');
-      var badge=document.createElement('span');
-      var status=getAdminArchiveStatus(pass);
-      card.dataset.status=status.toLowerCase();
-      badge.className='all-pass-card-status';
-      badge.dataset.status=status.toLowerCase();
-      var statusKey='status_'+status.toLowerCase();
-      badge.textContent=t(statusKey);
-      badge.setAttribute('data-i18n',statusKey);
-      cardHeading.appendChild(name);
-      if(isRecentlyApprovedPass(pass)){
-        var newBadge=document.createElement('span');
-        newBadge.className='all-pass-new-badge';
-        newBadge.textContent=t('new_pass_badge');
-        newBadge.setAttribute('data-i18n','new_pass_badge');
-        cardHeading.appendChild(newBadge);
-      }
-      cardHeading.appendChild(badge);
-      var fields=document.createElement('div');
-      fields.className='all-pass-card-fields';
-      appendAdminPassField(fields,'type_label',pass.Type);
-      appendAdminPassField(fields,'host_email',pass.HostEmail);
-      appendAdminPassField(fields,'archive_location',pass.Location);
-      appendAdminPassField(fields,'approved_by',formatPassDecisionAudit(pass,'Approved'));
-      appendAdminPassField(fields,'rejected_by',formatPassDecisionAudit(pass,'Rejected'));
-      appendAdminPassField(fields,'revoked_by',formatPassDecisionAudit(pass,'Revoked'));
-      var dateRange=document.createElement('div');
-      dateRange.className='all-pass-date-range';
-      var dateFrom=document.createElement('div');
-      dateFrom.className='all-pass-date-point';
-      var dateFromLabel=document.createElement('span');
-      dateFromLabel.textContent=t('archive_from');
-      dateFromLabel.setAttribute('data-i18n','archive_from');
-      var dateFromValue=document.createElement('strong');
-      dateFromValue.textContent=formatToDDMMYYYY(pass.StartDate);
-      dateFrom.appendChild(dateFromLabel);
-      dateFrom.appendChild(dateFromValue);
-      var dateArrow=document.createElement('span');
-      dateArrow.className='all-pass-date-arrow';
-      dateArrow.setAttribute('aria-hidden','true');
-      dateArrow.textContent='→';
-      var dateTo=document.createElement('div');
-      dateTo.className='all-pass-date-point';
-      var dateToLabel=document.createElement('span');
-      dateToLabel.textContent=t('archive_to');
-      dateToLabel.setAttribute('data-i18n','archive_to');
-      var dateToValue=document.createElement('strong');
-      dateToValue.textContent=formatToDDMMYYYY(pass.EndDate||pass.StartDate);
-      dateTo.appendChild(dateToLabel);
-      dateTo.appendChild(dateToValue);
-      dateRange.appendChild(dateFrom);
-      dateRange.appendChild(dateArrow);
-      dateRange.appendChild(dateTo);
-      var passIdField=document.createElement('div');
-      passIdField.className='all-pass-card-field all-pass-id-field';
-      var passIdLabel=document.createElement('span');
-      passIdLabel.textContent=t('pass_id');
-      passIdLabel.setAttribute('data-i18n','pass_id');
-      var passIdValue=document.createElement('div');
-      passIdValue.textContent=String(pass.UniqueID);
-      passIdField.appendChild(passIdLabel);
-      passIdField.appendChild(passIdValue);
-      fields.insertBefore(passIdField,fields.firstChild);
-      var actions=document.createElement('div');
-      actions.className='all-pass-card-actions';
-      function addAction(labelKey,className,handler,disabled){
-        var button=document.createElement('button');
-        button.type='button';
-        button.className=className;
-        button.textContent=t(labelKey);
-        button.setAttribute('data-i18n',labelKey);
-        button.disabled=!!disabled;
-        button.addEventListener('click',handler);
-        actions.appendChild(button);
-      }
-      var passId=String(pass.UniqueID);
-      addAction('view_pass_details','btn-primary btn-outline btn-sm',function(){openViewRecord(passId);},false);
-      addAction('reapprove_pass','btn-primary btn-success btn-sm',function(){openExtendPass(passId,'restore');},false);
-      card.appendChild(cardHeading);
-      card.appendChild(fields);
-      card.appendChild(dateRange);
-      card.appendChild(actions);
-      list.appendChild(card);
-    });
-  }
-
-  function openAdminPassArchive(){
-    if(!currentUser||currentUser.role!=='admin'||currentUser.accessLevel!=='superadmin')return;
-    ensureAdminPassArchiveUi();
-    var dashboard=document.getElementById('dashboard-admin');
-    if(dashboard&&dashboard.classList.contains('hidden'))switchMainView('admin');
-    switchAdminTab('all-passes');
-  }
-
-  function getAdminPassCompletionStateKey(){
-    var email=String(currentUser&&currentUser.email||'admin').toLowerCase().trim();
-    var access=String(currentUser&&(currentUser.accessLevel||currentUser.location)||'all').toLowerCase().trim();
-    return 'admin_completed_pass_state_'+encodeURIComponent(email+'|'+access);
-  }
-
-  function getPassEndOfDayTimestamp(pass){
-    var endDate=parseFlexibleDate(pass&&(pass.EndDate||pass.StartDate));
-    if(!endDate)return 0;
-    endDate.setHours(23,59,59,999);
-    return endDate.getTime();
-  }
-
-  function trackAdminPassCompletions(passes){
-    if(!currentUser||currentUser.role!=='admin'||!Array.isArray(passes))return;
-    var storageKey=getAdminPassCompletionStateKey();
-    var previousState=null;
-    try{
-      previousState=JSON.parse(localStorage.getItem(storageKey)||'null');
-    }catch(error){
-      console.warn('[Completed passes] Saved completion state could not be read.',error);
-    }
-    var previousPasses=previousState&&previousState.passes&&typeof previousState.passes==='object'
-      ?previousState.passes:{};
-    var today=new Date();
-    today.setHours(0,0,0,0);
-    var todayStart=today.getTime();
-    var currentPasses=Object.create(null);
-    var newlyCompleted=[];
-    var newlyRevoked=[];
-    passes.forEach(function(pass){
-      if(!pass||!pass.UniqueID)return;
-      var id=String(pass.UniqueID);
-      var status=String(pass.Status||'Pending').trim().toLowerCase();
-      var endTimestamp=getPassEndOfDayTimestamp(pass);
-      var endedByDate=status==='approved'&&endTimestamp>0&&endTimestamp<todayStart;
-      var isCompleted=status==='completed'||endedByDate;
-      var isRevoked=isPassRevoked(pass);
-      var previous=previousPasses[id];
-      var justCompleted=!!(previous&&isCompleted&&!isRevoked&&
-        (status==='completed'?String(previous.status||'').toLowerCase()!=='completed':!previous.endedByDate));
-      var previousDecisionTime=previous&&Number(previous.decisionTime||0);
-      var decisionTime=getPassDecisionSortTime(pass);
-      var justRevoked=isRevoked&&(
-        previous
-          ?(!previous.revoked||(decisionTime>0&&decisionTime>previousDecisionTime))
-          :(decisionTime>0&&Date.now()-decisionTime<24*60*60*1000&&decisionTime<=Date.now())
-      );
-      if(!previousState&&isCompleted&&!isRevoked){
-        var completedAt=parseFlexibleDate(pass.CheckOutTime);
-        justCompleted=(endedByDate&&endTimestamp>=todayStart-24*60*60*1000)||
-          (status==='completed'&&completedAt&&completedAt.getTime()>=Date.now()-24*60*60*1000);
-      }
-      if(justCompleted){
-        newlyCompleted.push(pass);
-      }
-      if(justRevoked){
-        newlyRevoked.push(pass);
-      }
-      currentPasses[id]={
-        status:status,
-        endedByDate:endedByDate,
-        revoked:isRevoked,
-        decisionTime:decisionTime,
-        endDate:endTimestamp
-      };
-    });
-    try{
-      localStorage.setItem(storageKey,JSON.stringify({passes:currentPasses,checkedAt:Date.now()}));
-    }catch(error){
-      console.warn('[Completed passes] Completion state could not be saved.',error);
-    }
-    if(newlyRevoked.length)showPassDecisionPopup(newlyRevoked,'revoked');
-    else if(newlyCompleted.length)showPassDecisionPopup(newlyCompleted,'completed');
-  }
-
-  function showPassCompletedPopup(passes){
-    showPassDecisionPopup(passes,'completed');
-  }
-
-  function showPassDecisionPopup(passes,decisionType){
-    decisionType=decisionType==='revoked'?'revoked':'completed';
-    var modal=document.getElementById('admin-pass-completed-modal');
-    if(!document.getElementById('admin-pass-completed-styles')){
-      var style=document.createElement('style');
-      style.id='admin-pass-completed-styles';
-      style.textContent='.popup-modal.pass-completed-modal{z-index:1000000;background:rgba(2,6,15,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:22px}.pass-completed-modal .record-modal-box{width:min(720px,96vw)!important;max-height:90vh!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:22px!important;background:linear-gradient(155deg,#17263b 0%,#101a2b 48%,#0b1321 100%)!important;box-shadow:0 32px 100px rgba(0,0,0,.72),0 0 0 1px rgba(255,199,0,.16),0 0 55px rgba(255,199,0,.13)!important;animation:passCompleteEnter .24s cubic-bezier(.2,.8,.2,1)}.pass-completed-modal .record-modal-header{display:flex;align-items:center;gap:14px;padding:20px 23px!important;border-bottom:1px solid rgba(255,255,255,.11)!important;background:linear-gradient(110deg,rgba(255,199,0,.13),rgba(255,199,0,.025) 65%,transparent)}.pass-completed-modal .pass-completed-emblem{display:grid;flex:0 0 48px;width:48px;height:48px;place-items:center;border:1px solid rgba(255,199,0,.48);border-radius:16px;background:linear-gradient(145deg,#ffe47a,#ffbd18);color:#182033;font-size:26px;font-weight:1000;box-shadow:0 8px 25px rgba(255,199,0,.22)}.pass-completed-modal .pass-completed-title-copy{flex:1;min-width:0}.pass-completed-modal .pass-completed-eyebrow{display:block;margin-bottom:4px;color:#ffe17a;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.pass-completed-modal #admin-pass-completed-title{color:#fff!important;font-size:clamp(17px,3vw,23px)!important;font-weight:900;letter-spacing:.045em;line-height:1.2}.pass-completed-modal .pass-completed-close{display:grid;flex:0 0 38px;width:38px;height:38px;place-items:center;border:1px solid rgba(255,255,255,.16)!important;border-radius:12px!important;background:rgba(255,255,255,.07)!important;color:#f8fafc!important;font-size:25px!important;transition:background .15s ease,transform .15s ease}.pass-completed-modal .pass-completed-close:hover{transform:rotate(90deg);background:rgba(255,255,255,.16)!important}.pass-completed-modal #admin-pass-completed-content{padding:21px 23px 23px!important;overflow:auto;max-height:calc(90vh - 92px)}.pass-completed-modal .pass-completed-summary{display:flex;align-items:center;gap:12px;margin:0;padding:14px 16px;border:1px solid rgba(52,211,153,.22);border-radius:14px;background:linear-gradient(110deg,rgba(16,185,129,.13),rgba(16,185,129,.045));color:#e5fff5!important;font-size:14px!important;font-weight:750;line-height:1.5}.pass-completed-modal .pass-completed-summary:before{display:grid;flex:0 0 27px;width:27px;height:27px;place-items:center;border-radius:50%;background:#20c997;color:#06251d;content:\"✓\";font-size:15px;font-weight:1000}.pass-completed-modal .pass-completed-popup-list{display:grid;gap:11px;margin:15px 0 18px;max-height:48vh;overflow:auto;padding:2px 3px 4px}.pass-completed-modal .pass-completed-popup-item{position:relative;padding:16px 17px 14px 20px;border:1px solid rgba(164,184,212,.19);border-radius:15px;background:linear-gradient(135deg,rgba(35,51,73,.8),rgba(15,25,40,.88));box-shadow:inset 0 1px rgba(255,255,255,.045)}.pass-completed-modal .pass-completed-popup-item:before{position:absolute;inset:13px auto 13px 0;width:3px;border-radius:0 4px 4px 0;background:linear-gradient(#35ddb0,#118e72);content:\"\"}.pass-completed-modal .pass-completed-popup-item h4{margin:0 0 12px;color:#fff;font-size:15px;font-weight:850;line-height:1.45;overflow-wrap:anywhere}.pass-completed-modal .pass-completed-popup-item p{display:grid;grid-template-columns:minmax(95px,.55fr) minmax(0,1.45fr);gap:8px;margin:0;padding:6px 0;border-top:1px solid rgba(255,255,255,.055);color:#e1e9f4!important;font-size:12px!important;line-height:1.45;overflow-wrap:anywhere}.pass-completed-modal .pass-completed-popup-item p span:first-child{color:#98a9bf;font-size:10px;font-weight:800;letter-spacing:.045em;text-transform:uppercase}.pass-completed-modal .pass-completed-ok{min-height:46px;border:1px solid rgba(255,255,255,.17)!important;border-radius:12px!important;background:linear-gradient(110deg,#ffd448,#f2b900)!important;color:#142033!important;font-size:12px!important;font-weight:950!important;letter-spacing:.1em;box-shadow:0 8px 24px rgba(255,199,0,.2);transition:transform .15s ease,filter .15s ease}.pass-completed-modal .pass-completed-ok:hover{transform:translateY(-1px);filter:brightness(1.08)}@keyframes passCompleteEnter{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:520px){.popup-modal.pass-completed-modal{padding:10px}.pass-completed-modal .record-modal-header{padding:15px!important;gap:11px}.pass-completed-modal .pass-completed-emblem{flex-basis:42px;width:42px;height:42px;border-radius:13px}.pass-completed-modal #admin-pass-completed-content{padding:15px!important}.pass-completed-modal .pass-completed-popup-item{padding:13px 12px 12px 16px}.pass-completed-modal .pass-completed-popup-item p{grid-template-columns:1fr;gap:2px}}@media(prefers-reduced-motion:reduce){.pass-completed-modal .record-modal-box{animation:none!important;transition:none!important}}';
-      document.head.appendChild(style);
-    }
-    if(!document.getElementById('admin-pass-revoked-styles')){
-      var revokedStyle=document.createElement('style');
-      revokedStyle.id='admin-pass-revoked-styles';
-      revokedStyle.textContent='.pass-completed-modal.pass-revoked-modal .record-modal-header{background:linear-gradient(110deg,rgba(239,68,68,.22),rgba(127,29,29,.07) 68%,transparent)!important;border-bottom-color:rgba(248,113,113,.25)!important}.pass-completed-modal.pass-revoked-modal .pass-completed-eyebrow{color:#fca5a5!important}.pass-completed-modal.pass-revoked-modal .pass-completed-emblem{border-color:rgba(252,165,165,.65)!important;background:linear-gradient(145deg,#fecaca,#ef4444)!important;color:#450a0a!important;box-shadow:0 8px 25px rgba(239,68,68,.3)!important}.pass-completed-modal.pass-revoked-modal .pass-completed-summary{border-color:rgba(248,113,113,.4)!important;background:linear-gradient(110deg,rgba(185,28,28,.32),rgba(127,29,29,.17))!important;color:#fff1f2!important}.pass-completed-modal.pass-revoked-modal .pass-completed-summary:before{background:#ef4444!important;color:#fff!important;content:\"!\"!important}.pass-completed-modal.pass-revoked-modal .pass-completed-popup-item{border-color:rgba(248,113,113,.28)!important;background:linear-gradient(135deg,rgba(69,26,26,.76),rgba(31,20,28,.94))!important}.pass-completed-modal.pass-revoked-modal .pass-completed-popup-item:before{background:linear-gradient(#f87171,#b91c1c)!important}.pass-completed-modal.pass-revoked-modal #admin-pass-completed-title{color:#fee2e2!important}';
-      document.head.appendChild(revokedStyle);
-    }
-    if(!modal){
-      modal=document.createElement('div');
-      modal.id='admin-pass-completed-modal';
-      modal.className='popup-modal pass-completed-modal hidden';
-      modal.setAttribute('role','dialog');
-      modal.setAttribute('aria-modal','true');
-      modal.setAttribute('aria-labelledby','admin-pass-completed-title');
-      var box=document.createElement('div');
-      box.className='record-modal-box';
-      var header=document.createElement('div');
-      header.className='record-modal-header';
-      var emblem=document.createElement('span');
-      emblem.className='pass-completed-emblem';
-      emblem.setAttribute('aria-hidden','true');
-      emblem.textContent='✓';
-      var titleCopy=document.createElement('div');
-      titleCopy.className='pass-completed-title-copy';
-      var eyebrow=document.createElement('span');
-      eyebrow.className='pass-completed-eyebrow';
-      eyebrow.textContent=t('pass_completed_eyebrow');
-      eyebrow.setAttribute('data-i18n','pass_completed_eyebrow');
-      var title=document.createElement('h3');
-      title.id='admin-pass-completed-title';
-      title.style.cssText='margin:0;text-transform:uppercase;';
-      titleCopy.appendChild(eyebrow);
-      titleCopy.appendChild(title);
-      var close=document.createElement('button');
-      close.type='button';
-      close.textContent='×';
-      close.setAttribute('aria-label','Close completed pass notice');
-      close.className='pass-completed-close';
-      close.addEventListener('click',function(){modal.classList.add('hidden');});
-      header.appendChild(emblem);
-      header.appendChild(titleCopy);
-      header.appendChild(close);
-      var content=document.createElement('div');
-      content.id='admin-pass-completed-content';
-      var dismiss=document.createElement('button');
-      dismiss.type='button';
-      dismiss.className='btn-primary btn-success';
-      dismiss.textContent='OK';
-      dismiss.classList.add('pass-completed-ok');
-      dismiss.style.width='100%';
-      dismiss.addEventListener('click',function(){modal.classList.add('hidden');});
-      content.appendChild(dismiss);
-      box.appendChild(header);
-      box.appendChild(content);
-      modal.appendChild(box);
-      modal.addEventListener('click',function(event){
-        if(event.target===modal)modal.classList.add('hidden');
-      });
-      document.body.appendChild(modal);
-    }
-    var title=modal.querySelector('#admin-pass-completed-title');
-    var content=modal.querySelector('#admin-pass-completed-content');
-    var dismiss=content.querySelector('button');
-    modal.classList.toggle('pass-revoked-modal',decisionType==='revoked');
-    var statusEmblem=modal.querySelector('.pass-completed-emblem');
-    if(statusEmblem)statusEmblem.textContent=decisionType==='revoked'?'!':'✓';
-    var titleKey=decisionType==='revoked'
-      ?(passes.length===1?'pass_revoked_title':'passes_revoked_title')
-      :(passes.length===1?'pass_completed_title':'passes_completed_title');
-    title.textContent=t(titleKey);
-    title.setAttribute('data-i18n',titleKey);
-    content.replaceChildren();
-    var summary=document.createElement('p');
-    summary.className='pass-completed-summary';
-    var summaryKey=decisionType==='revoked'
-      ?(passes.length===1?'pass_revoked_summary':'passes_revoked_summary')
-      :(passes.length===1?'pass_completed_summary':'passes_completed_summary');
-    var revokedBy=passes.length===1?formatPassDecisionAudit(passes[0],'Revoked'):'';
-    summary.textContent=t(summaryKey)+(decisionType==='revoked'&&passes.length===1?': '+revokedBy:'');
-    summary.setAttribute('data-i18n',summaryKey);
-    summary.style.cssText='margin:0;';
-    var details=document.createElement('div');
-    details.className='pass-completed-popup-list';
-    passes.forEach(function(pass){
-      var item=document.createElement('article');
-      item.className='pass-completed-popup-item';
-      var heading=document.createElement('h4');
-      var isContractor=String(pass.Type||'').toLowerCase()==='contractor';
-      heading.textContent=String(isContractor?(pass.CompanyName||pass.Company||pass.ProjectName):pass.VisitorName||pass.CompanyName||pass.ProjectName||'Pass holder')+' · '+String(pass.UniqueID);
-      item.appendChild(heading);
-      var popupFields=[
-        ['archive_type',pass.Type],
-        ['archive_location',pass.Location],
-        ['visit_dates',formatToDDMMYYYY(pass.StartDate)+' - '+formatToDDMMYYYY(pass.EndDate||pass.StartDate)],
-        ['host_email',pass.HostEmail],
-        ['archive_contact',pass.ContactNo]
-      ];
-      if(decisionType==='revoked'&&passes.length>1){
-        popupFields.push(['revoked_by',formatPassDecisionAudit(pass,'Revoked')]);
-      }
-      popupFields.forEach(function(field){
-        var line=document.createElement('p');
-        var label=document.createElement('span');
-        label.textContent=t(field[0])+': ';
-        label.setAttribute('data-i18n',field[0]);
-        var value=document.createElement('span');
-        value.textContent=String(field[1]||'-');
-        line.appendChild(label);
-        line.appendChild(value);
-        item.appendChild(line);
-      });
-      details.appendChild(item);
-    });
-    content.replaceChildren(summary,details,dismiss);
-    dismiss.textContent=t('btn_ok');
-    dismiss.setAttribute('data-i18n','btn_ok');
-    modal.classList.remove('hidden');
   }
 
   function toggleAdminOfficeRequests(){
@@ -7924,7 +7220,7 @@
       try{
         if(cachedM.trim().charAt(0)==='['){
           const parsedM=JSON.parse(cachedM);
-          if(Array.isArray(parsedM))          renderAdminData(parsedM);
+          if(Array.isArray(parsedM))renderAdminData(parsedM.slice().reverse());
           else localStorage.removeItem('cached_admin_data');
         }else localStorage.removeItem('cached_admin_data');
       }catch(e){localStorage.removeItem('cached_admin_data');}
@@ -7933,13 +7229,9 @@
       const dataMain=convertDriveUrls(await appsScriptJsonp({action:'get_admin_passes'},null,30000));
       if(Array.isArray(dataMain)){
         const newMStr=JSON.stringify(dataMain);
-        if(isSilent&&cachedM===newMStr){
-          trackAdminPassCompletions(dataMain);
-          return;
-        }
+        if(isSilent&&cachedM===newMStr)return;
         localStorage.setItem('cached_admin_data',newMStr);
-        renderAdminData(dataMain);
-        trackAdminPassCompletions(dataMain);
+        renderAdminData(dataMain.slice().reverse());
       }else{
         throw new Error('The admin pass list response was invalid.');
       }
@@ -8125,8 +7417,7 @@
       startAutoRefresh(currentUser.role);
       return;
     }
-    var busyText=newStatus==='Approved'?'ACCEPTING...':newStatus==='Rejected'?'REJECTING...':'SETTING PENDING...';
-    var actionButton=markPortalActionBusy(null,busyText);
+    var actionButton=markPortalActionBusy(null,newStatus==='Approved'?'ACCEPTING...':'REJECTING...');
     if(actionButton===false)return;
     beginPleaseWait('PLEASE WAIT...');
     if(Array.isArray(globalAdminData)){
@@ -8215,24 +7506,15 @@
     var actionButton=markPortalActionBusy(null,'REVOKING...');
     if(actionButton===false)return;
     try{
-      const result=await appsScriptAction({action:'revoke_pass',id:id},60000);
+      const adminInfo=currentUser.role==='admin'?'Admin: '+currentUser.name:currentUser.name+' ('+currentUser.location+')';
+      const result=await appsScriptAction({action:'check_out',id:id,guardInfo:adminInfo,headCount:1,forceStatus:'Completed'},60000);
       if(!result.time)throw new Error('The server confirmed the gate action without returning its recorded time.');
       if(String(result.action||'').toUpperCase()!=='OUT')throw new Error('The server response did not confirm that the pass was checked out.');
       const item=globalAdminData.find(function(pass){return String(pass.UniqueID)===String(id);});
       if(item){
         item.Status='Completed';
         item.CheckOutTime=result.time;
-        item.ScannedByGuard='Admin: '+String(result.revokedBy||'');
-        item.RevokedBy=result.revokedBy||'';
-        item.RevokedAt=result.revokedAt||result.time;
-        if(!Array.isArray(item.DecisionHistory))item.DecisionHistory=[];
-        item.DecisionHistory.push({
-          passType:item.Type||'',
-          decision:'Revoked',
-          actor:result.revokedBy||'',
-          timestamp:result.revokedAt||result.time,
-          previousStatus:'Approved'
-        });
+        item.ScannedByGuard=adminInfo;
         localStorage.setItem('cached_admin_data',JSON.stringify(globalAdminData));
         renderAdminData(globalAdminData);
         if(item.HostEmail)localStorage.removeItem('cached_passes_'+String(item.HostEmail).toLowerCase().trim());
@@ -8247,30 +7529,7 @@
     }
   }
 
-  function openExtendPass(id,type){
-    const ei=document.getElementById('extend-id'),et=document.getElementById('extend-type'),eg=document.getElementById('extend-end-group'),em=document.getElementById('extend-pass-modal');
-    const start=document.getElementById('extend-start'),end=document.getElementById('extend-end');
-    const title=document.querySelector('#extend-pass-modal .record-modal-header h3'),button=document.getElementById('btn-submit-extend');
-    const startLabel=document.querySelector('#extend-start-group label'),endLabel=document.querySelector('#extend-end-group label');
-    const restoring=type==='restore';
-    if(ei)ei.value=id;
-    if(et)et.value=type||'';
-    if(eg)eg.classList.remove('hidden');
-    if(restoring){
-      if(start)start.value='';
-      if(end)end.value='';
-      if(startLabel){startLabel.textContent=t('restore_visit_date_from');startLabel.setAttribute('data-i18n','restore_visit_date_from');}
-      if(endLabel){endLabel.textContent=t('restore_visit_date_to');endLabel.setAttribute('data-i18n','restore_visit_date_to');}
-      if(title)title.textContent=t('restore_pass_title');
-      if(button)button.textContent=t('restore_pass_button');
-    }else{
-      if(startLabel){startLabel.textContent=t('new_start_date');startLabel.setAttribute('data-i18n','new_start_date');}
-      if(endLabel){endLabel.textContent=t('new_end_date');endLabel.setAttribute('data-i18n','new_end_date');}
-      if(title)title.textContent=t('extend_pass');
-      if(button)button.textContent=t('save_extension');
-    }
-    if(em)em.classList.remove('hidden');
-  }
+  function openExtendPass(id,type){const ei=document.getElementById('extend-id'),et=document.getElementById('extend-type'),eg=document.getElementById('extend-end-group'),em=document.getElementById('extend-pass-modal');if(ei)ei.value=id;if(et)et.value=type;if(eg)eg.classList.remove('hidden');if(em)em.classList.remove('hidden');}
   function closeExtendPass(){const em=document.getElementById('extend-pass-modal');if(em)em.classList.add('hidden');}
 
   const nativeFetch=window.fetch.bind(window);
@@ -8296,41 +7555,7 @@
     finally{if(isSubmission){pleaseWaitRequestCount--;hidePleaseWait();}}
   };
 
-  async function submitExtendPass(){
-    const id=document.getElementById('extend-id').value;
-    const type=document.getElementById('extend-type').value;
-    const start=document.getElementById('extend-start').value;
-    const end=document.getElementById('extend-end').value;
-    const button=document.getElementById('btn-submit-extend');
-    const restoring=type==='restore';
-    if(!start||!end)return alert(t('select_both_dates'));
-    if(end<start)return alert(t('end_before_start'));
-    if(!confirm((restoring?t('confirm_restore_pass'):t('confirm_extend_pass'))+' '+id+'?'))return;
-    button.textContent='SAVING...';
-    button.disabled=true;
-    try{
-      await appsScriptAction({
-        action:restoring?'restore_pass':'extend_pass',
-        id:id,
-        newStartDate:start,
-        newEndDate:end
-      });
-      if(restoring){
-        var restoredPass=globalAdminData.find(function(pass){return String(pass.UniqueID)===String(id);});
-        if(restoredPass&&restoredPass.HostEmail){
-          localStorage.removeItem('cached_passes_'+String(restoredPass.HostEmail).toLowerCase().trim());
-        }
-      }
-      closeExtendPass();
-      localStorage.removeItem('cached_admin_data');
-      await loadAdminData(true);
-    }catch(error){
-      alert('Error: '+(error&&error.message?error.message:'Unable to save the pass dates.'));
-    }finally{
-      button.textContent=restoring?t('restore_pass_button'):t('save_extension');
-      button.disabled=false;
-    }
-  }
+  async function submitExtendPass(){const id=document.getElementById('extend-id').value,type=document.getElementById('extend-type').value,ns=document.getElementById('extend-start').value,ei=document.getElementById('extend-end');const ne=ei?ei.value:'';const btn=document.getElementById('btn-submit-extend');if(!ns||!ne)return alert('Please select both Start and End dates.');if(!confirm('Extend pass '+id+'?'))return;btn.innerText='SAVING...';btn.disabled=true;try{await appsScriptAction({action:'extend_pass',id:id,newStartDate:ns,newEndDate:ne});closeExtendPass();loadAdminData(false);}catch(e){alert('Error: '+(e&&e.message?e.message:'Unable to extend this pass.'));}finally{btn.innerText=t("save_extension");btn.disabled=false;}}
 
   async function adminResetPin(email){if(!confirm('Reset PIN for '+email+'? They will be prompted to create a new one next time.'))return;try{const response=await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'reset_pin',email:email}),redirect:'follow'});const result=await response.json();if(!result||result.status!=='success')throw new Error(result&&result.message?result.message:'The reset was not confirmed.');clearStoredPin(email);localStorage.removeItem('cached_admin_data');localStorage.removeItem('cached_passes_'+email);alert("PIN Reset Successful.");closeViewRecord();loadAdminData(true);}catch(e){alert('Error resetting PIN: '+(e&&e.message?e.message:'Unknown error'));}}
 
@@ -8735,18 +7960,6 @@
       h+='<div style="margin-bottom:10px;"><strong>ACCOUNT PIN</strong><div style="display:flex; gap:10px; align-items:center; margin-top:5px;"><span style="color:var(--text-muted);font-weight:bold;font-size:13px;">'+(hasAccountPin?'SET (HIDDEN)':'NOT SET')+'</span>'+actionBtn+'</div></div>';
     }
     h+='<div><strong>'+t('lbl_host_email')+'</strong>'+(r.HostEmail||'-')+'</div><div><strong>'+t('visitor_name')+'</strong>'+(r.VisitorName||'-')+'</div><div><strong>'+t('type_header')+'</strong>'+(t(rType.toLowerCase())||'-')+'</div><div><strong>'+t('location_label')+'</strong>'+(r.Location||'-')+'</div><div><strong>'+t('lbl_validity')+'</strong>'+validityPeriod+'</div><div><strong>'+t('slp_ticket')+'</strong>'+(r.SlpTicketNo||'-')+'</div><div><strong>'+t('contact_no')+'</strong>'+(r.ContactNo||'-')+'</div><div><strong>IMEI NUMBER</strong>'+(r.ImeiNumber||'-')+'</div>';
-    h+='<div style="margin:12px 0;padding:13px;border:1px solid rgba(148,166,190,.2);border-radius:11px;background:linear-gradient(135deg,rgba(30,43,61,.72),rgba(12,20,32,.8));"><strong style="display:block;margin-bottom:10px;color:#ffe17a;font-size:10px;letter-spacing:.1em;">'+t('pass_decisions')+'</strong><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;"><div><strong style="color:#9eafc5;">'+t('approved_by')+'</strong><span style="display:block;margin-top:3px;color:#f1f5fb;overflow-wrap:anywhere;">'+escapeHtmlForPrint(formatPassDecisionAudit(r,'Approved'))+'</span></div><div><strong style="color:#9eafc5;">'+t('rejected_by')+'</strong><span style="display:block;margin-top:3px;color:#f1f5fb;overflow-wrap:anywhere;">'+escapeHtmlForPrint(formatPassDecisionAudit(r,'Rejected'))+'</span></div><div><strong style="color:#9eafc5;">'+t('revoked_by')+'</strong><span style="display:block;margin-top:3px;color:#f1f5fb;overflow-wrap:anywhere;">'+escapeHtmlForPrint(formatPassDecisionAudit(r,'Revoked'))+'</span></div></div></div>';
-    var decisionHistory=Array.isArray(r.DecisionHistory)?r.DecisionHistory:[];
-    if(decisionHistory.length){
-      h+='<div style="margin:0 0 12px;padding:12px;border:1px solid rgba(148,166,190,.17);border-radius:10px;background:rgba(4,9,16,.48);"><strong style="display:block;margin-bottom:8px;color:#cbd5e1;font-size:9px;letter-spacing:.12em;">'+t('pass_decision_history')+'</strong>';
-      decisionHistory.slice().reverse().forEach(function(entry){
-        var decision=String(entry.decision||'').toLowerCase();
-        var actionLabel=decision==='approved'?t('approved_by'):decision==='revoked'?t('revoked_by'):t('rejected_by');
-        var timeLabel=entry.timestamp?formatHistoryDateTime(entry.timestamp):'';
-        h+='<div style="padding:6px 0;border-top:1px solid rgba(255,255,255,.06);color:#e2e8f0;font-size:11px;line-height:1.45;"><strong>'+escapeHtmlForPrint(actionLabel)+'</strong> · '+escapeHtmlForPrint(entry.actor||'-')+(timeLabel?' · '+escapeHtmlForPrint(timeLabel):'')+'</div>';
-      });
-      h+='</div>';
-    }
     if(rType==='Visitor')h+='<div><strong>'+t('invited_by')+'</strong>'+(r.InvitedBy||'-')+'</div>';
     else h+='<div><strong>'+t('project_name')+'</strong>'+(r.ProjectName||'-')+'</div><div><strong>'+t('company_name')+'</strong>'+(r.CompanyName||'-')+'</div><div><strong>'+t('project_manager')+'</strong>'+(r.ProjectManager||'-')+'</div><div><strong>'+t('fm_poc')+'</strong>'+(r.FmPoc||'-')+'</div>';
     let fmpocStr=String(r.FmPoc||'');
@@ -9126,49 +8339,6 @@
     renderScannedPass(data,true);
   }
 
-  function normalizeScannedMemberIdentity(value){
-    return String(value||'').toLowerCase().replace(/[\s\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E]/g,'');
-  }
-  function getScannedMemberIdentityKey(member){
-    var identity=normalizeScannedMemberIdentity(member&&member.iqamaText);
-    if(!identity||identity==='na'||identity==='none'||identity==='unknown'){
-      identity=normalizeScannedMemberIdentity(member&&member.name);
-    }
-    return identity?'member:'+identity:'';
-  }
-  function deduplicateScannedTeamMembers(members){
-    var uniqueMembers=[],membersByKey=Object.create(null);
-    members.forEach(function(member){
-      var key=getScannedMemberIdentityKey(member);
-      if(!key){uniqueMembers.push(member);return;}
-      if(!membersByKey[key]){
-        membersByKey[key]=member;
-        uniqueMembers.push(member);
-        return;
-      }
-      var existing=membersByKey[key];
-      if(/^Team Member \d+$/i.test(existing.name)&&!/^Team Member \d+$/i.test(member.name))existing.name=member.name;
-      existing.isNew=!!existing.isNew&&!!member.isNew;
-      existing.isRemoveRequested=!!existing.isRemoveRequested||!!member.isRemoveRequested;
-      existing.isDeviceRevokeReq=!!existing.isDeviceRevokeReq||!!member.isDeviceRevokeReq;
-      existing.isDeviceAddReq=!!existing.isDeviceAddReq||!!member.isDeviceAddReq;
-      if(!existing.pendingDevice)existing.pendingDevice=member.pendingDevice||'';
-      if(!existing.iqama)existing.iqama=member.iqama||'';
-      if(!existing.selfie)existing.selfie=member.selfie||'';
-      existing.devicePhotos=(existing.devicePhotos||[]).concat(member.devicePhotos||[]).filter(function(photo,index,photos){
-        return !!photo&&photos.indexOf(photo)===index;
-      });
-      var devices=[];
-      [existing.device,member.device].forEach(function(value){
-        String(value||'').split(/\s*\|\s*/).forEach(function(device){
-          var clean=device.trim();
-          if(clean&&clean.toLowerCase()!=='none'&&!devices.some(function(saved){return saved.toLowerCase()===clean.toLowerCase();}))devices.push(clean);
-        });
-      });
-      existing.device=devices.length?devices.join(' | '):'None';
-    });
-    return uniqueMembers;
-  }
   function renderScannedPass(data,liveVerified,connectionFailed){
     const resultCard=document.getElementById('scan-result');
     const selfieImg=document.getElementById('r-selfie');
@@ -9213,7 +8383,6 @@
           teamData.push({person:idx+1,name:cleanName,isNew:isNew,isRemoveRequested:isRemoveRequested,isDeviceAddReq:!!pendingDeviceMatch,pendingDevice:pendingDeviceMatch?pendingDeviceMatch[1].trim():'',iqamaText:iqamaMatch?normalizeTeamMemberIqama(iqamaMatch[1])||'N/A':'N/A',device:deviceMatch?deviceMatch[1].trim():'None',iqama:extractedUrls[0]||'',selfie:extractedUrls[1]||extractedUrls[0]||'',devicePhotos:extractedUrls.slice(2),devicePhoto:extractedUrls.length>2?extractedUrls[2]:'No File'});
         }
       });
-      teamData=deduplicateScannedTeamMembers(teamData);
       maxWorkers=teamData.length+1;
     }
     if(topInfoBox){
@@ -9540,27 +8709,15 @@
     let payload={action:"add_team_members",id:addMorePassId,team:JSON.stringify(cleanTeam)};
     beginPleaseWait('PLEASE WAIT...');
     try{
-      let submissionResult=await submitAppsScriptForm(payload);
-      let addedCount=submissionResult&&typeof submissionResult.added==='number'&&isFinite(submissionResult.added)
-        ?Math.max(0,Math.min(memberCount,submissionResult.added))
-        :memberCount;
-      let duplicateCount=submissionResult&&typeof submissionResult.duplicates==='number'&&isFinite(submissionResult.duplicates)
-        ?Math.max(0,submissionResult.duplicates)
-        :Math.max(0,memberCount-addedCount);
-      if(addedCount>0){
-        let notificationPayload=payload;
-        if(Array.isArray(submissionResult.addedMembers)){
-          notificationPayload=Object.assign({},payload,{team:JSON.stringify(submissionResult.addedMembers)});
-        }
-        notifyRequestAsync(payload.action,notificationPayload);
-      }
+      await submitAppsScriptForm(payload);
+      notifyRequestAsync(payload.action,payload);
       loadMyPasses(true,true);
       addMoreTeamList=[];
       renderAddTeamRoster();
       if(!keepAdding)closeAddMoreModal();
       else startAddMoreTimer();
       endPleaseWait();
-      alert(addMemberNotice(addedCount,duplicateCount));
+      alert(addMemberNotice(memberCount));
     }catch(e){
       endPleaseWait();
       console.error("[Add members] Submission failed.",e);
