@@ -55,13 +55,59 @@
     })();
     </script>
     <style>
-    #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>:not(h3):not(#admin-email-group):not(#req-country-facility-row):not(#req-office-request-fields):not(#btn-submit-req){display:none!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>:not(#request-form-heading-row):not(#req-type-group){display:none!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group{grid-column:1/-1;grid-row:auto;width:100%;margin-bottom:0}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected{grid-column:1/3;grid-row:1;grid-template-columns:minmax(0,1fr);align-content:center;gap:0;width:min(100%,640px);min-height:320px;justify-self:center;box-sizing:border-box;padding:34px clamp(24px,4vw,48px) 40px!important;overflow:hidden;border:1px solid rgba(255,199,0,.34)!important;background:radial-gradient(ellipse at 50% 0,rgba(255,199,0,.12),transparent 58%),linear-gradient(150deg,rgba(38,42,51,.98),rgba(17,21,30,.98))!important;box-shadow:0 24px 60px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.08)!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected::before{content:"";position:absolute;top:0;left:28%;right:28%;height:3px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,transparent,#ffc700,transparent);box-shadow:0 0 20px rgba(255,199,0,.45)}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#request-form-heading-row{grid-column:1/-1;display:flex;align-items:center;justify-content:center;position:relative;margin:0 0 24px!important;padding:0!important;border:0!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child>#request-form-heading-row{grid-column:1/-1;display:flex;align-items:center;justify-content:center;position:relative;width:100%;min-width:0}
+    #dashboard-ops #request-form-heading-row h3{margin:0!important;padding:0!important;border:0!important;text-align:center!important;font-size:clamp(20px,2.4vw,25px)!important;letter-spacing:.015em}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group{grid-column:1/-1;grid-row:auto;width:100%;max-width:440px;margin:0 auto}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group>label{margin-bottom:9px;color:#e3e7ef!important;font-size:12px!important;font-weight:750!important;letter-spacing:.08em;text-transform:uppercase}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group::after{content:attr(data-type-hint);display:block;margin-top:12px;color:#9da8ba;font-size:12px;line-height:1.5;text-align:center}
+    #dashboard-ops #req-type-group>#req-type{display:none!important}
+    #dashboard-ops #req-type-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;width:100%;margin-top:4px}
+    #dashboard-ops #req-type-actions .request-type-choice{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:112px;padding:18px 14px;border:1px solid transparent;border-radius:13px;color:#fff;font-size:16px;font-weight:800;letter-spacing:.025em;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
+    #dashboard-ops #req-type-actions .request-type-choice:hover{transform:translateY(-2px);filter:brightness(1.08)}
+    #dashboard-ops #req-type-actions .request-type-choice:focus-visible{outline:3px solid #fff;outline-offset:3px}
+    #dashboard-ops #req-type-actions .request-type-choice svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    #dashboard-ops #req-type-actions .request-type-choice-visitor{border-color:rgba(45,212,191,.48);background:linear-gradient(145deg,rgba(13,148,136,.34),rgba(15,118,110,.18));box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 22px rgba(13,148,136,.12);color:#99f6e4}
+    #dashboard-ops #req-type-actions .request-type-choice-contractor{border-color:rgba(129,140,248,.5);background:linear-gradient(145deg,rgba(79,70,229,.34),rgba(67,56,202,.18));box-shadow:inset 0 1px rgba(255,255,255,.1),0 8px 22px rgba(79,70,229,.14);color:#c7d2fe}
+    #dashboard-ops #request-form-card:not(.request-type-unselected) #req-type-actions{display:none}
+    #dashboard-ops #req-type-current{display:flex;align-items:center;gap:9px;min-height:42px;width:max-content;max-width:100%;padding:8px 13px;border:1px solid rgba(45,212,191,.42);border-radius:10px;background:linear-gradient(145deg,rgba(13,148,136,.2),rgba(15,118,110,.1));color:#99f6e4;font-size:12px;font-weight:800;letter-spacing:.025em;box-sizing:border-box}
+    #dashboard-ops #req-type-current.request-type-current-contractor{border-color:rgba(129,140,248,.48);background:linear-gradient(145deg,rgba(79,70,229,.22),rgba(67,56,202,.12));color:#c7d2fe}
+    #dashboard-ops #req-type-current.request-type-current-office{border-color:rgba(129,140,248,.48);background:linear-gradient(145deg,rgba(79,70,229,.22),rgba(67,56,202,.12));color:#c7d2fe}
+    #dashboard-ops #req-type-current svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group::after{margin-top:14px}
+    @media(min-width:1280px){#dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected{justify-self:start;margin-left:clamp(110px,10vw,150px)}}
+    #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>:not(#request-form-heading-row):not(#req-type-group):not(#admin-email-group):not(#req-country-facility-row):not(#req-office-request-fields):not(#btn-submit-req){display:none!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#req-type-group>label{margin-bottom:14px}
+    @media(max-width:480px){#dashboard-ops #req-type-actions{gap:9px}#dashboard-ops #req-type-actions .request-type-choice{min-height:94px;padding:14px 8px;font-size:14px}}
+    @media(max-width:1100px){#dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected{grid-column:1!important;grid-row:1!important;width:min(100%,560px)}}
+    @media(max-width:760px){#dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected{grid-column:1!important;grid-row:auto!important;width:100%;min-height:270px;padding:28px 22px 32px!important}#dashboard-ops .ops-grid>.ops-card:first-child.request-type-unselected>#request-form-heading-row{margin-bottom:20px!important}#dashboard-ops #request-form-heading-row h3{font-size:clamp(17px,5vw,22px)!important}#dashboard-ops #req-type-back{left:0;padding:6px 9px}}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-country-facility-row{grid-column:1/-1;grid-row:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-country-facility-row>#req-country{grid-column:1;grid-row:1}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-country-facility-row>#req-location-group{grid-column:2;grid-row:1}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-office-request-fields{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode{row-gap:14px}
-    #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>h3{display:block!important;visibility:visible!important;opacity:1!important;grid-column:1/-1;align-self:center;width:100%;margin:0!important;padding-bottom:10px;border-bottom:1px solid rgba(255,199,0,.25);text-align:center!important}
+    #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#request-form-heading-row{display:flex!important;visibility:visible!important;opacity:1!important;grid-column:1/-1;align-self:center;justify-content:center;width:100%;margin:0!important;padding-bottom:10px;border-bottom:1px solid rgba(255,199,0,.25)}
+    #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#request-form-heading-row h3{width:100%;text-align:center!important}
+    #dashboard-ops #req-type-back{position:absolute;left:0;top:50%;transform:translateY(-50%);width:auto;margin:0;padding:7px 12px;font-size:10px}
+    #dashboard-ops #request-form-heading-row:has(#req-type-back:not(.hidden)) h3{padding:0 72px!important;box-sizing:border-box}
+    #visitor-type-choice-modal{background:radial-gradient(ellipse at 50% 34%,rgba(24,34,48,.94),rgba(4,7,13,.99) 72%);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    #visitor-type-choice-modal .visitor-choice-card{position:relative;overflow:hidden;width:min(460px,100%);padding:30px 28px 26px;border:1px solid rgba(148,163,184,.24);border-radius:22px;background:radial-gradient(ellipse at 50% 0,rgba(255,199,0,.12),transparent 52%),linear-gradient(155deg,#202735,#10151f);box-shadow:0 32px 100px rgba(0,0,0,.75),inset 0 1px rgba(255,255,255,.09);text-align:center;animation:visitor-choice-enter .22s ease-out}
+    #visitor-type-choice-modal .visitor-choice-card::before{content:"";position:absolute;top:0;left:22%;right:22%;height:2px;background:linear-gradient(90deg,transparent,#ffc700,transparent);box-shadow:0 0 18px rgba(255,199,0,.45)}
+    #visitor-type-choice-modal .visitor-choice-icon{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 13px;border:1px solid rgba(45,212,191,.32);border-radius:17px;background:linear-gradient(145deg,rgba(13,148,136,.24),rgba(15,118,110,.1));color:#99f6e4}
+    #visitor-type-choice-modal .visitor-choice-icon svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    #visitor-type-choice-modal .visitor-choice-eyebrow{margin:0 0 8px;color:#ffd447;font-size:10px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
+    #visitor-type-choice-modal .visitor-choice-prompt{max-width:350px;margin:0 auto 22px;color:#f4f6fb;font-size:clamp(16px,4vw,19px);font-weight:750;line-height:1.45}
+    #visitor-type-choice-modal .visitor-choice-actions{display:grid;grid-template-columns:1fr;gap:11px}
+    #visitor-type-choice-modal .visitor-choice-actions button{width:100%;min-height:48px;margin:0;padding:12px 16px;border-radius:11px;font-size:11px;font-weight:850;letter-spacing:.045em;transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}
+    #visitor-type-choice-modal .visitor-choice-actions button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+    #visitor-type-choice-modal .visitor-choice-warehouse{border:1px solid rgba(45,212,191,.42);background:linear-gradient(135deg,#0f766e,#115e59);color:#e6fffb;box-shadow:0 8px 20px rgba(13,148,136,.2)}
+    #visitor-type-choice-modal .visitor-choice-office{border:1px solid rgba(129,140,248,.48);background:linear-gradient(135deg,rgba(79,70,229,.2),rgba(67,56,202,.08));color:#dbe4ff}
+    #visitor-type-choice-modal .visitor-choice-cancel{min-height:42px!important;border:1px solid rgba(148,163,184,.22);background:rgba(148,163,184,.07);color:#cbd5e1}
+    @keyframes visitor-choice-enter{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-office-request-fields{row-gap:12px;column-gap:16px}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-office-request-fields>.input-group{min-width:0;margin:0}
     #dashboard-ops .ops-grid>.ops-card:first-child.office-request-mode>#req-office-request-fields>.office-request-photo-row{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;min-width:0}
@@ -1041,7 +1087,8 @@
       #add-more-modal .record-modal-box{background:linear-gradient(145deg,rgba(49,51,57,.88),rgba(22,27,37,.9))!important;border:1px solid rgba(210,216,230,.48)!important;box-shadow:0 20px 55px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.16)!important;backdrop-filter:blur(18px)}
       #add-more-modal #add-team-entry-box{background:linear-gradient(145deg,rgba(49,51,57,.83),rgba(31,35,45,.88))!important;border:1px solid rgba(210,216,230,.38)!important;box-shadow:0 20px 55px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.14);backdrop-filter:blur(18px)}
       #dashboard-ops .ops-grid>.ops-card:first-child{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:12px;align-content:start;align-items:start;padding:18px 19px 20px}
-      #dashboard-ops .ops-grid>.ops-card:first-child>h3{grid-column:1/-1;margin-bottom:13px!important;font-size:18px!important;text-align:center!important}
+      #dashboard-ops .ops-grid>.ops-card:first-child>#request-form-heading-row{grid-column:1/-1;margin-bottom:13px!important}
+      #dashboard-ops #request-form-heading-row h3{font-size:18px!important;text-align:center!important}
       #dashboard-ops .ops-grid>.ops-card:first-child>.input-group,#dashboard-ops .ops-grid>.ops-card:first-child>#team-members-section,#dashboard-ops .ops-grid>.ops-card:first-child>#btn-submit-req{min-width:0;margin-bottom:8px}
       #dashboard-ops .ops-grid>.ops-card:first-child>#req-visitor-fields,#dashboard-ops .ops-grid>.ops-card:first-child>#req-contractor-fields{display:contents}
       #dashboard-ops .ops-grid>.ops-card:first-child>#req-type-group{grid-column:1}
@@ -1567,8 +1614,30 @@
     dict.ar.country_ksa="KSA (المملكة العربية السعودية)";
     dict.en.country_uae="UAE (United Arab Emirates)";
     dict.ar.country_uae="UAE (الإمارات العربية المتحدة)";
-    dict.en.slp_ticket="SLP Ticket No. (Optional)";
-    dict.ar.slp_ticket="رقم تذكرة SLP (اختياري)";
+    dict.en.slp_ticket="SLP Ticket No";
+    dict.ar.slp_ticket="رقم تذكرة SLP";
+    dict.en.type_select="Choose...";
+    dict.ar.type_select="اختر...";
+    dict.en.request_form_back="Back";
+    dict.ar.request_form_back="رجوع";
+    dict.en.request_form_type_hint="Choose a request type to get started";
+    dict.ar.request_form_type_hint="اختر نوع الطلب للبدء";
+    dict.en.visitor_type_prompt="Is this visitor coming to a warehouse or the office?";
+    dict.ar.visitor_type_prompt="هل هذا الزائر متجه إلى مستودع أم إلى المكتب؟";
+    dict.en.visitor_choice_eyebrow="Visitor destination";
+    dict.ar.visitor_choice_eyebrow="وجهة الزائر";
+    dict.en.visitor_as_warehouse="Visitor as Warehouse";
+    dict.ar.visitor_as_warehouse="زائر المستودع";
+    dict.en.visitor_as_office="Visitor as Office";
+    dict.ar.visitor_as_office="زائر المكتب";
+    dict.en.warehouse_type_label="Warehouse Visitor";
+    dict.ar.warehouse_type_label="زائر المستودع";
+    dict.en.warehouse_contractor_type_label="Warehouse Contractor";
+    dict.ar.warehouse_contractor_type_label="مقاول المستودع";
+    dict.en.office_visitor_type_label="Office Visitor";
+    dict.ar.office_visitor_type_label="زائر المكتب";
+    dict.en.visitor_type_cancel="Cancel";
+    dict.ar.visitor_type_cancel="إلغاء";
     dict.en.work_permit_ref="Work Permit Ref";
     dict.ar.work_permit_ref="مرجع تصريح العمل";
     dict.en.country_egy="EGY (Egypt)";
@@ -1623,6 +1692,8 @@
     function updateUI(){
       document.querySelectorAll('[data-i18n]').forEach(function(el){const k=el.getAttribute('data-i18n');const v=t(k);if(v)setTranslatedContent(el,v);});
       document.querySelectorAll('.t-ph').forEach(function(el){const k=el.getAttribute('data-i18n');const v=t(k);if(v)el.placeholder=v;});
+      const requestTypeGroup=document.getElementById('req-type-group');
+      if(requestTypeGroup)requestTypeGroup.setAttribute('data-type-hint',t('request_form_type_hint'));
       document.querySelectorAll('.scan-member-gate-button[data-member-key]').forEach(function(button){
         const status=button.dataset.gateStatus;
         button.textContent=t(status==='IN'?'gate_check_out':'gate_check_in');
@@ -5143,7 +5214,74 @@
         }
       });
       const requestCard=requestForm.querySelector('.ops-grid>.ops-card:first-child');
-      if(requestCard)requestCard.id='request-form-card';
+      if(requestCard){
+        requestCard.id='request-form-card';
+        requestCard.classList.add('request-type-unselected');
+        const requestHeading=requestCard.querySelector(':scope > h3');
+        if(requestHeading){
+          const headingRow=document.createElement('div');
+          headingRow.id='request-form-heading-row';
+          requestCard.insertBefore(headingRow,requestHeading);
+          headingRow.appendChild(requestHeading);
+        }
+      }
+      const requestTypeGroup=document.getElementById('req-type');
+      if(requestTypeGroup&&requestTypeGroup.parentElement)requestTypeGroup.parentElement.id='req-type-group';
+      if(requestTypeGroup&&requestTypeGroup.parentElement){
+        requestTypeGroup.parentElement.setAttribute('data-type-hint',t('request_form_type_hint'));
+        const typeActions=document.createElement('div');
+        typeActions.id='req-type-actions';
+        typeActions.setAttribute('role','group');
+        typeActions.setAttribute('aria-label',t('type'));
+        [
+          {
+            type:'Visitor',
+            label:'visitor',
+            className:'request-type-choice-visitor',
+            icon:'<path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 8v6m3-3h-6"></path>'
+          },
+          {
+            type:'Contractor',
+            label:'contractor',
+            className:'request-type-choice-contractor',
+            icon:'<path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"></path>'
+          }
+        ].forEach(function(choice){
+          const button=document.createElement('button');
+          button.type='button';
+          button.className='request-type-choice '+choice.className;
+          button.dataset.requestType=choice.type;
+          button.setAttribute('aria-controls','req-visitor-fields req-contractor-fields');
+          button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+choice.icon+'</svg><span data-i18n="'+choice.label+'">'+t(choice.label)+'</span>';
+          button.addEventListener('click',function(){
+            requestTypeGroup.value=choice.type;
+            requestTypeGroup.dispatchEvent(new Event('change',{bubbles:true}));
+          });
+          typeActions.appendChild(button);
+        });
+        requestTypeGroup.parentElement.appendChild(typeActions);
+        const currentType=document.createElement('div');
+        currentType.id='req-type-current';
+        currentType.className='hidden';
+        currentType.setAttribute('aria-live','polite');
+        currentType.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"></svg><span></span>';
+        requestTypeGroup.parentElement.appendChild(currentType);
+        const backButton=document.createElement('button');
+        backButton.id='req-type-back';
+        backButton.type='button';
+        backButton.className='btn-primary btn-outline request-form-back-button hidden';
+        backButton.setAttribute('data-i18n','request_form_back');
+        backButton.textContent=t('request_form_back');
+        const headingRow=document.getElementById('request-form-heading-row');
+        if(headingRow)headingRow.appendChild(backButton);
+        backButton.addEventListener('click',function(){
+          requestTypeGroup.value='';
+          requestTypeGroup.dataset.visitorDestination='';
+          country.select.value='';
+          updateRequestLocation();
+          requestTypeGroup.focus();
+        });
+      }
       const visitorContactInput=document.getElementById('req-vis-contact');
       const visitorInvitedByInput=document.getElementById('req-vis-invitedby');
       const visitorContactGroup=visitorContactInput&&visitorContactInput.closest('.input-group');
@@ -5157,7 +5295,7 @@
         ['EGY','country_egy']
       ];
       const facilitiesByCountry={
-        KSA:[['RUH01','RUH01'],['JED01','JED01'],['RUH01 OFFICE','RUH01 OFFICE']],
+        KSA:[['RUH01','RUH01'],['JED01','JED01']],
         UAE:[['AUH01','Kezad FC - AUH01']]
       };
       const country=createLoginSelectGroup('req-country','country_label','country_select',countries);
@@ -5260,7 +5398,8 @@
       const submitButton=document.getElementById('btn-submit-req');
       var officeModeIsActive=false;
       function updateOfficeRequestMode(){
-        const isOffice=country.select.value==='KSA'&&requestLocation.value==='RUH01 OFFICE';
+        const requestType=document.getElementById('req-type');
+        const isOffice=!!(requestType&&requestType.value==='Visitor'&&country.select.value==='KSA'&&requestLocation.value==='RUH01 OFFICE');
         if(isOffice&&!officeModeIsActive){
           var officeName=document.getElementById('req-office-name');
           var officeIdNumber=document.getElementById('req-office-id-number');
@@ -5272,6 +5411,7 @@
         officeModeIsActive=isOffice;
         if(requestCard)requestCard.classList.toggle('office-request-mode',isOffice);
         officeFields.classList.toggle('hidden',!isOffice);
+        requestLocationGroup.classList.toggle('hidden',isOffice||requestLocation.dataset.hasFacilities!=='true');
         if(!isOffice)clearOfficeRequestVehiclePicture();
         if(submitButton)submitButton.textContent=isOffice?t('office_submit_request'):t('submit_approval');
         toggleDateFields();
@@ -5310,7 +5450,110 @@
       country.select.addEventListener('change',updateRequestLocation);
       requestLocation.addEventListener('change',updateOfficeRequestMode);
       const requestType=document.getElementById('req-type');
-      if(requestType)requestType.addEventListener('change',toggleDateFields);
+      if(requestType){
+        var typePlaceholder=document.createElement('option');
+        typePlaceholder.value='';
+        typePlaceholder.setAttribute('data-i18n','type_select');
+        typePlaceholder.textContent=t('type_select');
+        typePlaceholder.selected=true;
+        requestType.insertBefore(typePlaceholder,requestType.firstChild);
+        requestType.value='';
+        requestType.required=false;
+        requestType.setAttribute('aria-required','false');
+        var visitorChoiceModal=document.createElement('div');
+        visitorChoiceModal.id='visitor-type-choice-modal';
+        visitorChoiceModal.className='popup-modal hidden';
+        visitorChoiceModal.setAttribute('role','dialog');
+        visitorChoiceModal.setAttribute('aria-modal','true');
+        visitorChoiceModal.setAttribute('aria-labelledby','visitor-type-prompt');
+        visitorChoiceModal.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:#070b12;';
+        var visitorChoiceBox=document.createElement('div');
+        visitorChoiceBox.className='visitor-choice-card';
+        var visitorChoiceIcon=document.createElement('div');
+        visitorChoiceIcon.className='visitor-choice-icon';
+        visitorChoiceIcon.setAttribute('aria-hidden','true');
+        visitorChoiceIcon.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"></path></svg>';
+        var visitorChoiceEyebrow=document.createElement('p');
+        visitorChoiceEyebrow.className='visitor-choice-eyebrow';
+        visitorChoiceEyebrow.setAttribute('data-i18n','visitor_choice_eyebrow');
+        visitorChoiceEyebrow.textContent=t('visitor_choice_eyebrow');
+        var visitorChoicePrompt=document.createElement('p');
+        visitorChoicePrompt.id='visitor-type-prompt';
+        visitorChoicePrompt.className='visitor-choice-prompt';
+        visitorChoicePrompt.setAttribute('data-i18n','visitor_type_prompt');
+        visitorChoicePrompt.textContent=t('visitor_type_prompt');
+        var visitorChoiceActions=document.createElement('div');
+        visitorChoiceActions.className='visitor-choice-actions';
+        var warehouseChoice=document.createElement('button');
+        warehouseChoice.type='button';
+        warehouseChoice.className='btn-primary visitor-choice-warehouse';
+        warehouseChoice.setAttribute('data-i18n','visitor_as_warehouse');
+        warehouseChoice.textContent=t('visitor_as_warehouse');
+        var officeChoice=document.createElement('button');
+        officeChoice.type='button';
+        officeChoice.className='btn-primary visitor-choice-office';
+        officeChoice.setAttribute('data-i18n','visitor_as_office');
+        officeChoice.textContent=t('visitor_as_office');
+        var cancelVisitorChoice=document.createElement('button');
+        cancelVisitorChoice.type='button';
+        cancelVisitorChoice.className='btn-primary visitor-choice-cancel';
+        cancelVisitorChoice.setAttribute('data-i18n','visitor_type_cancel');
+        cancelVisitorChoice.textContent=t('visitor_type_cancel');
+        visitorChoiceActions.append(warehouseChoice,officeChoice,cancelVisitorChoice);
+        visitorChoiceBox.append(visitorChoiceIcon,visitorChoiceEyebrow,visitorChoicePrompt,visitorChoiceActions);
+        visitorChoiceModal.appendChild(visitorChoiceBox);
+        document.body.appendChild(visitorChoiceModal);
+        function closeVisitorChoiceModal(){
+          visitorChoiceModal.classList.add('hidden');
+          document.body.style.overflow='';
+          requestType.focus();
+        }
+        warehouseChoice.addEventListener('click',function(){
+          requestType.value='Visitor';
+          requestType.dataset.visitorDestination='warehouse';
+          closeVisitorChoiceModal();
+          toggleDateFields();
+        });
+        officeChoice.addEventListener('click',function(){
+          requestType.value='Visitor';
+          requestType.dataset.visitorDestination='office';
+          country.select.value='KSA';
+          updateRequestLocation();
+          var officeFacilityOption=document.createElement('option');
+          officeFacilityOption.value='RUH01 OFFICE';
+          officeFacilityOption.textContent='RUH01 OFFICE';
+          officeFacilityOption.hidden=true;
+          requestLocation.appendChild(officeFacilityOption);
+          requestLocation.value='RUH01 OFFICE';
+          closeVisitorChoiceModal();
+          updateOfficeRequestMode();
+        });
+        cancelVisitorChoice.addEventListener('click',function(){
+          requestType.value='';
+          requestType.dataset.visitorDestination='';
+          closeVisitorChoiceModal();
+          updateOfficeRequestMode();
+          toggleDateFields();
+        });
+        requestType.addEventListener('change',function(){
+          if(requestType.value==='Visitor'){
+            requestType.dataset.visitorDestination='';
+            document.body.style.overflow='hidden';
+            visitorChoiceModal.classList.remove('hidden');
+            warehouseChoice.focus();
+            return;
+          }
+          if(requestType.value==='Contractor'){
+            requestType.dataset.visitorDestination='';
+            if(country.select.value==='KSA'&&requestLocation.value==='RUH01 OFFICE'){
+              country.select.value='';
+              updateRequestLocation();
+            }
+          }
+          if(!requestType.value)updateOfficeRequestMode();
+          toggleDateFields();
+        });
+      }
       toggleDateFields();
       updateRequestLocation();
     }
@@ -5727,7 +5970,61 @@
       location.reload();
     }
     function hardRefreshApp(){if(confirm("Reload the app with the latest data?")){window.location.reload();}}
-    function toggleDateFields(){const te=document.getElementById('req-type');if(!te)return;const type=te.value,vf=document.getElementById('req-visitor-fields'),cf=document.getElementById('req-contractor-fields'),tms=document.getElementById('team-members-section'),visitorTicket=document.getElementById('req-vis-slp-group'),contractorTicket=document.getElementById('req-con-slp-group'),country=document.getElementById('req-country'),facility=document.getElementById('req-location'),isOfficeFacility=!!(country&&country.value==='KSA'&&facility&&facility.value==='RUH01 OFFICE');if(vf)vf.classList.toggle('hidden',type==='Contractor');if(cf)cf.classList.toggle('hidden',type==='Visitor');if(visitorTicket)visitorTicket.classList.toggle('hidden',type!=='Visitor'||isOfficeFacility);if(contractorTicket)contractorTicket.classList.toggle('hidden',type!=='Contractor'||isOfficeFacility);if(tms)tms.classList.remove('hidden');}
+    function toggleDateFields(){
+      const te=document.getElementById('req-type');
+      if(!te)return;
+      const type=te.value;
+      const vf=document.getElementById('req-visitor-fields');
+      const cf=document.getElementById('req-contractor-fields');
+      const tms=document.getElementById('team-members-section');
+      const visitorTicket=document.getElementById('req-vis-slp-group');
+      const contractorTicket=document.getElementById('req-con-slp-group');
+      const visitorTicketInput=document.getElementById('req-vis-slp');
+      const contractorTicketInput=document.getElementById('req-con-slp');
+      const country=document.getElementById('req-country');
+      const facility=document.getElementById('req-location');
+      const requestCard=document.getElementById('request-form-card');
+      const backButton=document.getElementById('req-type-back');
+      const currentType=document.getElementById('req-type-current');
+      const currentTypeLabel=currentType&&currentType.querySelector('span');
+      const selectedTypeButton=document.querySelector('#req-type-actions [data-request-type="'+type+'"]');
+      const visitorDestination=te.dataset.visitorDestination||'';
+      const isOfficeFacility=!!(country&&country.value==='KSA'&&facility&&facility.value==='RUH01 OFFICE');
+      const visitorTicketRequired=type==='Visitor'&&!isOfficeFacility;
+      const contractorTicketRequired=type==='Contractor';
+      if(requestCard)requestCard.classList.toggle('request-type-unselected',!type);
+      if(backButton)backButton.classList.toggle('hidden',!type);
+      if(currentType){
+        currentType.classList.toggle('hidden',!type);
+        currentType.classList.toggle('request-type-current-contractor',type==='Contractor');
+        currentType.classList.toggle('request-type-current-office',type==='Visitor'&&visitorDestination==='office');
+        if(currentTypeLabel){
+          const label=type==='Contractor'
+            ?'warehouse_contractor_type_label'
+            :type==='Visitor'
+              ?(visitorDestination==='office'?'office_visitor_type_label':'warehouse_type_label')
+              :'';
+          if(label){
+            currentTypeLabel.setAttribute('data-i18n',label);
+            currentTypeLabel.textContent=t(label);
+          }
+        }
+        if(selectedTypeButton)currentType.querySelector('svg').innerHTML=selectedTypeButton.querySelector('svg').innerHTML;
+      }
+      if(vf)vf.classList.toggle('hidden',type!=='Visitor');
+      if(cf)cf.classList.toggle('hidden',type!=='Contractor');
+      if(visitorTicket)visitorTicket.classList.toggle('hidden',!visitorTicketRequired);
+      if(contractorTicket)contractorTicket.classList.toggle('hidden',!contractorTicketRequired);
+      if(visitorTicketInput){
+        visitorTicketInput.required=visitorTicketRequired;
+        visitorTicketInput.setAttribute('aria-required',String(visitorTicketRequired));
+      }
+      if(contractorTicketInput){
+        contractorTicketInput.required=contractorTicketRequired;
+        contractorTicketInput.setAttribute('aria-required',String(contractorTicketRequired));
+      }
+      if(tms)tms.classList.remove('hidden');
+    }
     function switchLoginTab(role){document.body.classList.toggle('blur-background',role!=='guard');document.querySelectorAll('.role-tab').forEach(function(t2){t2.classList.remove('active');});document.querySelectorAll('#login-guard, #login-ops, #login-admin').forEach(function(f){f.classList.add('hidden');});const te=document.getElementById('tab-'+role);if(te)te.classList.add('active');const le=document.getElementById('login-'+role);if(le)le.classList.remove('hidden');updateAdminPendingBadges(countPendingAccessRequests(globalAdminData),facilityAdminPendingCount);}
     function switchMainView(vId){
       if(vId==='guard'&&currentUser&&currentUser.role==='admin'&&currentUser.accessLevel==='facility')return;
@@ -6162,14 +6459,18 @@
     async function submitRequest(ka){
       var requestCountry=document.getElementById('req-country');
       var requestFacility=document.getElementById('req-location');
-      if(requestCountry&&requestFacility&&requestCountry.value==='KSA'&&requestFacility.value==='RUH01 OFFICE'){
+      var requestType=document.getElementById('req-type');
+      if(!requestType||!requestType.value)return alert('Please choose a type.');
+      if(requestType.value==='Visitor'&&requestCountry&&requestFacility&&requestCountry.value==='KSA'&&requestFacility.value==='RUH01 OFFICE'){
         return submitKsaOfficeRequest();
       }
       ka=!!ka;
-      const ti=document.getElementById('req-type');if(!ti)return;
+      const ti=requestType;
       if(teamList.length>10)return alert("Submit no more than 10 team members in one batch.");
       const type=ti.value,ii=document.getElementById('req-iqama'),si=document.getElementById('req-selfie'),imPho=document.getElementById('req-imeiphoto'),vi=document.getElementById('req-vehicle'),btn=document.getElementById('btn-submit-req');
       if(!btn)return;
+      const ticketInput=document.getElementById(type==='Visitor'?'req-vis-slp':'req-con-slp');
+      if((type==='Visitor'||type==='Contractor')&&(!ticketInput||!ticketInput.value.trim()))return alert("Please enter SLP Ticket No.");
       let iB64='',iMime='image/jpeg',sB64='',sMime='image/jpeg',imB64='',imMime='image/jpeg',vB64='',vMime='image/jpeg';
       let leadDevType=document.getElementById('req-lead-device-type').value;
       let leadDevId=document.getElementById('req-lead-device-id').value;
@@ -6248,7 +6549,6 @@
       document.getElementById('req-lead-device-type').value="None";toggleLeadDeviceInput();
       clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('vehicle');
       teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
-      const ticketInput=document.getElementById(type==='Visitor'?'req-vis-slp':'req-con-slp');
       const workPermitInput=document.getElementById('req-work-permit-ref');
       const payload={action:'create',UniqueID:tempId,requestId:tempId,hostName:hName,hostEmail:hMail,accountPin:accountPin,visitorName:vName,type:type,location:selectedLocation,startDate:startDateVal,endDate:endDateVal,iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,slpTicketNo:ticketInput?ticketInput.value.trim():'',workPermitRef:selectedCountry.value==='UAE'&&workPermitInput?workPermitInput.value.trim():'',contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''};
       if(ka){
