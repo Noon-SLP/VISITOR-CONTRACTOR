@@ -1372,7 +1372,11 @@
     function showRequestEmailFailure(result){
       if(result&&result.notificationSent===true)return;
       if(result&&result.notificationSent===false){
-        alert('Your request was saved, but the notification email could not be sent: '+String(result.notificationError||'No error details were returned.')+'\n\nPlease ask an administrator to authorize MailApp in Apps Script and deploy the latest backend version.');
+        var notificationError=String(result.notificationError||'No error details were returned.');
+        var nextStep=/Pass record was not found/i.test(notificationError)
+          ? '\n\nThe pass was saved, but the backend could not locate its record. Please give the pass number to an administrator to check the Apps Script execution log and deployment.'
+          : '\n\nPlease ask an administrator to authorize MailApp in Apps Script and deploy the latest backend version.';
+        alert('Your request was saved, but the notification email could not be sent: '+notificationError+nextStep);
         return;
       }
     }
