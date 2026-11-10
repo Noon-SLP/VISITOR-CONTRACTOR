@@ -6538,7 +6538,7 @@
         button.textContent=t('office_submit_request');
       }
     }
-    async function submitRequest(ka){
+    async function waitForCreatedPass(requestId){var deadline=Date.now()+60000,pollDelay=500,operationResult=null;while(Date.now()<deadline){operationResult=await appsScriptJsonp({action:'get_operation_result',requestId:requestId},null,10000);if(operationResult)break;await new Promise(function(resolve){setTimeout(resolve,pollDelay);});pollDelay=Math.min(pollDelay*2,3000);}if(!operationResult)throw new Error('The server did not confirm the saved pass. Refresh My Passes before trying again.');if(operationResult.status!=='success')throw new Error(operationResult.message||'The request could not be saved.');return operationResult;}async function submitRequest(ka){
       var requestCountry=document.getElementById('req-country');
       var requestFacility=document.getElementById('req-location');
       var requestType=document.getElementById('req-type');
@@ -6640,7 +6640,7 @@
           await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});
           notifyRequestAsync(payload.action,payload);
           loadMyPasses(true,true);
-          openAddMoreModal(tempId);
+          await waitForCreatedPass(tempId);await loadMyPasses(true,false);openAddMoreModal(tempId);
         }catch(e){
           console.error(e);
           existingPasses.pop();localStorage.setItem(cachedKey,JSON.stringify(existingPasses));renderMyPasses(existingPasses);
@@ -6651,7 +6651,7 @@
       }else{
         btn.innerText="SUBMITTING...";btn.disabled=true;
         beginPleaseWait('PLEASE WAIT...');
-        try{await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});notifyRequestAsync(payload.action,payload);loadMyPasses(true,true);}
+        try{await fetch(freshScriptUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),mode:'no-cors'});await waitForCreatedPass(tempId);await loadMyPasses(true,false);}
         catch(e){existingPasses.pop();localStorage.setItem(cachedKey,JSON.stringify(existingPasses));renderMyPasses(existingPasses);endPleaseWait();alert("Upload failed. Error: "+e.message);}
         finally{endPleaseWait();btn.innerText=t("submit_approval");btn.disabled=false;startAutoRefresh(currentUser.role);}
       }
