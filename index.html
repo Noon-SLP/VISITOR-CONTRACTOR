@@ -6621,7 +6621,7 @@
         accountPin=userSecurityPin||localPin;
       }
       const tempId='NOON-'+Math.floor(100000+Math.random()*900000);
-      let tempPass={UniqueID:tempId,VisitorName:vName,Type:type,Location:selectedLocation,StartDate:startDateVal,EndDate:endDateVal,Status:'Pending',HostEmail:hMail};
+      let tempPass={UniqueID:tempId,VisitorName:vName,type:type,location:selectedLocation,startDate:startDateVal,EndDate:endDateVal,Status:'Pending',HostEmail:hMail};
       if(autoRefreshTimer)clearInterval(autoRefreshTimer);
       existingPasses.push(tempPass);localStorage.setItem(cachedKey,JSON.stringify(existingPasses));renderMyPasses(existingPasses);
       if(currentUser.role==='admin'&&vni)vni.value="";
@@ -6632,7 +6632,7 @@
       clearCapturedData('iqama');clearCapturedData('selfie');clearCapturedData('imeiphoto');clearCapturedData('vehicle');
       teamList=[];currentTeamCounter=1;renderTeamRoster();hideTeamEntry();
       const workPermitInput=document.getElementById('req-work-permit-ref');
-      const payload={action:'create',UniqueID:tempId,requestId:tempId,hostName:hName,hostEmail:hMail,accountPin:accountPin,visitorName:vName,type:type,location:selectedLocation,startDate:startDateVal,endDate:endDateVal,iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,slpTicketNo:ticketInput?ticketInput.value.trim():'',workPermitRef:selectedCountry.value==='UAE'&&workPermitInput?workPermitInput.value.trim():'',contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''};
+      const payload={action:'create',UniqueID:tempId,requestId:tempId,hostName:hName,hostEmail:hMail,accountPin:accountPin,visitorName:vName,type:type,location:selectedLocation,country:selectedCountry.value,facility:countryHasFacilities?selectedFacility.value:'',startDate:startDateVal,endDate:endDateVal,iqamaBase64:iB64,iqamaMimeType:iMime,selfieBase64:sB64,selfieMimeType:sMime,imeiNumber:leadImeiVal,imeiPhotoBase64:imB64,fmPoc:fmPocVal,vehicleBase64:vB64,vehicleMimeType:vMime,vehiclePlateNo:'',team:cleanTeam,slpTicketNo:ticketInput?ticketInput.value.trim():'',workPermitRef:selectedCountry.value==='UAE'&&workPermitInput?workPermitInput.value.trim():'',contactNo:type==='Visitor'?document.getElementById('req-vis-contact').value:document.getElementById('req-con-contact').value,invitedBy:type==='Visitor'?document.getElementById('req-vis-invitedby').value:'',projectName:type==='Contractor'?document.getElementById('req-con-project').value:'',companyName:type==='Contractor'?document.getElementById('req-con-company').value:'',projectManager:type==='Contractor'?document.getElementById('req-con-pm').value:''};
       if(ka){
         btn.innerText="SUBMITTING...";btn.disabled=true;
         beginPleaseWait('PLEASE WAIT...');
