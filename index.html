@@ -1380,7 +1380,7 @@
         return;
       }
     }
-    function notifyRequestAsync(action,params){
+    function notifyRequestAsync(action,params){if(action==='create')return;
       var requestActions=['create','add_team_members','request_lead_device_add','request_member_device_add','request_revoke_device','request_lead_revoke_device','request_remove_member','request_lead_remove_member'];
       if(requestActions.indexOf(action)===-1)return;
       var notificationParams={
